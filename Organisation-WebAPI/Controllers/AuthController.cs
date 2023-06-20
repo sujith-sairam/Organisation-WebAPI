@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Organisation_WebAPI.DTO;
 using Organisation_WebAPI.Models;
-using Organisation_WebAPI.Repository.AuthRepo;
+using Organisation_WebAPI.Services.AuthRepo;
 
 namespace Organisation_WebAPI.Controllers
 {
@@ -20,7 +19,7 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<int>>> Register(AdminRegisterDto request)
         {
             var response = await _authRepository.Register(
-                new Admin { UserName = request.UserName }, request.Password
+                new Admin { UserName = request.UserName }, request.Password, request.Email
                 );
             if (!response.Success)
             {

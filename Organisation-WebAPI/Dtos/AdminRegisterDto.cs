@@ -1,4 +1,4 @@
-﻿namespace Organisation_WebAPI.DTO
+﻿namespace Organisation_WebAPI.Dtos
 {
     public class AdminRegisterDto
     {

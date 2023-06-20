@@ -2,12 +2,12 @@
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Models;
 
-namespace Organisation_WebAPI.Repository.AuthRepo
+namespace Organisation_WebAPI.Services.AuthRepo
 {
     public class AuthRepository : IAuthRepository
     {
-        private readonly ApplicationDbContext _dbContext;
-        public AuthRepository(ApplicationDbContext dbContext)
+        private readonly OrganizationContext _dbContext;
+        public AuthRepository(OrganizationContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -16,7 +16,7 @@ namespace Organisation_WebAPI.Repository.AuthRepo
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResponse<int>> Register(Admin user, string password)
+        public async Task<ServiceResponse<int>> Register(Admin user, string password, string email)
         {
             ServiceResponse<int> response = new ServiceResponse<int>();
             if (await UserExists(user.UserName))
@@ -30,6 +30,7 @@ namespace Organisation_WebAPI.Repository.AuthRepo
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.Email = email;
 
             _dbContext.Admins.Add(user);
             await _dbContext.SaveChangesAsync();
