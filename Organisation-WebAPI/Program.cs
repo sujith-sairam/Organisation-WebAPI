@@ -2,6 +2,7 @@ global using Organisation_WebAPI.Dtos;
 global using Organisation_WebAPI.Models;
 global using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using EmailService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -22,9 +23,17 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddScoped<IAuthRepository,AuthRepository>();
 builder.Services.AddScoped<IProductService,ProductService>();
-builder.Services.AddScoped<IDepartmentService,DepartmentService>();
+builder.Services.AddScoped<IDepartmentService,DepartmentService>(); 
 builder.Services.AddScoped<IEmployeeService,EmployeeService>();
 builder.Services.AddScoped<ICustomerService,CustomerService>();
+
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+var emailConfig = builder.Configuration
+        .GetSection("EmailConfiguration")
+        .Get<EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,6 +73,9 @@ builder.Services.AddSwaggerGen(c=>
 });
 
 #endregion
+
+
+builder.Services.AddMemoryCache();
 
 
 var app = builder.Build();
