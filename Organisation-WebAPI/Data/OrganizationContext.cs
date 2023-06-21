@@ -21,5 +21,6 @@ namespace Organisation_WebAPI.Data
         public DbSet<Customer> Customers => Set<Customer>();
 
         public DbSet<Department> Departments => Set<Department>();
+        public DbSet<Admin> Admins => Set<Admin>(); 
     }
 }

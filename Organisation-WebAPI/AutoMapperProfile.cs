@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Dtos.ProductDto;
 using Organisation_WebAPI.Dtos.CustomerDto;
 using Organisation_WebAPI.Dtos.DepartmentDto;
@@ -31,6 +32,7 @@ namespace Organisation_WebAPI
             CreateMap<UpdateEmployeeDto,Employee>();
 
 
+            CreateMap<Admin, AdminRegisterDto>();
         }
 
         
