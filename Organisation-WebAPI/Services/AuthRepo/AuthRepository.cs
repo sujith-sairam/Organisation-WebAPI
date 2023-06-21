@@ -1,12 +1,14 @@
 ﻿using Azure;
 using EmailService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 
 namespace Organisation_WebAPI.Services.AuthRepo
@@ -18,13 +20,17 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly Dictionary<string, string> _otpDictionary;
         private readonly Dictionary<string, RegistrationData> _registeredUsers;
         private readonly IConfiguration _configuration;
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IEmailSender emailSender)
+        private readonly IMemoryCache _memoryCache;
+
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IEmailSender emailSender, IMemoryCache memoryCache)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
             _otpDictionary = new Dictionary<string, string>();
             _registeredUsers = new Dictionary<string, RegistrationData>();
             _configuration = configuration;
+            _memoryCache = memoryCache;
+
 
         }
 
@@ -62,30 +68,20 @@ namespace Organisation_WebAPI.Services.AuthRepo
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
 
-            _otpDictionary.TryGetValue(email, out var existingOtp);
-            _otpDictionary[email] = otp;
 
-            _registeredUsers[email] = new RegistrationData() { 
+            RegistrationData registrationData = new RegistrationData
+            {
                 User = user,
-                Password = password,
+                Password = password
             };
 
-            if (_otpDictionary.TryGetValue(email, out var storedOtp))
-            {
-                Console.WriteLine($"_otpDictionary: {email} - {_otpDictionary[email]}");
-            }
+            _memoryCache.Set("OTP", otp);
+
+            _memoryCache.Set(email, registrationData);
+
 
             var message = new Message(new string[] { email }, $"Test email", $"This is your OTP : {otp}");
             _emailSender.SendEmail(message);
-
-            //CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            //user.PasswordHash = passwordHash;
-            //user.PasswordSalt = passwordSalt;
-            //user.Email = email;
-
-            //_dbContext.Admins.Add(user);
-            //await _dbContext.SaveChangesAsync();
 
             response.Data = "Please check your email for OTP.";
             return response;
@@ -93,25 +89,23 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> Verify(string email, string otp)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
-            //Console.WriteLine($"verify page _otpDictionary: {email} - {_otpDictionary[email]}");
-            foreach (var value in _otpDictionary.Values)
+
+            if (!_memoryCache.TryGetValue("OTP", out var storedOtp))
             {
-                Console.WriteLine(value);
-            }
-
-
-            if (!_otpDictionary.TryGetValue(email, out var storedOtp))
-            {
-                Console.WriteLine($"_otpDictionary: {email} - {_otpDictionary[email]}");
-
+                // OTP not found, handle accordingly
                 response.Success = false;
                 response.Message = "Invalid email or OTP expired.";
                 return response;
             }
+            else { 
+                Console.WriteLine($"OTP for {email}: {storedOtp} -   {otp}");
+            
+            }
 
-            if (otp == storedOtp)
+
+            if (otp == storedOtp.ToString())
             {
-                if (_registeredUsers.TryGetValue(email, out var registrationData))
+                if (_memoryCache.TryGetValue(email, out RegistrationData registrationData))
                 {
                     // Perform any required verification checks on the user data and password
                     // ...
@@ -122,9 +116,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     _dbContext.Admins.Add(registrationData.User);
                     await _dbContext.SaveChangesAsync();
 
-                    // Remove the user, OTP, and registration data from dictionaries
-                    _registeredUsers.Remove(email);
-                    _otpDictionary.Remove(email);
+                    _memoryCache.Remove(email);
+                    _memoryCache.Remove("OTP");
 
                     response.Success = true;
                     response.Message = "OTP verification successful.";
@@ -133,7 +126,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 else
                 {
                     response.Success = false;
-                    response.Message = "Failed to retrieve registration data";
+                    response.Message = "Incorrect Email, Please try again later";
 
                 }
 
@@ -145,11 +138,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
 
             return response;
-
-
-
         }
-       
 
         public async Task<bool> UserExists(string username)
         {
@@ -159,9 +148,29 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             return false;
         }
+        public async Task<ServiceResponse<string>> ForgotPassword(string email)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            if (!await EmailExists(email))
+            {
+                response.Success = false;
+                response.Message = "Invalid Email";
+                return response;
+            }
 
-       
+            return response;
 
+        }
+
+        public async Task<bool> EmailExists(string email)
+        {
+            if (await _dbContext.Admins.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            {
+                return true;
+            }
+            return false;
+        }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
@@ -212,5 +221,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             return tokenHandler.WriteToken(token);
         }
+
+        
     }
 }
