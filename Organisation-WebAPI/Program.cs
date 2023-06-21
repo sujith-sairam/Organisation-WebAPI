@@ -38,10 +38,11 @@ builder.Services.AddSingleton(emailConfig);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddMemoryCache();
 
 #region Configure Authentication
 
- 
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -75,7 +76,6 @@ builder.Services.AddSwaggerGen(c=>
 #endregion
 
 
-builder.Services.AddMemoryCache();
 
 
 var app = builder.Build();
