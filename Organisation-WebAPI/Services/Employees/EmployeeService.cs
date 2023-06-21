@@ -61,6 +61,23 @@ namespace Organisation_WebAPI.Services.Employees
             return serviceResponse;
         }
 
+         public async Task<ServiceResponse<GetEmployeeDto>> GetEmployeeById(int id)
+        {
+            
+            var serviceResponse = new ServiceResponse<GetEmployeeDto>();
+            var dbEmployee =  await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == id);
+            serviceResponse.Data = _mapper.Map<GetEmployeeDto>(dbEmployee);
+            return serviceResponse;
+        }
+
+        public Task<ServiceResponse<int>> GetEmployeeCount()
+        {
+            var serviceResponse = new ServiceResponse<int>();
+            var count =  _context.Employees.Count();
+            serviceResponse.Data = count;
+            return Task.FromResult(serviceResponse);
+        }
+
         public async Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
         {
             var serviceResponse = new ServiceResponse<GetEmployeeDto>();
