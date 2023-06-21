@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Services.AuthRepo;
+using Organisation_WebAPI.Services.Customers;
+using Organisation_WebAPI.Services.Departments;
+using Organisation_WebAPI.Services.Employees;
 using Organisation_WebAPI.Services.Products;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -15,10 +18,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<OrganizationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+
+builder.Services.AddScoped<IAuthRepository,AuthRepository>();
 builder.Services.AddScoped<IProductService,ProductService>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IDepartmentService,DepartmentService>();
+builder.Services.AddScoped<IEmployeeService,EmployeeService>();
+builder.Services.AddScoped<ICustomerService,CustomerService>();
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
 
 #region Configure Authentication
+
+ 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -32,12 +46,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
         };
     });
-
 #endregion
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 
 #region Configure Swagger
 

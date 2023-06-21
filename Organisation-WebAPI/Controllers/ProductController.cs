@@ -20,10 +20,26 @@ namespace Organisation_WebAPI.Controllers
             _productService = productService;
         }
 
-        [HttpGet("GetAll")]
-          public async Task<ActionResult<ServiceResponse<GetProductDto>>> Get()
+        [HttpGet("GetAllProducts")]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
+        }
+
+        [HttpPost("CreateProduct")]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
+        {
+            return Ok(await _productService.AddProduct(newProduct));
+        }
+
+        [HttpPut("UpdateProduct")]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> UpdateProduct(UpdateProductDto updatedProduct,int id){
+            return Ok(await _productService.UpdateProduct(updatedProduct,id));
+        }
+        
+        [HttpDelete("DeleteProduct")]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> DeleteProduct(int id){
+            return Ok(await _productService.DeleteProduct(id));
         }
     }
 }
