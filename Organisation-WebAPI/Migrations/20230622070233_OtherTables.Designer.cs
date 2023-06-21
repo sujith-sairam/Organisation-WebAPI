@@ -11,8 +11,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230621052856_admintable")]
-    partial class admintable
+    [Migration("20230622070233_OtherTables")]
+    partial class OtherTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
