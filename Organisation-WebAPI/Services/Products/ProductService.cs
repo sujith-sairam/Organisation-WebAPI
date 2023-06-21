@@ -61,7 +61,15 @@ namespace Organisation_WebAPI.Services.Products
             return serviceResponse;
         }
 
-       
+        public async Task<ServiceResponse<GetProductDto>> GetProductById(int id)
+        {
+            
+            var serviceResponse = new ServiceResponse<GetProductDto>();
+            var dbProduct =  await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
+            serviceResponse.Data = _mapper.Map<GetProductDto>(dbProduct);
+            return serviceResponse;
+        }
+
         public async Task<ServiceResponse<GetProductDto>> UpdateProduct(UpdateProductDto updateProduct,int id)
         {
             var serviceResponse = new ServiceResponse<GetProductDto>();

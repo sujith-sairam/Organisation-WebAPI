@@ -61,6 +61,14 @@ namespace Organisation_WebAPI.Services.Departments
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<GetDepartmentDto>> GetDepartmentById(int id)
+        {
+            
+            var serviceResponse = new ServiceResponse<GetDepartmentDto>();
+            var dbDepartment =  await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
+            serviceResponse.Data = _mapper.Map<GetDepartmentDto>(dbDepartment);
+            return serviceResponse;
+        }
         public async Task<ServiceResponse<GetDepartmentDto>> UpdateDepartment(UpdateDepartmentDto updatedDepartment, int id)
         {
               var serviceResponse = new ServiceResponse<GetDepartmentDto>();

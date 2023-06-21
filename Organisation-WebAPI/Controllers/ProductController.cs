@@ -26,6 +26,13 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _productService.GetAllProducts());
         }
 
+        
+        [HttpGet("GetProductById")]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProduct(int id)
+        {
+            return Ok(await _productService.GetProductById(id));
+        }
+
         [HttpPost("CreateProduct")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {
