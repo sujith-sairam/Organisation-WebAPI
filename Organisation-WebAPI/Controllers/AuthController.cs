@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using organisation_webapi.dtos.admin;
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Models;
 using Organisation_WebAPI.Services.AuthRepo;

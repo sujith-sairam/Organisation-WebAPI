@@ -1,4 +1,4 @@
- global using Organisation_WebAPI.Dtos;
+global using Organisation_WebAPI.Dtos;
 global using Organisation_WebAPI.Models;
 global using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
