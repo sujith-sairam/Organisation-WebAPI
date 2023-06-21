@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure;
+using EmailService;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
@@ -6,18 +8,28 @@ using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
+
 namespace Organisation_WebAPI.Services.AuthRepo
 {
     public class AuthRepository : IAuthRepository
     {
         private readonly OrganizationContext _dbContext;
+        private readonly IEmailSender _emailSender;
+        private readonly Dictionary<string, string> _otpDictionary;
+        private readonly Dictionary<string, RegistrationData> _registeredUsers;
         private readonly IConfiguration _configuration;
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IEmailSender emailSender)
         {
             _dbContext = dbContext;
-            _configuration = configuration; 
+            _emailSender = emailSender;
+            _otpDictionary = new Dictionary<string, string>();
+            _registeredUsers = new Dictionary<string, RegistrationData>();
+            _configuration = configuration;
+
+
 
         }
+
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
@@ -40,28 +52,106 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return response;
         }
 
-        public async Task<ServiceResponse<int>> Register(Admin user, string password, string email)
+        public async Task<ServiceResponse<string>> Register(Admin user, string password, string email)
         {
-            ServiceResponse<int> response = new ServiceResponse<int>();
+            ServiceResponse<string> response = new ServiceResponse<string>();
             if (await UserExists(user.UserName))
             {
                 response.Success = false;
                 response.Message = "User already exists";
                 return response;
             }
+            OtpGenerator otpGenerator = new OtpGenerator();
+            string otp = otpGenerator.GenerateOtp();
 
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            _otpDictionary.TryGetValue(email, out var existingOtp);
+            _otpDictionary[email] = otp;
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            user.Email = email;
+            _registeredUsers[email] = new RegistrationData() { 
+                User = user,
+                Password = password,
+            };
 
-            _dbContext.Admins.Add(user);
-            await _dbContext.SaveChangesAsync();
+            if (_otpDictionary.TryGetValue(email, out var storedOtp))
+            {
+                Console.WriteLine($"_otpDictionary: {email} - {_otpDictionary[email]}");
+            }
 
-            response.Data = user.Id;
+            var message = new Message(new string[] { email }, $"Test email", $"This is your OTP : {otp}");
+            _emailSender.SendEmail(message);
+
+            //CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            //user.PasswordHash = passwordHash;
+            //user.PasswordSalt = passwordSalt;
+            //user.Email = email;
+
+            //_dbContext.Admins.Add(user);
+            //await _dbContext.SaveChangesAsync();
+
+            response.Data = "Please check your email for OTP.";
             return response;
         }
+        public async Task<ServiceResponse<string>> Verify(string email, string otp)
+        {
+            ServiceResponse<string> response = new ServiceResponse<string>();
+            //Console.WriteLine($"verify page _otpDictionary: {email} - {_otpDictionary[email]}");
+            foreach (var value in _otpDictionary.Values)
+            {
+                Console.WriteLine(value);
+            }
+
+
+            if (!_otpDictionary.TryGetValue(email, out var storedOtp))
+            {
+                Console.WriteLine($"_otpDictionary: {email} - {_otpDictionary[email]}");
+
+                response.Success = false;
+                response.Message = "Invalid email or OTP expired.";
+                return response;
+            }
+
+            if (otp == storedOtp)
+            {
+                if (_registeredUsers.TryGetValue(email, out var registrationData))
+                {
+                    // Perform any required verification checks on the user data and password
+                    // ...
+                    CreatePasswordHash(registrationData.Password, out byte[] passwordHash, out byte[] passwordSalt);
+                    registrationData.User.PasswordHash = passwordHash;
+                    registrationData.User.PasswordSalt = passwordSalt;
+                    registrationData.User.Email = email;
+                    _dbContext.Admins.Add(registrationData.User);
+                    await _dbContext.SaveChangesAsync();
+
+                    // Remove the user, OTP, and registration data from dictionaries
+                    _registeredUsers.Remove(email);
+                    _otpDictionary.Remove(email);
+
+                    response.Success = true;
+                    response.Message = "OTP verification successful.";
+                    return response;
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Failed to retrieve registration data";
+
+                }
+
+            }
+            else {
+                response.Success = false;
+                response.Message = "Invalid OTP , Please try again";
+
+            }
+
+            return response;
+
+
+
+        }
+       
 
         public async Task<bool> UserExists(string username)
         {
@@ -72,6 +162,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return false;
         }
 
+       
+
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
@@ -79,6 +171,13 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
+        }
+
+
+        private class RegistrationData
+        {
+            public Admin User { get; set; }
+            public string Password { get; set; }
         }
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
@@ -89,6 +188,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return computeHash.SequenceEqual(passwordHash);
             }
         }
+
 
         private string CreateToken(Admin admin)
         {
