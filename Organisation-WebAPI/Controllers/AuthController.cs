@@ -4,6 +4,7 @@ using organisation_webapi.dtos.admin;
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Models;
 using Organisation_WebAPI.Services.AuthRepo;
+using static System.Net.WebRequestMethods;
 
 namespace Organisation_WebAPI.Controllers
 {
@@ -53,6 +54,17 @@ namespace Organisation_WebAPI.Controllers
             }
             return Ok(response);
 
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult<ServiceResponse<string>>> ForgotPassword(string email)
+        {
+            var response = await _authRepository.ForgotPassword(email);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
     }

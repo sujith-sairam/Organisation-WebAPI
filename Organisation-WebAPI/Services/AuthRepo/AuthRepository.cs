@@ -137,11 +137,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
 
             return response;
-
-
-
         }
-       
 
         public async Task<bool> UserExists(string username)
         {
@@ -151,9 +147,29 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             return false;
         }
+        public async Task<ServiceResponse<string>> ForgotPassword(string email)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            if (!await EmailExists(email))
+            {
+                response.Success = false;
+                response.Message = "Invalid Email";
+                return response;
+            }
 
-       
+            return response;
 
+        }
+
+        public async Task<bool> EmailExists(string email)
+        {
+            if (await _dbContext.Admins.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            {
+                return true;
+            }
+            return false;
+        }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
@@ -204,5 +220,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             return tokenHandler.WriteToken(token);
         }
+
+        
     }
 }
