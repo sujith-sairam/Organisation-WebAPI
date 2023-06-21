@@ -69,6 +69,14 @@ namespace Organisation_WebAPI.Services.Customers
             return serviceResponse;
         }
 
+        public Task<ServiceResponse<int>> GetCustomerCount()
+        {
+           var serviceResponse = new ServiceResponse<int>();
+            var count =  _context.Customers.Count();
+            serviceResponse.Data = count;
+            return Task.FromResult(serviceResponse);
+        }
+
         public async Task<ServiceResponse<GetCustomerDto>> UpdateCustomer(UpdateCustomerDto updatedCustomer, int id)
         {
              var serviceResponse = new ServiceResponse<GetCustomerDto>();

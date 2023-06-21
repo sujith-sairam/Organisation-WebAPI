@@ -70,6 +70,33 @@ namespace Organisation_WebAPI.Services.Products
             return serviceResponse;
         }
 
+        public Task<ServiceResponse<int>> GetProductCount()
+        {
+            var serviceResponse = new ServiceResponse<int>();
+            var count =  _context.Products.Count();
+            serviceResponse.Data = count;
+            return Task.FromResult(serviceResponse);
+        }
+
+        public async Task<ServiceResponse<Dictionary<string,int>>> GetRevenue(){
+
+                var serviceResponse = new ServiceResponse<Dictionary<string,int>>();
+                var revenueDictionary = new Dictionary<string, int>();
+
+                // Query the database to retrieve the products and their revenues
+                var products = await _context.Products.ToListAsync();
+
+                // Iterate over the products and add the name and revenue to the dictionary
+                foreach (var product in products)
+                {
+                    revenueDictionary.Add(product.ProductName!, product.ProductRevenue);
+                }
+
+                serviceResponse.Data = revenueDictionary;
+                return serviceResponse;
+
+        }
+
         public async Task<ServiceResponse<GetProductDto>> UpdateProduct(UpdateProductDto updateProduct,int id)
         {
             var serviceResponse = new ServiceResponse<GetProductDto>();
@@ -97,6 +124,8 @@ namespace Organisation_WebAPI.Services.Products
             
             return serviceResponse;
         }
+
+        
     }
 
 }

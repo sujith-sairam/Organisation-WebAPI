@@ -31,6 +31,13 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _departmentService.GetDepartmentById(id));
         }
 
+        [HttpGet("GetDepartmentCount")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetDepartmentCount()
+        {
+            var serviceResponse = await _departmentService.GetDepartmentCount();
+            return Ok(serviceResponse);
+        }
+
         [HttpPost("CreateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> AddProduct(AddDepartmentDto newDepartment)
         {

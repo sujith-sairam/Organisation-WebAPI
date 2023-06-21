@@ -33,6 +33,21 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _productService.GetProductById(id));
         }
 
+       [HttpGet("GetProductCount")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetProductCount()
+        {
+            var serviceResponse = await _productService.GetProductCount();
+            return Ok(serviceResponse);
+        }
+
+        [HttpGet("GetProductRevenue")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
+        {
+            var serviceResponse = await _productService.GetRevenue();
+            return Ok(serviceResponse);
+        }
+
+
         [HttpPost("CreateProduct")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {

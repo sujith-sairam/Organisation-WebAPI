@@ -25,7 +25,13 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeService.GetAllEmployees());
         }
 
-         
+        [HttpGet("GetEmployeeCount")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
+        {
+            var serviceResponse = await _employeeService.GetEmployeeCount();
+            return Ok(serviceResponse);
+        }
+
         [HttpGet("GetEmployeeById")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
         {

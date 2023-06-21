@@ -10,6 +10,8 @@ namespace Organisation_WebAPI.Services.Products
     {
         Task<ServiceResponse<List<GetProductDto>>> GetAllProducts();
         Task<ServiceResponse<GetProductDto>> GetProductById(int id);
+        Task<ServiceResponse<int>> GetProductCount();
+        Task<ServiceResponse<Dictionary<string,int>>> GetRevenue();
         Task<ServiceResponse<List<GetProductDto>>> AddProduct(AddProductDto newProduct);
         Task<ServiceResponse<GetProductDto>> UpdateProduct(UpdateProductDto product,int id);
         Task<ServiceResponse<List<GetProductDto>>> DeleteProduct(int id);

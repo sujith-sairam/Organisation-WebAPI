@@ -30,6 +30,13 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _customerService.GetCustomerById(id));
         }
 
+        [HttpGet("GetCustomerCount")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetCustomerCount()
+        {
+            var serviceResponse = await _customerService.GetCustomerCount();
+            return Ok(serviceResponse);
+        }
+
         [HttpPost("CreateCustomer")]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> AddCustomer(AddCustomerDto newCustomer)
         {

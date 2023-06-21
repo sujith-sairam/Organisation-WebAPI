@@ -10,6 +10,7 @@ namespace Organisation_WebAPI.Services.Customers
     {
         Task<ServiceResponse<List<GetCustomerDto>>> GetAllCustomers();
         Task<ServiceResponse<GetCustomerDto>> GetCustomerById(int id);
+        Task<ServiceResponse<int>> GetCustomerCount();
         Task<ServiceResponse<List<GetCustomerDto>>> AddCustomer(AddCustomerDto customer);
         Task<ServiceResponse<GetCustomerDto>> UpdateCustomer(UpdateCustomerDto customer,int id);
         Task<ServiceResponse<List<GetCustomerDto>>> DeleteCustomer(int id);

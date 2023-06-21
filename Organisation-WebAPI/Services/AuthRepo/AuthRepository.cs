@@ -26,8 +26,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             _registeredUsers = new Dictionary<string, RegistrationData>();
             _configuration = configuration;
 
-
-
         }
 
         public async Task<ServiceResponse<string>> Login(string username, string password)
