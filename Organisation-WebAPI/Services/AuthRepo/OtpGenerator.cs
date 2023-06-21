@@ -14,6 +14,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 rng.GetBytes(buffer);
 
                 var otp = BitConverter.ToInt32(buffer, 0) % (int)Math.Pow(10, OtpLength);
+                otp = Math.Abs(otp); // Convert negative number to positive
+
                 return otp.ToString("D" + OtpLength);
             }
         }
