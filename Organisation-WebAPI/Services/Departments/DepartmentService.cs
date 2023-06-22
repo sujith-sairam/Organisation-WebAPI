@@ -11,16 +11,17 @@ namespace Organisation_WebAPI.Services.Departments
 {
     public class DepartmentService : IDepartmentService
     {
-        private readonly IMapper _mapper;
-        private readonly OrganizationContext _context ;
+        private readonly IMapper _mapper;  // Provides object-object mapping
+        private readonly OrganizationContext _context ; // Provides object-object mapping
         
 
         public DepartmentService(IMapper mapper,OrganizationContext context)
         {
-            _context = context;
-            _mapper = mapper;
+            _context = context; // Injects the OrganizationContext instance
+            _mapper = mapper; // Injects the IMapper instance
             
         }
+         // Adds a new department to the database
         public async Task<ServiceResponse<List<GetDepartmentDto>>> AddDepartment(AddDepartmentDto newDepartment)
         {
             var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
@@ -32,6 +33,7 @@ namespace Organisation_WebAPI.Services.Departments
             return serviceResponse;
         }
 
+        // Deletes a department from the database based on the provided ID
         public async Task<ServiceResponse<List<GetDepartmentDto>>> DeleteDepartment(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
@@ -39,7 +41,7 @@ namespace Organisation_WebAPI.Services.Departments
 
             var department = await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
             if (department is null)
-                throw new Exception($"Character with id '{id}' not found");
+                throw new Exception($"Department with id '{id}' not found");
             
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
@@ -53,6 +55,7 @@ namespace Organisation_WebAPI.Services.Departments
                 return serviceResponse;
         }
 
+        // Retrieves all department from the database
         public async Task<ServiceResponse<List<GetDepartmentDto>>> GetAllDepartments()
         {
             var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
@@ -61,13 +64,25 @@ namespace Organisation_WebAPI.Services.Departments
             return serviceResponse;
         }
 
+        //Retrieves a department from the database with Id
         public async Task<ServiceResponse<GetDepartmentDto>> GetDepartmentById(int id)
         {
             
             var serviceResponse = new ServiceResponse<GetDepartmentDto>();
-            var dbDepartment =  await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
-            serviceResponse.Data = _mapper.Map<GetDepartmentDto>(dbDepartment);
+            try
+            {
+            var department =  await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
+            if (department is null)
+                    throw new Exception($"Department with id '{id}' not found");
+            serviceResponse.Data = _mapper.Map<GetDepartmentDto>(department);
             return serviceResponse;
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+        return serviceResponse;
         }
 
         public Task<ServiceResponse<int>> GetDepartmentCount()
@@ -85,7 +100,7 @@ namespace Organisation_WebAPI.Services.Departments
                 var department = await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
 
                 if (department is null)
-                    throw new Exception($"Character with id '{id}' not found");
+                    throw new Exception($"Department with id '{id}' not found");
                 
                 department.DepartmentName = updatedDepartment.DepartmentName;
 
