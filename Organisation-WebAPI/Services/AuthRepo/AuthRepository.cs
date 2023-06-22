@@ -205,7 +205,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             _memoryCache.Set("OTP", otp, otpExpiration);
             _memoryCache.Set("email", email, otpExpiration);
-            var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP : {otp}.\n\nIt will expire at {otpExpiration} IST.");
+            var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP to reset your password : {otp}.\n\nIt will expire at {otpExpiration} IST.");
             _emailSender.SendEmail(message);
             response.Data = "Please check your email for OTP.";
             return response;
@@ -252,6 +252,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         return response;
                     }
 
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Invalid OTP.";
+                    return response;
                 }
             }
             else
