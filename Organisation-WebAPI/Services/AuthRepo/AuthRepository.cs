@@ -9,6 +9,7 @@ using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using static System.Net.WebRequestMethods;
 
 
@@ -60,6 +61,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> Register(Admin user, string password, string email)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
+
+            if (!IsEmailValid(email))
+            {
+                response.Success = false;
+                response.Message = "Invalid email address.";
+                return response;
+            }
+
             if (await UserExists(user.UserName))
             {
                 response.Success = false;
@@ -76,12 +85,18 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 Password = password
             };
 
-            _memoryCache.Set("OTP", otp);
+            // Get the current Indian time
+            DateTimeOffset indianTime = DateTimeOffset.UtcNow.ToOffset(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time").BaseUtcOffset);
 
-            _memoryCache.Set(email, registrationData);
+            // Add the expiration time in minutes
+            DateTimeOffset otpExpiration = indianTime.AddMinutes(5);
+
+            _memoryCache.Set("OTP", otp, otpExpiration);
+
+            _memoryCache.Set(email, registrationData, otpExpiration);
 
 
-            var message = new Message(new string[] { email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}");
+            var message = new Message(new string[] { email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.  It will expire at {otpExpiration} UTC.");
             _emailSender.SendEmail(message);
 
             response.Data = "Please check your email for OTP.";
@@ -91,13 +106,29 @@ namespace Organisation_WebAPI.Services.AuthRepo
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
 
-            if (!_memoryCache.TryGetValue("OTP", out var storedOtp))
+            if (!IsEmailValid(email))
             {
-                // OTP not found, handle accordingly
                 response.Success = false;
-                response.Message = "Invalid email or OTP expired.";
+                response.Message = "Invalid email address.";
                 return response;
             }
+
+            if (!_memoryCache.TryGetValue("OTP", out var storedOtp) || storedOtp == null)
+    {
+                // OTP not found or expired
+                response.Success = false;
+                response.Message = "OTP expired.";
+                return response;
+            }
+                
+            if (otp != storedOtp.ToString())
+            {
+                // Invalid OTP
+                response.Success = false;
+                response.Message = "Invalid OTP.";
+                return response;
+            }
+
             else { 
                 Console.WriteLine($"OTP for {email}: {storedOtp} -   {otp}");
             
@@ -153,7 +184,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         {
             var response = new ServiceResponse<string>();
             var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-            if (!await EmailExists(email))
+            if (!(await EmailExists(email) || IsEmailValid(email)))
             {
                 response.Success = false;
                 response.Message = "Invalid Email";
@@ -265,6 +296,16 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return tokenHandler.WriteToken(token);
         }
 
-      
+        private bool IsEmailValid(string email)
+        {
+            // Regular expression pattern for email validation
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+
+            // Check if the email matches the pattern
+            bool isValid = Regex.IsMatch(email, pattern);
+
+            return isValid;
+        }
+
     }
 }
