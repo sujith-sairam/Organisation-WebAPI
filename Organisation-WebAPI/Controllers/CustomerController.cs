@@ -12,7 +12,7 @@ namespace Organisation_WebAPI.Controllers
     [Route("api/[controller]")]
     public class CustomerController : ControllerBase
     {
-          private readonly ICustomerService _customerService;
+        private readonly ICustomerService _customerService;
         public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
@@ -49,7 +49,6 @@ namespace Organisation_WebAPI.Controllers
         }
         
         [HttpDelete("DeleteCustomer")]
-
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> DeleteCustomer(int id){
             return Ok(await _customerService.DeleteCustomer(id));
         }
