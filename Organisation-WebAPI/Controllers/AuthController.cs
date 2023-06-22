@@ -27,5 +27,20 @@ namespace Organisation_WebAPI.Controllers
             }
             return Ok(response);
         }
+
+        [HttpPost("verify")]
+        public async Task<ActionResult<ServiceResponse<string>>> Verify(string email, string otp)
+        {
+            var response = await _authRepository.Verify(
+                email, otp
+                );
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+
+        }
+
     }
 }
