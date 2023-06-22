@@ -11,26 +11,27 @@ namespace Organisation_WebAPI.Services.Products
 {
     public class ProductService : IProductService
     {
-        private readonly IMapper _mapper;
-        private readonly OrganizationContext _context;
+        private readonly IMapper _mapper; // Provides object-object mapping
+        private readonly OrganizationContext _context;  // Represents the database context
         
         public ProductService(OrganizationContext context,IMapper mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            _context = context; // Injects the OrganizationContext instance
+            _mapper = mapper; // Injects the IMapper instance
         }
 
+        // Adds a new product to the database
         public async Task<ServiceResponse<List<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {
             var serviceResponse = new ServiceResponse<List<GetProductDto>>();
             var product = _mapper.Map<Product>(newProduct);
-
              _context.Products.Add(product);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.Products.Select(c => _mapper.Map<GetProductDto>(c)).ToListAsync();
             return serviceResponse;
         }
 
+        // Deletes a product from the database based on the provided ID
         public async Task<ServiceResponse<List<GetProductDto>>> DeleteProduct(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetProductDto>>();
@@ -38,7 +39,7 @@ namespace Organisation_WebAPI.Services.Products
 
             var product = await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
             if (product is null)
-                throw new Exception($"Character with id '{id}' not found");
+                throw new Exception($"Product with id '{id}' not found");
             
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
@@ -52,6 +53,7 @@ namespace Organisation_WebAPI.Services.Products
                 return serviceResponse;
         }
 
+        // Retrieves all product from the database
         public async Task<ServiceResponse<List<GetProductDto>>> GetAllProducts()
         {
            
@@ -61,15 +63,28 @@ namespace Organisation_WebAPI.Services.Products
             return serviceResponse;
         }
 
+        //Retrieves a product from the database with Id
         public async Task<ServiceResponse<GetProductDto>> GetProductById(int id)
         {
-            
             var serviceResponse = new ServiceResponse<GetProductDto>();
-            var dbProduct =  await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
-            serviceResponse.Data = _mapper.Map<GetProductDto>(dbProduct);
+            try
+            {
+                var dbProduct =  await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
+                serviceResponse.Data = _mapper.Map<GetProductDto>(dbProduct);
+                if (dbProduct is null)
+                    throw new Exception($"Product with id '{id}' not found");
+
+                return serviceResponse;
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;
         }
 
+        // Retrieves the count of product in the database
         public Task<ServiceResponse<int>> GetProductCount()
         {
             var serviceResponse = new ServiceResponse<int>();
@@ -78,6 +93,7 @@ namespace Organisation_WebAPI.Services.Products
             return Task.FromResult(serviceResponse);
         }
 
+         // Retrieves the revenue of products in the database
         public async Task<ServiceResponse<Dictionary<string,int>>> GetRevenue(){
 
                 var serviceResponse = new ServiceResponse<Dictionary<string,int>>();
@@ -97,13 +113,14 @@ namespace Organisation_WebAPI.Services.Products
 
         }
 
+         // Updates a product in the database based on the provided ID
         public async Task<ServiceResponse<GetProductDto>> UpdateProduct(UpdateProductDto updateProduct,int id)
         {
             var serviceResponse = new ServiceResponse<GetProductDto>();
             try {
-                var product = await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
+                var product = await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id); //finds the product in the database
                 if (product is null)
-                    throw new Exception($"Character with id '{id}' not found");
+                    throw new Exception($"Product with id '{id}' not found");
                 
                 
                 product.ProductName = updateProduct.ProductName;
@@ -111,7 +128,7 @@ namespace Organisation_WebAPI.Services.Products
                 product.ProductRevenue = updateProduct.ProductRevenue;
             
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); //save changes in the database
                 serviceResponse.Data = _mapper.Map<GetProductDto>(product);
 
                 return serviceResponse;

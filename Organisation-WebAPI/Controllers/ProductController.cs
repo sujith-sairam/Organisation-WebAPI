@@ -20,19 +20,21 @@ namespace Organisation_WebAPI.Controllers
             _productService = productService;
         }
 
+        // Retrieves all products from the database
         [HttpGet("GetAllProducts")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
         }
 
-        
+        // Retrieves a product from the database based on the provided ID
         [HttpGet("GetProductById")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProduct(int id)
         {
             return Ok(await _productService.GetProductById(id));
         }
 
+       // Retrieves the count of products in the database 
        [HttpGet("GetProductCount")]
         public async Task<ActionResult<ServiceResponse<int>>> GetProductCount()
         {
@@ -40,6 +42,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(serviceResponse);
         }
 
+        //Retrieves all product revenues with product names
         [HttpGet("GetProductRevenue")]
         public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
         {
@@ -47,18 +50,20 @@ namespace Organisation_WebAPI.Controllers
             return Ok(serviceResponse);
         }
 
-
+        // Adds a new Product to the database
         [HttpPost("CreateProduct")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {
             return Ok(await _productService.AddProduct(newProduct));
         }
 
+        // Updates a product in the database based on the provided ID
         [HttpPut("UpdateProduct")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> UpdateProduct(UpdateProductDto updatedProduct,int id){
             return Ok(await _productService.UpdateProduct(updatedProduct,id));
         }
         
+        // Deletes a product from the database based on the provided ID
         [HttpDelete("DeleteProduct")]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> DeleteProduct(int id){
             return Ok(await _productService.DeleteProduct(id));

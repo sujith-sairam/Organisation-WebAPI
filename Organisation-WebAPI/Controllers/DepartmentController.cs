@@ -21,18 +21,21 @@ namespace Organisation_WebAPI.Controllers
             
         }
 
+        // Retrieves all departments from the database
         [HttpGet("GetAllDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartments()
         {
             return Ok(await _departmentService.GetAllDepartments());
         }
 
+        // Retrieves a department from the database based on the provided ID
         [HttpGet("GetDepartmentById")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartment(int id)
         {
             return Ok(await _departmentService.GetDepartmentById(id));
         }
 
+        // Retrieves the count of departments in the database
         [HttpGet("GetDepartmentCount")]
         public async Task<ActionResult<ServiceResponse<int>>> GetDepartmentCount()
         {
@@ -40,19 +43,21 @@ namespace Organisation_WebAPI.Controllers
             return Ok(serviceResponse);
         }
 
+        // Adds a new Department to the database
         [HttpPost("CreateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> AddProduct(AddDepartmentDto newDepartment)
         {
             return Ok(await _departmentService.AddDepartment(newDepartment));
         }
 
+        // Updates a department in the database based on the provided ID
         [HttpPut("UpdateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> UpdateProduct(UpdateDepartmentDto updatedDepartment,int id){
             return Ok(await _departmentService.UpdateDepartment(updatedDepartment,id));
         }
         
+        // Deletes a department from the database based on the provided ID
         [HttpDelete("DeleteDepartment")]
-
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> DeleteProduct(int id){
             return Ok(await _departmentService.DeleteDepartment(id));
         }
