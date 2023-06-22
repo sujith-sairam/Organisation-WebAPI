@@ -13,7 +13,7 @@ using Organisation_WebAPI.Services.Departments;
 using Organisation_WebAPI.Services.Employees;
 using Organisation_WebAPI.Services.Products;
 using Swashbuckle.AspNetCore.Filters;
-
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,7 +76,19 @@ builder.Services.AddSwaggerGen(c=>
 
 #endregion
 
+#region Configure Serilog
 
+builder.Host.UseSerilog((context, config) =>
+{
+    config.WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day);
+
+    if (context.HostingEnvironment.IsProduction() == false)
+    {
+        config.WriteTo.Console();
+    }
+});
+
+#endregion
 
 
 var app = builder.Build();
