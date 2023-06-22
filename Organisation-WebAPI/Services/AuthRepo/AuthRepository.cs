@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
+using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -79,7 +80,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             _memoryCache.Set(email, registrationData);
 
 
-            var message = new Message(new string[] { email }, $"Test email", $"This is your OTP : {otp}");
+            var message = new Message(new string[] { email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}");
             _emailSender.SendEmail(message);
 
             response.Data = "Please check your email for OTP.";
@@ -157,10 +158,52 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid Email";
                 return response;
             }
-
+            OtpGenerator otpGenerator = new OtpGenerator();
+            string otp = otpGenerator.GenerateOtp();
+            _memoryCache.Set("OTP", otp);
+            _memoryCache.Set("email", email);
+            var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP : {otp}");
+            _emailSender.SendEmail(message);
+            response.Data = "Please check your email for OTP.";
             return response;
-
         }
+
+
+        public async Task<ServiceResponse<ResetPasswordDto>> ResetPassword(ResetPasswordDto request)
+        {
+            ServiceResponse<ResetPasswordDto> response = new ServiceResponse<ResetPasswordDto>();
+
+            if (!_memoryCache.TryGetValue("OTP", out var storedOtp))
+            {
+                // OTP not found, handle accordingly
+                response.Success = false;
+                response.Message = "Invalid email or OTP expired.";
+                return response;
+            }
+            else
+            {
+                Console.WriteLine($"OTP for : {storedOtp} -   {request.Otp}");
+
+            }
+            if (request.Otp == storedOtp.ToString())
+            {
+
+                if (_memoryCache.TryGetValue("email", out string email))
+                {
+                    var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+                    CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+                    user.PasswordHash = passwordHash;
+                    user.PasswordSalt = passwordSalt;
+                    await _dbContext.SaveChangesAsync();
+                    _memoryCache.Remove("email");
+                    _memoryCache.Remove("OTP");
+                }
+
+             }
+             return response;
+
+        }   
+
 
         public async Task<bool> EmailExists(string email)
         {
@@ -221,6 +264,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return tokenHandler.WriteToken(token);
         }
 
-        
+      
     }
 }

@@ -67,5 +67,17 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+
+        [HttpPost("reset-password")]
+        public async Task<ActionResult<ServiceResponse<string>>> ResetPassword(ResetPasswordDto request)
+        {
+            var response = await _authRepository.ResetPassword(request);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
     }
 }
