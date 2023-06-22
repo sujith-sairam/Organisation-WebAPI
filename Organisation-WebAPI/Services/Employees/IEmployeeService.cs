@@ -9,6 +9,8 @@ namespace Organisation_WebAPI.Services.Employees
     public interface IEmployeeService
     {
         Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees();
+        Task<ServiceResponse<GetEmployeeDto>> GetEmployeeById(int id);
+        Task<ServiceResponse<int>> GetEmployeeCount();
         Task<ServiceResponse<List<GetEmployeeDto>>> AddEmployee(AddEmployeeDto newDepartment);
         Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto department,int id);
         Task<ServiceResponse<List<GetEmployeeDto>>> DeleteEmployee(int id);

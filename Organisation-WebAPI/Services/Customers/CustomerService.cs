@@ -60,6 +60,23 @@ namespace Organisation_WebAPI.Services.Customers
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<GetCustomerDto>> GetCustomerById(int id)
+        {
+            
+            var serviceResponse = new ServiceResponse<GetCustomerDto>();
+            var dbCustomer =  await _context.Customers.FirstOrDefaultAsync(c => c.CustomerID == id);
+            serviceResponse.Data = _mapper.Map<GetCustomerDto>(dbCustomer);
+            return serviceResponse;
+        }
+
+        public Task<ServiceResponse<int>> GetCustomerCount()
+        {
+           var serviceResponse = new ServiceResponse<int>();
+            var count =  _context.Customers.Count();
+            serviceResponse.Data = count;
+            return Task.FromResult(serviceResponse);
+        }
+
         public async Task<ServiceResponse<GetCustomerDto>> UpdateCustomer(UpdateCustomerDto updatedCustomer, int id)
         {
              var serviceResponse = new ServiceResponse<GetCustomerDto>();
