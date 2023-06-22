@@ -1,4 +1,4 @@
-﻿namespace Organisation_WebAPI.Dtos.Admin
+﻿namespace organisation_webapi.dtos.admin
 {
     public class AdminLoginDto
     {

@@ -31,8 +31,6 @@ namespace Organisation_WebAPI
             CreateMap<AddEmployeeDto,Employee>();
             CreateMap<UpdateEmployeeDto,Employee>();
 
-
-            CreateMap<Admin, AdminRegisterDto>();
         }
 
         
