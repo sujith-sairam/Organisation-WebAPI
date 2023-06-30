@@ -22,6 +22,8 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all customers from the database
         [HttpGet("GetAllCustomer")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetCustomers()
         {
             return Ok(await _customerService.GetAllCustomers());
@@ -44,6 +46,8 @@ namespace Organisation_WebAPI.Controllers
 
         // Adds a new customer to the database
         [HttpPost("CreateCustomer")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> AddCustomer(AddCustomerDto newCustomer)
         {
             return Ok(await _customerService.AddCustomer(newCustomer));
