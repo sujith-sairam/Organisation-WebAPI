@@ -19,9 +19,10 @@ namespace Organisation_WebAPI.Controllers
         {
             _productService = productService;
         }
-
         // Retrieves all products from the database
         [HttpGet("GetAllProducts")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
@@ -52,6 +53,8 @@ namespace Organisation_WebAPI.Controllers
 
         // Adds a new Product to the database
         [HttpPost("CreateProduct")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {
             return Ok(await _productService.AddProduct(newProduct));
