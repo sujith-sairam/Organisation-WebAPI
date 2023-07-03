@@ -43,7 +43,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Success = false;
                 response.Message = "User Not Found";
             }
-
+            else if (user.IsVerified == false) {
+                response.Success = false;
+                response.Message = "User Not Verified";
+            }
             else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
@@ -76,23 +79,21 @@ namespace Organisation_WebAPI.Services.AuthRepo
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
 
-
-            RegistrationData registrationData = new RegistrationData
-            {
-                User = user,
-                Password = password
-            };
-
             // Get the current Indian time
             DateTimeOffset indianTime = DateTimeOffset.UtcNow.ToOffset(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time").BaseUtcOffset);
 
             // Add the expiration time in minutes
-            DateTimeOffset otpExpiration = indianTime.AddMinutes(3);
+            DateTimeOffset otpExpiration = indianTime.AddMinutes(2);
 
-            _memoryCache.Set("OTP", otp, otpExpiration);
-
-            _memoryCache.Set(email, registrationData, otpExpiration);
-
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.Email = email;
+            user.Otp = otp;
+            user.OtpExpiration = otpExpiration;
+           
+            _dbContext.Admins.Add(user);
+            await _dbContext.SaveChangesAsync();
 
             var message = new Message(new string[] { email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
             _emailSender.SendEmail(message);
@@ -100,6 +101,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             response.Data = "Please check your email for OTP.";
             return response;
         }
+
         public async Task<ServiceResponse<string>> Verify(string email, string otp)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
@@ -110,45 +112,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid email address.";
                 return response;
             }
-
-            if (!_memoryCache.TryGetValue("OTP", out var storedOtp) || storedOtp == null)
-    {
-                // OTP not found or expired
-                response.Success = false;
-                response.Message = "OTP expired.";
-                return response;
-            }
-                
-            if (otp != storedOtp.ToString())
+            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            if (user != null)
             {
-                // Invalid OTP
-                response.Success = false;
-                response.Message = "Invalid OTP.";
-                return response;
-            }
-
-            else { 
-                Console.WriteLine($"OTP for {email}: {storedOtp} -   {otp}");
-            
-            }
-
-
-            if (otp == storedOtp.ToString())
-            {
-                if (_memoryCache.TryGetValue(email, out RegistrationData registrationData))
-                {
-                    // Perform any required verification checks on the user data and password
-                    // ...
-                    CreatePasswordHash(registrationData.Password, out byte[] passwordHash, out byte[] passwordSalt);
-                    registrationData.User.PasswordHash = passwordHash;
-                    registrationData.User.PasswordSalt = passwordSalt;
-                    registrationData.User.Email = email;
-                    _dbContext.Admins.Add(registrationData.User);
+                if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow) { 
+                    user.IsVerified = true;
+                    user.Otp = null;
+                    user.OtpExpiration = null;
                     await _dbContext.SaveChangesAsync();
-
-                    _memoryCache.Remove(email);
-                    _memoryCache.Remove("OTP");
-
                     response.Success = true;
                     response.Message = "OTP verification successful.";
                     return response;
@@ -156,14 +127,15 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 else
                 {
                     response.Success = false;
-                    response.Message = "Incorrect Email, Please try again later";
+                    response.Message = "Invalid OTP , Please try again";
 
                 }
 
             }
             else {
+
                 response.Success = false;
-                response.Message = "Invalid OTP , Please try again";
+                response.Message = "Invalid Email , Please try again";
 
             }
 
@@ -188,12 +160,18 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid email address.";
                 return response;
             }
-            if (!await EmailExists(email) )
+            if (!await EmailExists(email))
             {
                 response.Success = false;
                 response.Message = "Email does not exists";
                 return response;
             }
+            if (user.IsVerified == false)
+            {
+                response.Success = false;
+                response.Message = "User Not Verified";
+            }
+
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
 
@@ -203,8 +181,11 @@ namespace Organisation_WebAPI.Services.AuthRepo
             // Add the expiration time in minutes
             DateTimeOffset otpExpiration = indianTime.AddMinutes(3);
 
-            _memoryCache.Set("OTP", otp, otpExpiration);
-            _memoryCache.Set("email", email, otpExpiration);
+            user.Otp = otp;
+            user.OtpExpiration = otpExpiration;
+
+            await _dbContext.SaveChangesAsync();
+
             var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP to reset your password : {otp}.\n\nIt will expire at {otpExpiration} IST.");
             _emailSender.SendEmail(message);
             response.Data = "Please check your email for OTP.";
@@ -219,46 +200,40 @@ namespace Organisation_WebAPI.Services.AuthRepo
             if (request.Email is not null) {
 
                 var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
-                if (user is null) {
-                    response.Success = false;
-                    response.Message = "Invalid Email.";
-                    return response;
-                }
-                if (!_memoryCache.TryGetValue("OTP", out var storedOtp))
+                
+                if(user != null)
                 {
-                    // OTP not found, handle accordingly
-                    response.Success = false;
-                    response.Message = "OTP expired.";
-                    return response;
-                }
-             
+                    if (user.IsVerified == false)
+                    {
+                        response.Success = false;
+                        response.Message = "User Not Verified";
+                        return response;
+                    }
 
-                if (request.Otp == storedOtp.ToString())
-                {
-
-                    if (_memoryCache.TryGetValue("email", out string email))
+                    if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow)
                     {
                         CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
                         user.PasswordHash = passwordHash;
                         user.PasswordSalt = passwordSalt;
+                        user.Otp = null;
+                        user.OtpExpiration = null;
                         await _dbContext.SaveChangesAsync();
                         response.Message = "Password changed successfully.";
+
                     }
                     else
                     {
-                        // Email not found, handle accordingly
                         response.Success = false;
-                        response.Message = "Invalid Email Address.";
+                        response.Message = "Invalid OTP.";
                         return response;
                     }
 
                 }
-                else
-                {
+                else{
                     response.Success = false;
-                    response.Message = "Invalid OTP.";
-                    return response;
+                    response.Message = "Invalid Email Address.";
                 }
+              
             }
             else
             {
@@ -266,14 +241,61 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email is Required.";
             }
 
-
-
-            _memoryCache.Remove("email");
-            _memoryCache.Remove("OTP");
-
             return response;
 
-        }   
+        }
+
+
+        public async Task<ServiceResponse<string>> ResendOtp(string email)
+        {
+            var response = new ServiceResponse<string>();
+
+            if (!IsEmailValid(email))
+            {
+                response.Success = false;
+                response.Message = "Invalid email address.";
+                return response;
+            }
+
+            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "Email does not exist.";
+                return response;
+            }
+
+            if (user.OtpResendCount >= 3)
+            {
+                response.Success = false;
+                response.Message = "Maximum OTP resend limit reached.";
+                return response;
+            }
+
+            OtpGenerator otpGenerator = new OtpGenerator();
+            string otp = otpGenerator.GenerateOtp();
+
+            // Get the current Indian time
+            DateTimeOffset indianTime = DateTimeOffset.UtcNow.ToOffset(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time").BaseUtcOffset);
+
+            // Add the expiration time in minutes
+            DateTimeOffset otpExpiration = indianTime.AddMinutes(3);
+
+            user.Otp = otp;
+            user.OtpExpiration = otpExpiration;
+            user.OtpResendCount++;
+
+            await _dbContext.SaveChangesAsync();
+
+            var message = new Message(new string[] { email }, "OTP Resent", $"This is your new OTP: {otp}.\n\nIt will expire at {otpExpiration} IST.");
+            _emailSender.SendEmail(message);
+
+            response.Success = true;
+            response.Message = "OTP has been resent.";
+            return response;
+        }
+
 
 
         public async Task<bool> EmailExists(string email)

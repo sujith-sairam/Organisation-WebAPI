@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Organisation_WebAPI.Data;
 
@@ -11,9 +12,11 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    partial class OrganizationContextModelSnapshot : ModelSnapshot
+    [Migration("20230703155712_OtpExpiration")]
+    partial class OtpExpiration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,11 +43,11 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<string>("Otp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("OtpExpiration")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime?>("OtpExpiration")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("OtpResendCount")
-                        .HasColumnType("int");
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
@@ -138,66 +141,6 @@ namespace Organisation_WebAPI.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Organisation_WebAPI.Models.EmployeeTask", b =>
-                {
-                    b.Property<int>("TaskID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskID"));
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("TaskCreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TaskDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TaskDueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TaskName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TaskStatus")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TaskID");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("EmployeeTasks");
-                });
-
-            modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
-                {
-                    b.Property<int>("ManagerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManagerId"));
-
-                    b.Property<int>("ManagerAge")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ManagerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ManagerSalary")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.HasKey("ManagerId");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("Managers");
-                });
-
             modelBuilder.Entity("Organisation_WebAPI.Models.Product", b =>
                 {
                     b.Property<int>("ProductID")
@@ -205,6 +148,9 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductID"));
+
+                    b.Property<string>("ProductManagerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
@@ -243,28 +189,6 @@ namespace Organisation_WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Organisation_WebAPI.Models.EmployeeTask", b =>
-                {
-                    b.HasOne("Organisation_WebAPI.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
-                {
-                    b.HasOne("Organisation_WebAPI.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Product");
                 });

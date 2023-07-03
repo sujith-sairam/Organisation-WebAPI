@@ -79,5 +79,17 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+
+        [HttpPost("resend-otp")]
+        public async Task<ActionResult<ServiceResponse<string>>> ResendOtp(string email)
+        {
+            var response = await _authRepository.ResendOtp(email);
+            if (!response.Success)  
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
     }
 }

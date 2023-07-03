@@ -10,6 +10,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         Task<ServiceResponse<string>> Verify(string email, string otp);
         Task<ServiceResponse<string>> ForgotPassword(string email);
         Task<ServiceResponse<ResetPasswordDto>> ResetPassword(ResetPasswordDto email);
+        Task<ServiceResponse<string>> ResendOtp(string email);
         Task<bool> UserExists(string username);
 
     }
