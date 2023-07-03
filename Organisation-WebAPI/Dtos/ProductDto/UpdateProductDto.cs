@@ -9,7 +9,7 @@ namespace Organisation_WebAPI.Dtos.ProductDto
     {
        
         public string? ProductName { get; set; }
-        public string? ProductManagerName {get;set;}
+       
         public int ProductRevenue {get;set;}
     }
 }
