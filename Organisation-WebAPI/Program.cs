@@ -17,7 +17,21 @@ using Serilog;
 using Organisation_WebAPI.Services.EmployeeTasks;
 using Organisation_WebAPI.Services.Managers;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Add services to the container.
 
@@ -58,6 +72,8 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
+
+
 
 #region Configure Authentication
 
@@ -121,8 +137,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Enable CORS
-app.UseCors("AllowAngularApp");
+app.UseCors();
 
 app.UseAuthentication();
 
