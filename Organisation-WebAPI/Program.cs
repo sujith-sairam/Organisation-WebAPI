@@ -14,8 +14,12 @@ using Organisation_WebAPI.Services.Employees;
 using Organisation_WebAPI.Services.Products;
 using Swashbuckle.AspNetCore.Filters;
 using Serilog;
+using Organisation_WebAPI.Services.EmployeeTasks;
+using Organisation_WebAPI.Services.Managers;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +34,7 @@ builder.Services.AddCors(opt =>
 });
 
 // Add services to the container.
+
 builder.Services.AddDbContext<OrganizationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
@@ -38,8 +43,9 @@ builder.Services.AddScoped<IAuthRepository,AuthRepository>();
 builder.Services.AddScoped<IProductService,ProductService>();
 builder.Services.AddScoped<IDepartmentService,DepartmentService>(); 
 builder.Services.AddScoped<IEmployeeService,EmployeeService>();
+builder.Services.AddScoped<IManagerService,ManagerService>();
 builder.Services.AddScoped<ICustomerService,CustomerService>();
-
+builder.Services.AddScoped<IEmployeeTaskService,EmployeeTaskService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
@@ -49,6 +55,20 @@ var emailConfig = builder.Configuration
 builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddControllers();
+
+
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
@@ -113,6 +133,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

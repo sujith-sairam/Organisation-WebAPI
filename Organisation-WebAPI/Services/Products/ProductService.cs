@@ -124,7 +124,6 @@ namespace Organisation_WebAPI.Services.Products
                 
                 
                 product.ProductName = updateProduct.ProductName;
-                product.ProductManagerName = updateProduct.ProductManagerName;
                 product.ProductRevenue = updateProduct.ProductRevenue;
             
 
