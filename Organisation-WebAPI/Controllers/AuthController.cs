@@ -19,11 +19,9 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<ServiceResponse<int>>> Register(AdminRegisterDto request)
+        public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)
         {
-            var response = await _authRepository.Register(
-                new Admin { UserName = request.UserName }, request.Password, request.Email
-                );
+            var response = await _authRepository.Register(request);
             if (!response.Success)
             {
                 return BadRequest(response);
@@ -32,7 +30,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<ServiceResponse<int>>> Login(AdminLoginDto request)
+        public async Task<ActionResult<ServiceResponse<int>>> Login(UserLoginDto request)
         {
             var response = await _authRepository.Login(request.UserName, request.Password);
             if (!response.Success)
