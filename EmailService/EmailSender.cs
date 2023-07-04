@@ -48,7 +48,7 @@ namespace EmailService
                     client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
 
                     client.Send(mailMessage);
-                }
+                    }
                 catch
                 {
                     //log an error message or throw an exception or both.
