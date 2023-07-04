@@ -5,7 +5,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 {
     public interface IAuthRepository
     {
-        Task<ServiceResponse<string>> Register(UserRegisterDto model);
+        Task<ServiceResponse<string>> AdminRegister(AdminRegisterDto model);
         Task<ServiceResponse<string>> Login(string username, string password);
         Task<ServiceResponse<string>> Verify(string email, string otp);
         Task<ServiceResponse<string>> ForgotPassword(string email);

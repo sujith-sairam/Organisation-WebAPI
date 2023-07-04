@@ -22,15 +22,17 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly Dictionary<string, string> _otpDictionary;
         private readonly Dictionary<string, RegistrationData> _registeredUsers;
         private readonly IConfiguration _configuration;
+        private readonly IJwtUtils _jwtUtils;
         private readonly IMemoryCache _memoryCache;
 
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IEmailSender emailSender, IMemoryCache memoryCache)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
             _otpDictionary = new Dictionary<string, string>();
             _registeredUsers = new Dictionary<string, RegistrationData>();
             _configuration = configuration;
+            _jwtUtils = jwtUtils;
             _memoryCache = memoryCache;
         }
 
@@ -56,12 +58,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             else
             {
-                response.Data = CreateToken(user);
+                response.Data = _jwtUtils.GenerateJwtToken(user);
             }
             return response;
         }
 
-        public async Task<ServiceResponse<string>> Register(UserRegisterDto model)
+        public async Task<ServiceResponse<string>> AdminRegister(AdminRegisterDto model)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
 
@@ -76,15 +78,13 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 response.Success = false;
                 response.Message = "User already exists";
-                return response;    
+                return response;
             }
+
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
 
-            // Get the current Indian time
             DateTimeOffset indianTime = DateTimeOffset.UtcNow.ToOffset(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time").BaseUtcOffset);
-
-            // Add the expiration time in minutes
             DateTimeOffset otpExpiration = indianTime.AddMinutes(2);
 
             CreatePasswordHash(model.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -98,30 +98,19 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 Otp = otp,
                 IsVerified = false,
                 OtpExpiration = otpExpiration,
-                Role = model.Role
-     
+                Role = UserRole.Admin
             };
 
             await _dbContext.Users.AddAsync(user);
+            await _dbContext.SaveChangesAsync();
 
-
-            if (model.Role == UserRole.Admin)
+            var admin = new Admin
             {
-                var adminUser = new Admin
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    PasswordHash = passwordHash,
-                    PasswordSalt = passwordSalt,
-                    Otp = otp,
-                    IsVerified = false,
-                    OtpExpiration = otpExpiration
+                UserId = user.Id, // Set the foreign key UserId to the user's Id
+               
+            };
 
-                };
-
-                await _dbContext.Admins.AddAsync(adminUser);
-            }
-
+            await _dbContext.Admins.AddAsync(admin);
             await _dbContext.SaveChangesAsync();
 
             var message = new Message(new string[] { model.Email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
@@ -399,5 +388,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return isValid;
         }
 
+        
     }
 }

@@ -38,6 +38,7 @@ builder.Services.AddCors(opt =>
 builder.Services.AddDbContext<OrganizationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
+builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 
 builder.Services.AddScoped<IAuthRepository,AuthRepository>();
 builder.Services.AddScoped<IProductService,ProductService>();
