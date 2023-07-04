@@ -27,5 +27,8 @@ namespace Organisation_WebAPI.Data
         public DbSet<EmployeeTask> EmployeeTasks => Set<EmployeeTask>();
 
         public DbSet<Manager> Managers => Set<Manager>();
+        
+        public DbSet<User> Users => Set<User>();
+
     }
 }
