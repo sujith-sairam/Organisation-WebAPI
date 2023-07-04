@@ -39,7 +39,7 @@ namespace Organisation_WebAPI.Services.Managers
 
             var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
             if (manager is null)
-                throw new Exception($"Employee with id '{id}' not found");
+                throw new Exception($"Manager with id '{id}' not found");
             
             _context.Managers.Remove(manager);
             await _context.SaveChangesAsync();
@@ -68,7 +68,7 @@ namespace Organisation_WebAPI.Services.Managers
             {
             var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
             if (dbManager is null)
-                    throw new Exception($"Employee with id '{id}' not found");
+                    throw new Exception($"Manager with id '{id}' not found");
 
             serviceResponse.Data = _mapper.Map<GetManagerDto>(dbManager);
             return serviceResponse;
@@ -96,7 +96,7 @@ namespace Organisation_WebAPI.Services.Managers
                 var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
 
                 if (manager is null)
-                    throw new Exception($"Employee with id '{id}' not found");
+                    throw new Exception($"Manager with id '{id}' not found");
                 
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;

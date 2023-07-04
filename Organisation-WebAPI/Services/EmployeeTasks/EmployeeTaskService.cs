@@ -38,7 +38,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
             var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
             if (employeeTask is null)
-                throw new Exception($"Employee with id '{id}' not found");
+                throw new Exception($"EmployeeTask with id '{id}' not found");
             
             _context.EmployeeTasks.Remove(employeeTask);
             await _context.SaveChangesAsync();
@@ -68,7 +68,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             {
             var dbEmployeeTask =  await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
             if (dbEmployeeTask is null)
-                    throw new Exception($"Employee with id '{id}' not found");
+                    throw new Exception($"EmployeeTask with id '{id}' not found");
 
             serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(dbEmployeeTask);
             return serviceResponse;
@@ -96,7 +96,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
 
                 if (employeeTask is null)
-                    throw new Exception($"Employee with id '{id}' not found");
+                    throw new Exception($"EmployeeTask with id '{id}' not found");
                 
                 employeeTask.TaskName = updateEmployeeTask.TaskName;
                 employeeTask.TaskDueDate = updateEmployeeTask.TaskDueDate;
