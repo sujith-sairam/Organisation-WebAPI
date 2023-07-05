@@ -18,7 +18,6 @@ namespace Organisation_WebAPI.Models
         [ForeignKey("Product")]
         public int ProductID {get; set;}
         public Department? Department { get; set; }
-
         public Product? Product {get; set;}
 
     }

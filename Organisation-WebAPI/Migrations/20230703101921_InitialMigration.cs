@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Organisation_WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class OtherTables : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,7 +47,6 @@ namespace Organisation_WebAPI.Migrations
                     ProductID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProductManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductRevenue = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -105,6 +105,52 @@ namespace Organisation_WebAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Managers",
+                columns: table => new
+                {
+                    ManagerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ManagerSalary = table.Column<int>(type: "int", nullable: false),
+                    ManagerAge = table.Column<int>(type: "int", nullable: false),
+                    ProductID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Managers", x => x.ManagerId);
+                    table.ForeignKey(
+                        name: "FK_Managers_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeTasks",
+                columns: table => new
+                {
+                    TaskID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TaskName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TaskDueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TaskStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeTasks", x => x.TaskID);
+                    table.ForeignKey(
+                        name: "FK_EmployeeTasks_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_ProductID",
                 table: "Customers",
@@ -119,6 +165,16 @@ namespace Organisation_WebAPI.Migrations
                 name: "IX_Employees_ProductID",
                 table: "Employees",
                 column: "ProductID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeTasks_EmployeeId",
+                table: "EmployeeTasks",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Managers_ProductID",
+                table: "Managers",
+                column: "ProductID");
         }
 
         /// <inheritdoc />
@@ -129,6 +185,12 @@ namespace Organisation_WebAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeTasks");
+
+            migrationBuilder.DropTable(
+                name: "Managers");
 
             migrationBuilder.DropTable(
                 name: "Employees");
