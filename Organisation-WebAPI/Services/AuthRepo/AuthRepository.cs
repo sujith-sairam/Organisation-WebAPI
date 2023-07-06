@@ -22,28 +22,31 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly Dictionary<string, string> _otpDictionary;
         private readonly Dictionary<string, RegistrationData> _registeredUsers;
         private readonly IConfiguration _configuration;
+        private readonly IJwtUtils _jwtUtils;
         private readonly IMemoryCache _memoryCache;
 
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IEmailSender emailSender, IMemoryCache memoryCache)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
             _otpDictionary = new Dictionary<string, string>();
             _registeredUsers = new Dictionary<string, RegistrationData>();
             _configuration = configuration;
+            _jwtUtils = jwtUtils;
             _memoryCache = memoryCache;
         }
 
-        public async Task<ServiceResponse<string>> Login(string username, string password)
+       public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
             if (user == null)
             {
                 response.Success = false;
                 response.Message = "User Not Found";
             }
-            else if (user.IsVerified == false) {
+            else if (user.IsVerified == false)
+            {
                 response.Success = false;
                 response.Message = "User Not Verified";
             }
@@ -51,51 +54,66 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 response.Success = false;
                 response.Message = "Incorrect Password";
+                
             }
             else
             {
-                response.Data = CreateToken(user);
+                response.Data = _jwtUtils.GenerateJwtToken(user);
             }
             return response;
         }
 
-        public async Task<ServiceResponse<string>> Register(Admin user, string password, string email)
+        public async Task<ServiceResponse<string>> AdminRegister(AdminRegisterDto model)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
 
-            if (!IsEmailValid(email))
+            if (!IsEmailValid(model.Email))
             {
                 response.Success = false;
                 response.Message = "Invalid email address.";
                 return response;
             }
 
-            if (await UserExists(user.UserName))
+            if (await UserExists(model.UserName))
             {
                 response.Success = false;
                 response.Message = "User already exists";
                 return response;
             }
+
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
 
-            // Get the current Indian time
             DateTimeOffset indianTime = DateTimeOffset.UtcNow.ToOffset(TimeZoneInfo.FindSystemTimeZoneById("India Standard Time").BaseUtcOffset);
-
-            // Add the expiration time in minutes
             DateTimeOffset otpExpiration = indianTime.AddMinutes(2);
 
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
-            user.Email = email;
-            user.Otp = otp;
-            user.OtpExpiration = otpExpiration;
-           
-            _dbContext.Admins.Add(user);
+            CreatePasswordHash(model.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var user = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                Otp = otp,
+                IsVerified = false,
+                OtpExpiration = otpExpiration,
+                Role = UserRole.Admin
+            };
+
+            await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            var message = new Message(new string[] { email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
+            var admin = new Admin
+            {
+                UserId = user.Id, // Set the foreign key UserId to the user's Id
+               
+            };
+
+            await _dbContext.Admins.AddAsync(admin);
+            await _dbContext.SaveChangesAsync();
+
+            var message = new Message(new string[] { model.Email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
             _emailSender.SendEmail(message);
 
             response.Data = "Please check your email for OTP.";
@@ -112,7 +130,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid email address.";
                 return response;
             }
-            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (user != null)
             {
                 if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow) { 
@@ -144,7 +162,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         public async Task<bool> UserExists(string username)
         {
-            if (await _dbContext.Admins.AnyAsync(u => u.UserName.ToLower() == username.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.UserName.ToLower() == username.ToLower()))
             {
                 return true;
             }
@@ -153,7 +171,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> ForgotPassword(string email)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (!IsEmailValid(email))
             {
                 response.Success = false;
@@ -199,7 +217,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             if (request.Email is not null) {
 
-                var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
                 
                 if(user != null)
                 {
@@ -257,7 +275,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
 
-            var user = await _dbContext.Admins.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
 
             if (user == null)
             {
@@ -300,7 +318,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         public async Task<bool> EmailExists(string email)
         {
-            if (await _dbContext.Admins.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
             {
                 return true;
             }
@@ -318,7 +336,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         private class RegistrationData
         {
-            public Admin User { get; set; }
+            public User User { get; set; }
             public string Password { get; set; }
         }
 
@@ -332,12 +350,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
         }
 
 
-        private string CreateToken(Admin admin)
+        private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString()),
-                new Claim(ClaimTypes.Name, admin.UserName)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
+
             };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
@@ -368,5 +388,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return isValid;
         }
 
+        
     }
 }
