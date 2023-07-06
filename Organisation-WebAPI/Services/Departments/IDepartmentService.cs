@@ -10,7 +10,6 @@ namespace Organisation_WebAPI.Services.Departments
     {
         Task<ServiceResponse<List<GetDepartmentDto>>> GetAllDepartments();
         Task<ServiceResponse<GetDepartmentDto>> GetDepartmentById(int id);
-        Task<ServiceResponse<int>> GetDepartmentCount();
         Task<ServiceResponse<List<GetDepartmentDto>>> AddDepartment(AddDepartmentDto newDepartment);
         Task<ServiceResponse<GetDepartmentDto>> UpdateDepartment(UpdateDepartmentDto department,int id);
         Task<ServiceResponse<List<GetDepartmentDto>>> DeleteDepartment(int id);

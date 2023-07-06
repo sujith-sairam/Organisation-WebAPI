@@ -9,7 +9,7 @@ using Organisation_WebAPI.Services.Departments;
 
 namespace Organisation_WebAPI.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class DepartmentController : ControllerBase
@@ -35,13 +35,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _departmentService.GetDepartmentById(id));
         }
 
-        // Retrieves the count of departments in the database
-        [HttpGet("GetDepartmentCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetDepartmentCount()
-        {
-            var serviceResponse = await _departmentService.GetDepartmentCount();
-            return Ok(serviceResponse);
-        }
+       
 
         // Adds a new Department to the database
         [HttpPost("CreateDepartment")]

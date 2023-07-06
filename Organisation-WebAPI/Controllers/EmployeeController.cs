@@ -9,7 +9,7 @@ using Organisation_WebAPI.Services.Employees;
 
 namespace Organisation_WebAPI.Controllers
 {
-    [Authorize]
+   
     [ApiController]
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
@@ -28,13 +28,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeService.GetAllEmployees());
         }
 
-        // Retrieves the count of employees in the database
-        [HttpGet("GetEmployeeCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
-        {
-            var serviceResponse = await _employeeService.GetEmployeeCount();
-            return Ok(serviceResponse);
-        }
 
         // Retrieves a employee from the database based on the provided ID
         [HttpGet("GetEmployeeById")]
