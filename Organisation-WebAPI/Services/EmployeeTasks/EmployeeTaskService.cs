@@ -81,13 +81,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             return serviceResponse;
         }
 
-        public Task<ServiceResponse<int>> GetEmployeeTaskCount()
-        {
-            var serviceResponse = new ServiceResponse<int>();
-            var count =  _context.EmployeeTasks.Count();
-            serviceResponse.Data = count;
-            return Task.FromResult(serviceResponse);
-        }
+      
 
         public async Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTask(UpdateEmployeeTaskDto updateEmployeeTask, int id)
         {

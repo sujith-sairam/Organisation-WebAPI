@@ -57,13 +57,27 @@ namespace Organisation_WebAPI.Services.Employees
         }
 
         // Retrieves all employees from the database
-        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees()
+       public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees()
+       {
+        var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+        var dbEmployees = await _context.Employees.ToListAsync();
+        var employeeDTOs = dbEmployees.Select(e => new GetEmployeeDto
         {
-            var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
-            var dbEmployees = await _context.Employees.ToListAsync();
-            serviceResponse.Data = dbEmployees.Select(c => _mapper.Map<GetEmployeeDto>(c)).ToList();
-            return serviceResponse;
-        }
+            EmployeeID = e.EmployeeID,
+            EmployeeName = e.EmployeeName,
+            EmployeeSalary = e.EmployeeSalary,
+            EmployeeAge = e.EmployeeAge,
+            DepartmentID = e.DepartmentID,
+            DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
+            ProductID = e.ProductID,
+            ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
+        }).ToList();
+
+        serviceResponse.Data = employeeDTOs;
+        return serviceResponse;
+     }
+
+
 
         //Retrieves a employee from the database with Id
          public async Task<ServiceResponse<GetEmployeeDto>> GetEmployeeById(int id)
@@ -85,14 +99,6 @@ namespace Organisation_WebAPI.Services.Employees
                 serviceResponse.Message = ex.Message;
             }
             return serviceResponse;
-        }
-
-        public Task<ServiceResponse<int>> GetEmployeeCount()
-        {
-            var serviceResponse = new ServiceResponse<int>();
-            var count =  _context.Employees.Count();
-            serviceResponse.Data = count;
-            return Task.FromResult(serviceResponse);
         }
 
         public async Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)

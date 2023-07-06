@@ -10,7 +10,7 @@ namespace Organisation_WebAPI.Services.Managers
     {
         Task<ServiceResponse<List<GetManagerDto>>> GetAllManagers();
         Task<ServiceResponse<GetManagerDto>> GetManagerById(int id);
-        Task<ServiceResponse<int>> GetManagerCount();
+        
         Task<ServiceResponse<List<GetManagerDto>>> AddManager(AddManagerDto newManager);
         Task<ServiceResponse<GetManagerDto>> UpdateManager(UpdateManagerDto updatedManager ,int id);
         Task<ServiceResponse<List<GetManagerDto>>> DeleteManager(int id);

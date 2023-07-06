@@ -43,12 +43,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeTaskService.GetEmployeeTaskById(id));
         }
 
-        [HttpGet("GetEmployeeTaskCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeTaskCount()
-        {
-            var serviceResponse = await _employeeTaskService.GetEmployeeTaskCount();
-            return Ok(serviceResponse);
-        }
 
         [HttpPut("UpdateEmployeeTask")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployeeTask(UpdateEmployeeTaskDto updatedEmployeeTask,int id){
