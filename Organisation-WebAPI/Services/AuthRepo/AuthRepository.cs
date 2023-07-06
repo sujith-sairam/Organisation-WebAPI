@@ -20,7 +20,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly OrganizationContext _dbContext;
         private readonly IEmailSender _emailSender;
         private readonly Dictionary<string, string> _otpDictionary;
-        private readonly Dictionary<string, RegistrationData> _registeredUsers;
         private readonly IConfiguration _configuration;
         private readonly IJwtUtils _jwtUtils;
         private readonly IMemoryCache _memoryCache;
@@ -30,7 +29,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             _dbContext = dbContext;
             _emailSender = emailSender;
             _otpDictionary = new Dictionary<string, string>();
-            _registeredUsers = new Dictionary<string, RegistrationData>();
             _configuration = configuration;
             _jwtUtils = jwtUtils;
             _memoryCache = memoryCache;
@@ -136,7 +134,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow) { 
                     user.IsVerified = true;
                     user.Otp = null;
-                    user.OtpExpiration = null;
                     await _dbContext.SaveChangesAsync();
                     response.Success = true;
                     response.Message = "OTP verification successful.";
@@ -159,6 +156,9 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             return response;
         }
+
+      
+
 
         public async Task<bool> UserExists(string username)
         {
@@ -211,6 +211,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         }
 
 
+
         public async Task<ServiceResponse<ResetPasswordDto>> ResetPassword(ResetPasswordDto request)
         {
             ServiceResponse<ResetPasswordDto> response = new ServiceResponse<ResetPasswordDto>();
@@ -228,7 +229,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         return response;
                     }
 
-                    if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow)
+                    if (user.OtpExpiration > DateTimeOffset.UtcNow)
                     {
                         CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
                         user.PasswordHash = passwordHash;
@@ -242,7 +243,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     else
                     {
                         response.Success = false;
-                        response.Message = "Invalid OTP.";
+                        response.Message = "Your OTP is expired.";
                         return response;
                     }
 
@@ -333,13 +334,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
         }
 
-
-        private class RegistrationData
-        {
-            public User User { get; set; }
-            public string Password { get; set; }
-        }
-
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
@@ -347,34 +341,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return computeHash.SequenceEqual(passwordHash);
             }
-        }
-
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
-
-            };
-
-            SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
-            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
-            };
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(token);
         }
 
         private bool IsEmailValid(string email)
@@ -388,6 +354,5 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return isValid;
         }
 
-        
     }
 }
