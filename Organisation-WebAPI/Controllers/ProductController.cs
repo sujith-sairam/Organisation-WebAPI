@@ -35,13 +35,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _productService.GetProductById(id));
         }
 
-       // Retrieves the count of products in the database 
-       [HttpGet("GetProductCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetProductCount()
-        {
-            var serviceResponse = await _productService.GetProductCount();
-            return Ok(serviceResponse);
-        }
+      
 
         //Retrieves all product revenues with product names
         [HttpGet("GetProductRevenue")]

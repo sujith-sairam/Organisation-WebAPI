@@ -85,13 +85,7 @@ namespace Organisation_WebAPI.Services.Products
         }
 
         // Retrieves the count of product in the database
-        public Task<ServiceResponse<int>> GetProductCount()
-        {
-            var serviceResponse = new ServiceResponse<int>();
-            var count =  _context.Products.Count();
-            serviceResponse.Data = count;
-            return Task.FromResult(serviceResponse);
-        }
+        
 
          // Retrieves the revenue of products in the database
         public async Task<ServiceResponse<Dictionary<string,int>>> GetRevenue(){

@@ -81,13 +81,6 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
-        public Task<ServiceResponse<int>> GetManagerCount()
-        {
-            var serviceResponse = new ServiceResponse<int>();
-            var count =  _context.Managers.Count();
-            serviceResponse.Data = count;
-            return Task.FromResult(serviceResponse);
-        }
 
         public async Task<ServiceResponse<GetManagerDto>> UpdateManager(UpdateManagerDto updatedManager, int id)
         {

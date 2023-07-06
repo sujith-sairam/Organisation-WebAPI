@@ -25,12 +25,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetAllManagers());
         }
 
-        [HttpGet("GetManagerCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
-        {
-            var serviceResponse = await _managerService.GetManagerCount();
-            return Ok(serviceResponse);
-        }
 
         
         [HttpGet("GetManagerById")]

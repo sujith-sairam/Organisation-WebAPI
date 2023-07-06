@@ -36,14 +36,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _customerService.GetCustomerById(id));
         }
 
-        // Retrieves the count of customers in the database
-        [HttpGet("GetCustomerCount")]
-        public async Task<ActionResult<ServiceResponse<int>>> GetCustomerCount()
-        {
-            var serviceResponse = await _customerService.GetCustomerCount();
-            return Ok(serviceResponse);
-        }
-
         // Adds a new customer to the database
         [HttpPost("CreateCustomer")]
         [AllowAnonymous]

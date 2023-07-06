@@ -16,6 +16,7 @@ using Swashbuckle.AspNetCore.Filters;
 using Serilog;
 using Organisation_WebAPI.Services.EmployeeTasks;
 using Organisation_WebAPI.Services.Managers;
+using Organisation_WebAPI.Services.Dashboard;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IManagerService,ManagerService>();
 builder.Services.AddScoped<ICustomerService,CustomerService>();
 builder.Services.AddScoped<IEmployeeTaskService,EmployeeTaskService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var emailConfig = builder.Configuration
