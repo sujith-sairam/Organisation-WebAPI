@@ -5,6 +5,6 @@
         public int Id { get; set; }
         // Navigation property for User
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User User {  get; set; }
     }
 }
