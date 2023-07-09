@@ -61,7 +61,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return response;
         }
 
-        public async Task<ServiceResponse<string>> AdminRegister(AdminRegisterDto model)
+        public async Task<ServiceResponse<string>> Register(UserRegisterDto model)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
 
@@ -96,27 +96,54 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 Otp = otp,
                 IsVerified = false,
                 OtpExpiration = otpExpiration,
-                Role = UserRole.Admin
+                Role = model.Role
             };
 
             await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
 
-            var admin = new Admin
+            if (user.Role == UserRole.Employee)
             {
-                UserId = user.Id, // Set the foreign key UserId to the user's Id
-               
-            };
+                var employee = new Employee
+                {
+                    EmployeeName = model.EmployeeName,
+                    EmployeeSalary = model.EmployeeSalary,
+                    EmployeeAge = model.EmployeeAge,
+                    DepartmentID = model.DepartmentID,
+                    ProductID = model.ProductID,
+                    User = user
+                };
 
-            await _dbContext.Admins.AddAsync(admin);
+                await _dbContext.Employees.AddAsync(employee);
+            }
+            else if (user.Role == UserRole.Manager)
+            {
+                var manager = new Manager
+                {
+                    ManagerName = model.ManagerName,
+                    ManagerSalary = model.ManagerSalary,
+                    ManagerAge = model.ManagerAge,
+                    ProductID = model.ProductID,
+                    User = user
+                };
+
+                await _dbContext.Managers.AddAsync(manager);
+            }
+            else
+            {
+                response.Success = false;
+                response.Message = "Invalid user role.";
+                return response;
+            }
+
             await _dbContext.SaveChangesAsync();
 
-            var message = new Message(new string[] { model.Email }, $"HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
+            var message = new Message(new string[] { model.Email }, "HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
             _emailSender.SendEmail(message);
 
             response.Data = "Please check your email for OTP.";
             return response;
         }
+
 
         public async Task<ServiceResponse<string>> Verify(string email, string otp)
         {

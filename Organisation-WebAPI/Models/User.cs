@@ -1,8 +1,11 @@
-﻿namespace Organisation_WebAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Organisation_WebAPI.Models
 {
     public class User
     {
-        public int Id { get; set; }
+        [Key]
+        public int UserID { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
         public bool IsVerified { get; set; }

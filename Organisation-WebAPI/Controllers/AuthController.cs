@@ -18,10 +18,10 @@ namespace Organisation_WebAPI.Controllers
             _authRepository = authRepository;
         }
 
-        [HttpPost("AdminRegister")]
-        public async Task<ActionResult<ServiceResponse<int>>> AdminRegister(AdminRegisterDto request)
+        [HttpPost("Register")]
+        public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)
         {
-            var response = await _authRepository.AdminRegister(request);
+            var response = await _authRepository.Register(request);
             if (!response.Success)
             {
                 return BadRequest(response);
