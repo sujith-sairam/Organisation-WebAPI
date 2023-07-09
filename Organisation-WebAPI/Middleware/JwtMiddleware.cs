@@ -7,11 +7,13 @@ namespace Organisation_WebAPI.Middleware
     public class JwtMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly IAuthRepository _authRepository;
         private readonly AppSettings _appSettings;
 
-        public JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettings)
+        public JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettings,IAuthRepository authRepository)
         {
             _next = next;
+            _authRepository = authRepository;
             _appSettings = appSettings.Value;
         }
 
@@ -20,6 +22,7 @@ namespace Organisation_WebAPI.Middleware
             var userId = jwtUtils.ValidateJwtToken(token);
             if (userId != null) {
                 //context.Items["User"] = 
+                context.Items["User"] = _authRepository.GetUserBYId(userId.Value);
             }
             await _next(context);
         }

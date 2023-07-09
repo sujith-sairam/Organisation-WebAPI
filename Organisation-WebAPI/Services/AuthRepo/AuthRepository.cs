@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using EmailService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.Admin;
+using Organisation_WebAPI.Dtos.CustomerDto;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,8 +25,9 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly IConfiguration _configuration;
         private readonly IJwtUtils _jwtUtils;
         private readonly IMemoryCache _memoryCache;
+        private readonly IMapper _mapper;
 
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
@@ -32,6 +35,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             _configuration = configuration;
             _jwtUtils = jwtUtils;
             _memoryCache = memoryCache;
+            _mapper = mapper;
         }
 
        public async Task<ServiceResponse<string>> Login(string username, string password)
@@ -291,6 +295,21 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         }
 
+        public async Task<ServiceResponse<GetUserDto>> GetUserBYId(int id)
+        {
+            var response = new ServiceResponse<GetUserDto>();
+            var user = await _dbContext.Users.FindAsync(id);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            response.Data = _mapper.Map<GetUserDto>(user); ;
+            return response;
+        }
+
 
         public async Task<ServiceResponse<string>> ResendOtp(string email)
         {
@@ -381,5 +400,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return isValid;
         }
 
+      
     }
 }

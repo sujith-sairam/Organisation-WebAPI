@@ -17,6 +17,11 @@ namespace Organisation_WebAPI
     {
         public AutoMapperProfile()
         {
+            CreateMap<User, GetUserDto>()
+           .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+           .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
+
             CreateMap<Product, GetProductDto>();
             CreateMap<AddProductDto,Product>();
             CreateMap<UpdateProductDto,Product>();
