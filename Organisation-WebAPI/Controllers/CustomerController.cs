@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -22,8 +23,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all customers from the database
         [HttpGet("GetAllCustomer")]
-        [AllowAnonymous]
-
+        [Authorize(Roles = nameof(UserRole.Employee) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetCustomers()
         {
             return Ok(await _customerService.GetAllCustomers());
