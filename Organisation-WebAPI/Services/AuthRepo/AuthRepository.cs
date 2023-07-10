@@ -47,11 +47,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Success = false;
                 response.Message = "User Not Found";
             }
-            else if (user.IsVerified == false)
-            {
-                response.Success = false;
-                response.Message = "User Not Verified";
-            }
+
             else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 response.Success = false;
@@ -98,15 +94,33 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 Otp = otp,
-                IsVerified = false,
+                IsVerified = true,
                 OtpExpiration = otpExpiration,
                 Role = model.Role
             };
 
             await _dbContext.Users.AddAsync(user);
 
+            var product = await _dbContext.Products.FindAsync(model.ProductID);
+
+            if (product == null)
+            {
+                response.Success = false;
+                response.Message = "Invalid product ID. Product Not Found";
+                return response;
+            }
+
             if (user.Role == UserRole.Employee)
             {
+                var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
+
+                if (department == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid department ID. Department Not Found";
+                    return response;
+                }
+
                 var employee = new Employee
                 {
                     EmployeeName = model.EmployeeName,
