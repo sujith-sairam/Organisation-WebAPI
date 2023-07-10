@@ -8,8 +8,7 @@ using Organisation_WebAPI.Dtos.ProductDto;
 using Organisation_WebAPI.Services.Products;
 
 namespace Organisation_WebAPI.Controllers
-{
-    [Authorize]   
+{   
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
@@ -21,7 +20,6 @@ namespace Organisation_WebAPI.Controllers
         }
         // Retrieves all products from the database
         [HttpGet("GetAllProducts")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
@@ -29,7 +27,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a product from the database based on the provided ID
         [HttpGet("GetProductById")]
-        [Authorize(Roles = nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProduct(int id)
         {
             return Ok(await _productService.GetProductById(id));
