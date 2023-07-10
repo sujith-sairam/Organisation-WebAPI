@@ -10,7 +10,7 @@ using Organisation_WebAPI.Services.Customers;
 
 namespace Organisation_WebAPI.Controllers
 {
-    [Authorize]
+    
     [ApiController]
     [Route("api/[controller]")]
     public class CustomerController : ControllerBase
@@ -23,7 +23,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all customers from the database
         [HttpGet("GetAllCustomer")]
-        [Authorize(Roles = nameof(UserRole.Employee) + "," + nameof(UserRole.Manager))]
+        // [Authorize(Roles = nameof(UserRole.Employee) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetCustomers()
         {
             return Ok(await _customerService.GetAllCustomers());

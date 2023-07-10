@@ -10,7 +10,6 @@ namespace Organisation_WebAPI.Dtos.DashboardDto
         public string? ProductName { get; set; }
         public int EmployeeCount { get; set; }
         public int CustomerCount { get; set; }
-
         public int ProductRevenue {get;set;}
             
     }
