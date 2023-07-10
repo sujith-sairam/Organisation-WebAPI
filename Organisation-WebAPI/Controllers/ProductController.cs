@@ -8,8 +8,7 @@ using Organisation_WebAPI.Dtos.ProductDto;
 using Organisation_WebAPI.Services.Products;
 
 namespace Organisation_WebAPI.Controllers
-{
-    
+{   
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
@@ -28,7 +27,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a product from the database based on the provided ID
         [HttpGet("GetProductById")]
-        
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProduct(int id)
         {
             return Ok(await _productService.GetProductById(id));
