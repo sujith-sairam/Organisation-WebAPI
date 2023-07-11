@@ -12,5 +12,6 @@ namespace Organisation_WebAPI.Dtos.ManagerDto
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
         public int ProductID {get;set;}
+        public string? ProductName {get;set;}
     }
 }

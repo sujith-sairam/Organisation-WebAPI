@@ -56,8 +56,18 @@ namespace Organisation_WebAPI.Services.Managers
         public async Task<ServiceResponse<List<GetManagerDto>>> GetAllManagers()
         {
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
-            var dbManagerTasks = await _context.Managers.ToListAsync();
-            serviceResponse.Data = dbManagerTasks.Select(c => _mapper.Map<GetManagerDto>(c)).ToList();
+            var dbManagers = await _context.Managers.ToListAsync();
+            var managerDTOs = dbManagers.Select(e => new GetManagerDto
+            {
+                ManagerId = e.ManagerId,
+                ManagerName = e.ManagerName,
+                ManagerSalary = e.ManagerSalary,
+                ManagerAge = e.ManagerAge,
+                ProductID = e.ProductID,
+                ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
+            }).ToList();
+
+            serviceResponse.Data = managerDTOs;
             return serviceResponse;
         }
 
