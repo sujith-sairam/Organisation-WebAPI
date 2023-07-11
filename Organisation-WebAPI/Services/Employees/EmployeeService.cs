@@ -22,7 +22,7 @@ namespace Organisation_WebAPI.Services.Employees
             
         }
 
-         // Adds a new Employee to the database
+        // Adds a new Employee to the database
         public async Task<ServiceResponse<List<GetEmployeeDto>>> AddEmployee(AddEmployeeDto newEmployee)
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
@@ -60,6 +60,8 @@ namespace Organisation_WebAPI.Services.Employees
        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees()
        {
         var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+
+        try {
         var dbEmployees = await _context.Employees.ToListAsync();
         var employeeDTOs = dbEmployees.Select(e => new GetEmployeeDto
         {
@@ -74,6 +76,13 @@ namespace Organisation_WebAPI.Services.Employees
         }).ToList();
 
         serviceResponse.Data = employeeDTOs;
+        } 
+
+        catch(Exception ex)
+         {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Error occured while fetching Employee Details " + ex;
+        }
         return serviceResponse;
      }
 
@@ -109,7 +118,16 @@ namespace Organisation_WebAPI.Services.Employees
 
                 if (employee is null)
                     throw new Exception($"Employee with id '{id}' not found");
-                
+
+                var departmentExists = await _context.Departments.AnyAsync(d => d.DepartmentID == updatedEmployee.DepartmentID);
+                if (!departmentExists)
+                    throw new Exception($"Invalid DepartmentID '{updatedEmployee.DepartmentID}'");
+
+        
+                var productExists = await _context.Products.AnyAsync(p => p.ProductID == updatedEmployee.ProductID);
+                if (!productExists)
+                    throw new Exception($"Invalid ProductID '{updatedEmployee.ProductID}'");
+
                 employee.EmployeeName = updatedEmployee.EmployeeName;
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.DepartmentID = updatedEmployee.DepartmentID;

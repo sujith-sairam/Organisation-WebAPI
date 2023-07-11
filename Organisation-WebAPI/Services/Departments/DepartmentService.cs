@@ -23,13 +23,21 @@ namespace Organisation_WebAPI.Services.Departments
         }
          // Adds a new department to the database
         public async Task<ServiceResponse<List<GetDepartmentDto>>> AddDepartment(AddDepartmentDto newDepartment)
-        {
+        {   
             var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
+            try 
+            {
             var department = _mapper.Map<Department>(newDepartment);
 
              _context.Departments.Add(department);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.Departments.Select(c => _mapper.Map<GetDepartmentDto>(c)).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            } 
             return serviceResponse;
         }
 
@@ -59,8 +67,16 @@ namespace Organisation_WebAPI.Services.Departments
         public async Task<ServiceResponse<List<GetDepartmentDto>>> GetAllDepartments()
         {
             var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
+            try
+            {
             var dbDepartments = await _context.Departments.ToListAsync();
             serviceResponse.Data = dbDepartments.Select(c => _mapper.Map<GetDepartmentDto>(c)).ToList();
+            } 
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;
         }
 
@@ -85,10 +101,9 @@ namespace Organisation_WebAPI.Services.Departments
         return serviceResponse;
         }
 
-
         public async Task<ServiceResponse<GetDepartmentDto>> UpdateDepartment(UpdateDepartmentDto updatedDepartment, int id)
         {
-              var serviceResponse = new ServiceResponse<GetDepartmentDto>();
+            var serviceResponse = new ServiceResponse<GetDepartmentDto>();
             try {
                 var department = await _context.Departments.FirstOrDefaultAsync(c => c.DepartmentID == id);
 
@@ -109,7 +124,6 @@ namespace Organisation_WebAPI.Services.Departments
             }
             
             return serviceResponse;
-        
         }
     }
 }
