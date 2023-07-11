@@ -108,7 +108,7 @@ namespace Organisation_WebAPI.Services.Customers
                 customer.CustomerName = updatedCustomer.CustomerName;
                 customer.CustomerEmail = updatedCustomer.CustomerEmail;
                 customer.CustomerPhoneNumber = updatedCustomer.CustomerPhoneNumber;
-               
+                customer.ProductID = updatedCustomer.ProductID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetCustomerDto>(customer);
