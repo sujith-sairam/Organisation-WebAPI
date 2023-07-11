@@ -174,15 +174,32 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+          
+
             if (user != null)
             {
-                if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow) { 
-                    user.IsVerified = true;
-                    user.Otp = null;
-                    await _dbContext.SaveChangesAsync();
-                    response.Success = true;
-                    response.Message = "OTP verification successful.";
+                if (user.OtpResendCount >= 3)
+                {
+                    response.Success = false;
+                    response.Message = "Maximum OTP resend limit reached.";
                     return response;
+                }
+                if (user.Otp == otp) {
+
+                    if (user.OtpExpiration > DateTimeOffset.UtcNow)
+                    {
+                        user.IsVerified = true;
+                        user.Otp = null;
+                        await _dbContext.SaveChangesAsync();
+                        response.Success = true;
+                        response.Message = "OTP verification successful.";
+                        return response;
+                    }
+                    else {
+                        response.Success = false;
+                        response.Message = "Your Otp has been expired , Please try again";
+                    }  
                 }
                 else
                 {
