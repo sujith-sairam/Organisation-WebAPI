@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Dtos.CustomerDto;
+using Organisation_WebAPI.Dtos.DepartmentDto;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -174,15 +175,32 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+          
+
             if (user != null)
             {
-                if (user.Otp != null && user.OtpExpiration > DateTimeOffset.UtcNow) { 
-                    user.IsVerified = true;
-                    user.Otp = null;
-                    await _dbContext.SaveChangesAsync();
-                    response.Success = true;
-                    response.Message = "OTP verification successful.";
+                if (user.OtpResendCount >= 3)
+                {
+                    response.Success = false;
+                    response.Message = "Maximum OTP resend limit reached.";
                     return response;
+                }
+                if (user.Otp == otp) {
+
+                    if (user.OtpExpiration > DateTimeOffset.UtcNow)
+                    {
+                        user.IsVerified = true;
+                        user.Otp = null;
+                        await _dbContext.SaveChangesAsync();
+                        response.Success = true;
+                        response.Message = "OTP verification successful.";
+                        return response;
+                    }
+                    else {
+                        response.Success = false;
+                        response.Message = "Your Otp has been expired , Please try again";
+                    }  
                 }
                 else
                 {
@@ -309,7 +327,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         }
 
-        public async Task<ServiceResponse<GetUserDto>> GetUserBYId(int id)
+        public async Task<ServiceResponse<GetUserDto>> GetUserById(int id)
         {
             var response = new ServiceResponse<GetUserDto>();
             var user = await _dbContext.Users.FindAsync(id);
@@ -324,6 +342,36 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return response;
         }
 
+        public async Task<ServiceResponse<string>> DeleteUserById(int id)
+        {
+            var response = new ServiceResponse<string>();
+            var user = await _dbContext.Users.FindAsync(id);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "User deleted successfully";
+            return response;
+
+        }
+
+        public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
+        {
+            var response = new ServiceResponse<List<GetUserDto>>();
+            var users = await _dbContext.Users.ToListAsync();
+
+            response.Data = users.Select(c => _mapper.Map<GetUserDto>(c)).ToList();
+            response.Message = "Users retrieved successfully";
+
+            return response;
+
+        }
 
         public async Task<ServiceResponse<string>> ResendOtp(string email)
         {

@@ -22,7 +22,7 @@ namespace Organisation_WebAPI.Middleware
             var userId = jwtUtils.ValidateJwtToken(token);
             if (userId != null) {
                 //context.Items["User"] = 
-                context.Items["User"] = _authRepository.GetUserBYId(userId.Value);
+                context.Items["User"] = _authRepository.GetUserById(userId.Value);
             }
             await _next(context);
         }
