@@ -21,7 +21,8 @@ namespace Organisation_WebAPI.Services.Dashboard
         public async Task<ServiceResponse<List<OverViewChartDto>>> GetChartDetails()
         {
             var serviceResponse = new ServiceResponse<List<OverViewChartDto>>();
-
+            try
+            {
             var products = await _context.Products
             .Select(p => new OverViewChartDto
             {
@@ -33,6 +34,12 @@ namespace Organisation_WebAPI.Services.Dashboard
             .ToListAsync();
 
             serviceResponse.Data = products;
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            } 
             return serviceResponse;
         }
 

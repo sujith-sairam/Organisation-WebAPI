@@ -40,7 +40,7 @@ namespace Organisation_WebAPI.Services.Products
             var product = await _context.Products.FirstOrDefaultAsync(c => c.ProductID == id);
             if (product is null)
                 throw new Exception($"Product with id '{id}' not found");
-            
+           
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             serviceResponse.Data = _context.Products.Select(c => _mapper.Map<GetProductDto>(c)).ToList();
