@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -25,11 +26,26 @@ namespace Organisation_WebAPI.Services.Customers
         public async Task<ServiceResponse<List<GetCustomerDto>>> AddCustomer(AddCustomerDto addCustomer)
         {
             var serviceResponse = new ServiceResponse<List<GetCustomerDto>>();
+            try 
+            {
             var customer = _mapper.Map<Customer>(addCustomer);
+
+            var productExists = await _context.Products.AnyAsync(p => p.ProductID == addCustomer.ProductID);
+            if (!productExists)
+                throw new Exception($"Invalid ProductID '{addCustomer.ProductID}'");
+            
+            if (!IsEmailValid(addCustomer.CustomerEmail))
+                throw new Exception($"Email is invalid");
 
              _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.Customers.Select(c => _mapper.Map<GetCustomerDto>(c)).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            } 
             return serviceResponse;
         }
 
@@ -103,7 +119,13 @@ namespace Organisation_WebAPI.Services.Customers
                 var customer = await _context.Customers.FirstOrDefaultAsync(c => c.CustomerID == id);
                 if (customer is null)
                     throw new Exception($"Customer with id '{id}' not found");
-                
+
+                var productExists = await _context.Products.AnyAsync(p => p.ProductID == updatedCustomer.ProductID);
+                if (!productExists)
+                    throw new Exception($"Invalid ProductID '{updatedCustomer.ProductID}'");
+
+                if (!IsEmailValid(updatedCustomer.CustomerEmail))
+                    throw new Exception($"Email is invalid");
                 
                 customer.CustomerName = updatedCustomer.CustomerName;
                 customer.CustomerEmail = updatedCustomer.CustomerEmail;
@@ -123,5 +145,21 @@ namespace Organisation_WebAPI.Services.Customers
             
             return serviceResponse;
         }
+
+        private bool IsEmailValid(string? email)
+        {   
+            if (email is null)
+            {
+                return false;
+            }
+            // Regular expression pattern for email validation
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+
+            // Check if the email matches the pattern
+            bool isValid = Regex.IsMatch(email, pattern);
+
+            return isValid;
+        }
     }
+
 }

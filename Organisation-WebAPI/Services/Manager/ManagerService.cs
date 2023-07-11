@@ -25,11 +25,17 @@ namespace Organisation_WebAPI.Services.Managers
         public async Task<ServiceResponse<List<GetManagerDto>>> AddManager(AddManagerDto newManager)
         {
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
+            try {
             var manager = _mapper.Map<Manager>(newManager);
-
              _context.Managers.Add(manager);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.Managers.Select(c => _mapper.Map<GetManagerDto>(c)).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;   
         }    
         public async Task<ServiceResponse<List<GetManagerDto>>> DeleteManager(int id)
@@ -54,8 +60,10 @@ namespace Organisation_WebAPI.Services.Managers
         }
 
         public async Task<ServiceResponse<List<GetManagerDto>>> GetAllManagers()
-        {
+        {   
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
+            try
+            {
             var dbManagers = await _context.Managers.ToListAsync();
             var managerDTOs = dbManagers.Select(e => new GetManagerDto
             {
@@ -68,6 +76,14 @@ namespace Organisation_WebAPI.Services.Managers
             }).ToList();
 
             serviceResponse.Data = managerDTOs;
+            }
+
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+
             return serviceResponse;
         }
 
@@ -101,6 +117,10 @@ namespace Organisation_WebAPI.Services.Managers
                 if (manager is null)
                     throw new Exception($"Manager with id '{id}' not found");
                 
+                var productExists = await _context.Products.AnyAsync(p => p.ProductID == updatedManager.ProductID);
+                if (!productExists)
+                    throw new Exception($"Invalid ProductID '{updatedManager.ProductID}'");
+
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
