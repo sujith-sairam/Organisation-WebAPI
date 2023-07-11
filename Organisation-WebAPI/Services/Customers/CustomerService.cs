@@ -58,10 +58,20 @@ namespace Organisation_WebAPI.Services.Customers
         // Retrieves all customers from the database
         public async Task<ServiceResponse<List<GetCustomerDto>>> GetAllCustomers()
         {  
-            var serviceResponse = new ServiceResponse<List<GetCustomerDto>>();
-            var dbCustomers = await _context.Customers.ToListAsync();
-            serviceResponse.Data = dbCustomers.Select(c => _mapper.Map<GetCustomerDto>(c)).ToList();
-            return serviceResponse;
+              var serviceResponse = new ServiceResponse<List<GetCustomerDto>>();
+        var dbCustomer = await _context.Customers.ToListAsync();
+        var customerDTOs = dbCustomer.Select(e => new GetCustomerDto
+        {
+            CustomerID = e.CustomerID,
+            CustomerName = e.CustomerName,
+            CustomerEmail = e.CustomerEmail,
+            CustomerPhoneNumber = e.CustomerPhoneNumber,
+            ProductID = e.ProductID,
+            ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
+        }).ToList();
+
+        serviceResponse.Data = customerDTOs;
+        return serviceResponse;
         }
 
         //Retrieves a customer from the database with Id
@@ -98,7 +108,7 @@ namespace Organisation_WebAPI.Services.Customers
                 customer.CustomerName = updatedCustomer.CustomerName;
                 customer.CustomerEmail = updatedCustomer.CustomerEmail;
                 customer.CustomerPhoneNumber = updatedCustomer.CustomerPhoneNumber;
-               
+                customer.ProductID = updatedCustomer.ProductID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetCustomerDto>(customer);

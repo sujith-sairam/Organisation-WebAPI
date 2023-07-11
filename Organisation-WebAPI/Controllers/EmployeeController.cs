@@ -36,12 +36,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeService.GetEmployeeById(id));
         }
 
-        // Adds a new Employee to the database
-        [HttpPost("CreateEmployee")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> AddEmployee(AddEmployeeDto newEmployee)
-        {
-            return Ok(await _employeeService.AddEmployee(newEmployee));
-        }
 
         // Updates a employee in the database based on the provided ID
         [HttpPut("UpdateEmployee")]

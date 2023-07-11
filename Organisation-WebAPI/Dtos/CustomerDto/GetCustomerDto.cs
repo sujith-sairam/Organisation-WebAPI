@@ -12,6 +12,7 @@ namespace Organisation_WebAPI.Dtos.CustomerDto
         public int CustomerPhoneNumber { get; set; }
         public string ?CustomerEmail {get;set;}
         public int ProductID {get; set;}
+         public string? ProductName {get;set;}
         
     }
 }

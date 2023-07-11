@@ -8,7 +8,7 @@ using Organisation_WebAPI.Dtos.ProductDto;
 using Organisation_WebAPI.Services.Products;
 
 namespace Organisation_WebAPI.Controllers
-{
+{   
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase

@@ -59,7 +59,7 @@ namespace Organisation_WebAPI.Controllers
         [HttpPost("GetUserById")]
         public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserById(int id)
         {
-            var response = await _authRepository.GetUserBYId(id);
+            var response = await _authRepository.GetUserById(id);
             if (!response.Success)
             {
                 return BadRequest(response);
@@ -97,6 +97,29 @@ namespace Organisation_WebAPI.Controllers
         {
             var response = await _authRepository.ResendOtp(email);
             if (!response.Success)  
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost("DeleteUserById")]
+        public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
+        {
+            var response = await _authRepository.DeleteUserById(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+
+        [HttpPost("GetAllUsers")]
+        public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
+        {
+            var response = await _authRepository.GetAllUsers();
+            if (!response.Success)
             {
                 return BadRequest(response);
             }

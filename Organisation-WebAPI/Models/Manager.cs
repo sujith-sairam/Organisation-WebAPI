@@ -13,7 +13,7 @@ namespace Organisation_WebAPI.Models
         public string? ManagerName {get;set; }
         public int ManagerSalary { get; set; }
         [ForeignKey("User")]
-        public int UserID { get; set; }
+        public int? UserID { get; set; }
         public int ManagerAge { get; set; }
         [ForeignKey("Product")]
         public int ProductID {get;set;}

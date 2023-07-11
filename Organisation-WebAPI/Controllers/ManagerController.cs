@@ -33,11 +33,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetManagerById(id));
         }
 
-        [HttpPost("CreateManager")]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> AddEmployee(AddManagerDto newManager)
-        {
-            return Ok(await _managerService.AddManager(newManager));
-        }
+        
 
        
         [HttpPut("UpdateManager")]
