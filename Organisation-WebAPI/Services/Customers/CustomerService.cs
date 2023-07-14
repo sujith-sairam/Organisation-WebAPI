@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -15,7 +16,6 @@ namespace Organisation_WebAPI.Services.Customers
     {   
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context;  // Provides object-object mapping
-
         public CustomerService(IMapper mapper,OrganizationContext context)
         {
             _mapper = mapper; // Injects the IMapper instance
@@ -23,6 +23,7 @@ namespace Organisation_WebAPI.Services.Customers
         }
 
         // Adds a new customer to the database
+
         public async Task<ServiceResponse<List<GetCustomerDto>>> AddCustomer(AddCustomerDto addCustomer)
         {
             var serviceResponse = new ServiceResponse<List<GetCustomerDto>>();

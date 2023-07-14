@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Services.Dashboard;
 
@@ -19,6 +21,7 @@ namespace Organisation_WebAPI.Controllers
         }
         
         [HttpGet("GetTotalCount")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
         {
             var serviceResponse = await _dashboardService.GetTotalCount();
@@ -26,6 +29,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetChartDetails")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetChartDetails()
         {
             var serviceResponse = await _dashboardService.GetChartDetails();

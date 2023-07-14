@@ -22,6 +22,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all employees from the database
         [HttpGet("GetAllEmployees")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployees()
         {
             return Ok(await _employeeService.GetAllEmployees());
@@ -30,6 +31,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a employee from the database based on the provided ID
         [HttpGet("GetEmployeeById")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
         {
             return Ok(await _employeeService.GetEmployeeById(id));
@@ -38,12 +40,14 @@ namespace Organisation_WebAPI.Controllers
 
         // Updates a employee in the database based on the provided ID
         [HttpPut("UpdateEmployee")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
             return Ok(await _employeeService.UpdateEmployee(updatedEmployee,id));
         }
         
         // Deletes a employee from the database based on the provided ID
         [HttpDelete("DeleteEmployee")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
             return Ok(await _employeeService.DeleteEmployee(id));
         }
