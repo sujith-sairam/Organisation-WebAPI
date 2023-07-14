@@ -11,10 +11,10 @@ namespace Organisation_WebAPI.Models
         public string ?EmployeeName { get; set; }
         public int EmployeeSalary { get; set; }
         public int EmployeeAge { get; set; }
-
         [ForeignKey("User")]
         public int? UserID { get; set; }
-
+        [ForeignKey("Manager")]
+        public int ManagerID {get;set;}
         [ForeignKey("Department")]
         public int DepartmentID { get; set; }
 
