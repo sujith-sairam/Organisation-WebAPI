@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using organisation_webapi.dtos.admin;
+using Organisation_WebAPI.Attributes;
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Models;
 using Organisation_WebAPI.Services.AuthRepo;
+using System.Data;
+using System.Security.Claims;
 using static System.Net.WebRequestMethods;
 
 namespace Organisation_WebAPI.Controllers
@@ -18,7 +21,10 @@ namespace Organisation_WebAPI.Controllers
             _authRepository = authRepository;
         }
 
+
         [HttpPost("Register")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDto request)
         {
             var response = await _authRepository.Register(request);
@@ -31,6 +37,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<int>>> Login(UserLoginDto request)
         {
             var response = await _authRepository.Login(request.UserName, request.Password);
@@ -41,7 +48,10 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+
+
         [HttpPost("Verify")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> Verify(string email, string otp)
         {
             var response = await _authRepository.Verify(
@@ -56,7 +66,9 @@ namespace Organisation_WebAPI.Controllers
         }
 
 
-        [HttpPost("GetUserById")]
+        [HttpGet("GetUserById")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserById(int id)
         {
             var response = await _authRepository.GetUserById(id);
@@ -69,6 +81,8 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("ForgotPassword")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<string>>> ForgotPassword(string email)
         {
             var response = await _authRepository.ForgotPassword(email);
@@ -81,6 +95,8 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("ResetPassword")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<string>>> ResetPassword(ResetPasswordDto request)
         {
             var response = await _authRepository.ResetPassword(request);
@@ -93,6 +109,8 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("ResendOtp")]
+        [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<string>>> ResendOtp(string email)
         {
             var response = await _authRepository.ResendOtp(email);
@@ -103,7 +121,9 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpPost("DeleteUserById")]
+        [HttpDelete("DeleteUserById")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+
         public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
         {
             var response = await _authRepository.DeleteUserById(id);
@@ -114,8 +134,8 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-
-        [HttpPost("GetAllUsers")]
+        [HttpGet("GetAllUsers")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
         {
             var response = await _authRepository.GetAllUsers();

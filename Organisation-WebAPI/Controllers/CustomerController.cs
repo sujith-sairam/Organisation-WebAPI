@@ -23,7 +23,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all customers from the database
         [HttpGet("GetAllCustomer")]
-        // [Authorize(Roles = nameof(UserRole.Employee) + "," + nameof(UserRole.Manager))]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetCustomers()
         {
             return Ok(await _customerService.GetAllCustomers());
@@ -31,6 +31,8 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a customer from the database based on the provided ID
         [HttpGet("GetCustomerById")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetDepartment(int id)
         {
             return Ok(await _customerService.GetCustomerById(id));
@@ -38,7 +40,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Adds a new customer to the database
         [HttpPost("CreateCustomer")]
-        [AllowAnonymous]
+        [Authorize(Roles = nameof(UserRole.Admin))]
 
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> AddCustomer(AddCustomerDto newCustomer)
         {
@@ -47,12 +49,15 @@ namespace Organisation_WebAPI.Controllers
 
         // Updates a customer in the database based on the provided ID
         [HttpPut("UpdateCustomer")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
+
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> UpdateCustomer(UpdateCustomerDto updatedCustomer,int id){
             return Ok(await _customerService.UpdateCustomer(updatedCustomer,id));
         }
         
         // Deletes a customer from the database based on the provided ID
         [HttpDelete("DeleteCustomer")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> DeleteCustomer(int id){
             return Ok(await _customerService.DeleteCustomer(id));
         }

@@ -17,6 +17,9 @@ using Serilog;
 using Organisation_WebAPI.Services.EmployeeTasks;
 using Organisation_WebAPI.Services.Managers;
 using Organisation_WebAPI.Services.Dashboard;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Organisation_WebAPI.DataSeed;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -33,6 +36,7 @@ builder.Services.AddCors(opt =>
             .AllowAnyMethod();
     });
 });
+
 
 // Add services to the container.
 
@@ -59,18 +63,6 @@ builder.Services.AddSingleton(emailConfig);
 
 builder.Services.AddControllers();
 
-
-// Add CORS configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularApp",
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:4200")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -113,6 +105,22 @@ builder.Services.AddSwaggerGen(c=>
 
 #endregion
 
+
+static void SeedData(IServiceProvider services)
+{
+    using var scope = services.CreateScope();
+    var serviceProvider = scope.ServiceProvider;
+    var context = serviceProvider.GetRequiredService<OrganizationContext>();
+
+    // Seed the admin user
+    AdminUserSeed.SeedAdminUser(serviceProvider);
+
+    // Add more seed methods for other entities if needed
+
+    // Save changes to the database
+    context.SaveChanges();
+}
+
 #region Configure Serilog
 
 builder.Host.UseSerilog((context, config) =>
@@ -130,6 +138,9 @@ builder.Host.UseSerilog((context, config) =>
 
 var app = builder.Build();
 
+var serviceProvider = app.Services;
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -138,7 +149,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();      
 
 app.UseCors();
 
@@ -147,5 +158,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+SeedData(serviceProvider);
 
 app.Run();

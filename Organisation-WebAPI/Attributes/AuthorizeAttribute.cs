@@ -18,6 +18,8 @@ namespace Organisation_WebAPI.Attributes
             _roles = roles ?? new UserRole[] { };
         }
 
+        public string Roles { get; set; }
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             // skip authorization if action is decorated with [AllowAnonymous] attribute
