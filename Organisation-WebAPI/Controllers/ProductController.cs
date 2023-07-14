@@ -20,6 +20,7 @@ namespace Organisation_WebAPI.Controllers
         }
         // Retrieves all products from the database
         [HttpGet("GetAllProducts")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
@@ -27,6 +28,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a product from the database based on the provided ID
         [HttpGet("GetProductById")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProduct(int id)
         {
             return Ok(await _productService.GetProductById(id));
@@ -36,6 +38,7 @@ namespace Organisation_WebAPI.Controllers
 
         //Retrieves all product revenues with product names
         [HttpGet("GetProductRevenue")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
         {
             var serviceResponse = await _productService.GetRevenue();
@@ -44,8 +47,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Adds a new Product to the database
         [HttpPost("CreateProduct")]
-        [AllowAnonymous]
-
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> AddProduct(AddProductDto newProduct)
         {
             return Ok(await _productService.AddProduct(newProduct));
@@ -53,12 +55,14 @@ namespace Organisation_WebAPI.Controllers
 
         // Updates a product in the database based on the provided ID
         [HttpPut("UpdateProduct")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> UpdateProduct(UpdateProductDto updatedProduct,int id){
             return Ok(await _productService.UpdateProduct(updatedProduct,id));
         }
         
         // Deletes a product from the database based on the provided ID
         [HttpDelete("DeleteProduct")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> DeleteProduct(int id){
             return Ok(await _productService.DeleteProduct(id));
         }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Azure;
 using EmailService;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +30,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly IMemoryCache _memoryCache;
         private readonly IMapper _mapper;
 
+
         public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
         {
             _dbContext = dbContext;
@@ -39,7 +42,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             _mapper = mapper;
         }
 
-       public async Task<ServiceResponse<string>> Login(string username, string password)
+        public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
@@ -61,6 +64,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             return response;
         }
+
+
 
         public async Task<ServiceResponse<string>> Register(UserRegisterDto model)
         {
