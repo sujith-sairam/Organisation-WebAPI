@@ -8,8 +8,12 @@ namespace Organisation_WebAPI.Models
 {
     public class Manager
     {
+        public Manager()
+        {
+            Managers = new List<Manager>();
+        }
         [Key]
-        public int ManagerId {get;set;}
+        public int ManagerID {get;set;}
         public string? ManagerName {get;set; }
         public int ManagerSalary { get; set; }
         [ForeignKey("User")]
@@ -20,6 +24,6 @@ namespace Organisation_WebAPI.Models
         public Product? Product {get;set;}
         public User? User { get; set; }
 
-
+        public ICollection<Manager> Managers {get;set;}
     }
 }

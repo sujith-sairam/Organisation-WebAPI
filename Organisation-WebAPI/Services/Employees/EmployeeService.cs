@@ -72,7 +72,7 @@ namespace Organisation_WebAPI.Services.Employees
             DepartmentID = e.DepartmentID,
             DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
             ManagerID = e.ManagerID,
-            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.ManagerName,
+            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerID == e.ManagerID)?.ManagerName,
             ProductID = e.ProductID,
             ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
         }).ToList();

@@ -7,6 +7,9 @@ namespace Organisation_WebAPI.Models
 {
     public class Employee
     {
+         public Employee() { 
+           EmployeeTasks = new List<EmployeeTask>();
+        }
         public int EmployeeID { get; set; }
         public string ?EmployeeName { get; set; }
         public int EmployeeSalary { get; set; }
@@ -23,6 +26,7 @@ namespace Organisation_WebAPI.Models
         public User? User { get; set; }
         public Department? Department { get; set; }
         public Product? Product {get; set;}
+        public ICollection<EmployeeTask> EmployeeTasks { get; set; }
 
 
     }

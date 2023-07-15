@@ -21,7 +21,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
             return Ok(await _employeeTaskService.GetAllEmployeeTasks());

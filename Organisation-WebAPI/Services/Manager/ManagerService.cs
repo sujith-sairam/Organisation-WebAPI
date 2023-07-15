@@ -43,7 +43,7 @@ namespace Organisation_WebAPI.Services.Managers
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
             try {
 
-            var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
+            var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
             if (manager is null)
                 throw new Exception($"Manager with id '{id}' not found");
             
@@ -67,7 +67,7 @@ namespace Organisation_WebAPI.Services.Managers
             var dbManagers = await _context.Managers.ToListAsync();
             var managerDTOs = dbManagers.Select(e => new GetManagerDto
             {
-                ManagerId = e.ManagerId,
+                ManagerId = e.ManagerID,
                 ManagerName = e.ManagerName,
                 ManagerSalary = e.ManagerSalary,
                 ManagerAge = e.ManagerAge,
@@ -92,7 +92,7 @@ namespace Organisation_WebAPI.Services.Managers
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try
             {
-            var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
+            var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
             if (dbManager is null)
                     throw new Exception($"Manager with id '{id}' not found");
 
@@ -112,7 +112,7 @@ namespace Organisation_WebAPI.Services.Managers
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try {
-                var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
+                var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
 
                 if (manager is null)
                     throw new Exception($"Manager with id '{id}' not found");

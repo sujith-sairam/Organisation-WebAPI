@@ -36,8 +36,6 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetManagerById(id));
         }
 
-        
-
        
         [HttpPut("UpdateManager")]
         [Authorize(Roles = nameof(UserRole.Admin))]
