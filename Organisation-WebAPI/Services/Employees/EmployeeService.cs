@@ -71,6 +71,8 @@ namespace Organisation_WebAPI.Services.Employees
             EmployeeAge = e.EmployeeAge,
             DepartmentID = e.DepartmentID,
             DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
+            ManagerID = e.ManagerID,
+            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.ManagerName,
             ProductID = e.ProductID,
             ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
         }).ToList();
@@ -132,6 +134,7 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.DepartmentID = updatedEmployee.DepartmentID;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
+                employee.ManagerID = updatedEmployee.ManagerID;
                 employee.ProductID = updatedEmployee.ProductID;
 
                 await _context.SaveChangesAsync();

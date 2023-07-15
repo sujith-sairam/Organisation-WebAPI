@@ -45,14 +45,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName!.ToLower() == username.ToLower());
             if (user == null)
             {
                 response.Success = false;
                 response.Message = "User Not Found";
             }
 
-            else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            else if (!VerifyPasswordHash(password, user.PasswordHash!, user.PasswordSalt!))
             {
                 response.Success = false;
                 response.Message = "Incorrect Password";
@@ -82,6 +82,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 response.Success = false;
                 response.Message = "User already exists";
+                return response;
+            }
+
+            var ExistingEmail = await _dbContext.Users.FirstOrDefaultAsync(e => model.Email == e.Email);
+            if(ExistingEmail != null) 
+            {
+                response.Success = false;
+                response.Message = "Email already exists";
                 return response;
             }
 
@@ -122,6 +130,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
 
 
+                if(manager == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid Manager ID. Manager Not Found";
+                    return response;
+                }
+
+
                 if (department == null)
                 {
                     response.Success = false;
@@ -142,6 +158,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     EmployeeSalary = model.EmployeeSalary,
                     EmployeeAge = model.EmployeeAge,
                     DepartmentID = model.DepartmentID,
+                    ManagerID = model.DepartmentID,
                     ProductID = model.ProductID,
                     ManagerID = model.ManagerID
                     User = user
@@ -171,10 +188,11 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             await _dbContext.SaveChangesAsync();
 
-            var message = new Message(new string[] { model.Email }, "HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
+            var message = new Message(new string[] { model.Email }, "HR GO - Account Registration", $"Your Account for  HR GO Portal is: \n UserName : {model.UserName} \n Password : {model.Password} ");
             _emailSender.SendEmail(message);
 
-            response.Data = "Please check your email for OTP.";
+            response.Data = "";
+            response.Message = " Account has been created successfully ";
             return response;
         }
 
@@ -189,10 +207,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid email address.";
                 return response;
             }
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-
-          
-
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
             if (user != null)
             {
                 if (user.OtpResendCount >= 3)
@@ -240,7 +255,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         public async Task<bool> UserExists(string username)
         {
-            if (await _dbContext.Users.AnyAsync(u => u.UserName.ToLower() == username.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.UserName!.ToLower() == username.ToLower()))
             {
                 return true;
             }
@@ -249,7 +264,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> ForgotPassword(string email)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
             if (!IsEmailValid(email))
             {
                 response.Success = false;
@@ -262,7 +277,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email does not exists";
                 return response;
             }
-            if (user.IsVerified == false)
+            if (user!.IsVerified == false)
             {
                 response.Success = false;
                 response.Message = "User Not Verified";
@@ -296,7 +311,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             if (request.Email is not null) {
 
-                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == request.Email.ToLower());
                 
                 if(user != null)
                 {
@@ -399,7 +414,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
 
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
 
             if (user == null)
             {
@@ -442,7 +457,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         public async Task<bool> EmailExists(string email)
         {
-            if (await _dbContext.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.Email!.ToLower() == email.ToLower()))
             {
                 return true;
             }

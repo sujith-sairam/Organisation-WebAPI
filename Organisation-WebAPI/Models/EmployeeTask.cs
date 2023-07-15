@@ -10,7 +10,7 @@ namespace Organisation_WebAPI.Models
         public string? TaskDescription { get; set; }
         public DateTime? TaskCreatedDate { get; set; }
         public DateTime? TaskDueDate { get; set; }
-        public string? TaskStatus { get; set; }
+        public Status TaskStatus { get; set; }
         [ForeignKey("EmployeeID")]
         public int EmployeeId { get; set; }
         public Employee? Employee { get; set; }

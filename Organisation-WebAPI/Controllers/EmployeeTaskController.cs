@@ -27,6 +27,30 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeTaskService.GetAllEmployeeTasks());
         }
 
+        [HttpGet("GetNewEmployeeTasks")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetNewEmployeeTasks()
+        {
+            return Ok(await _employeeTaskService.GetEmployeeNewTask());
+        }
+
+        [HttpGet("GetOngoingEmployeeTasks")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetOngoingEmployeeTasks()
+        {
+            return Ok(await _employeeTaskService.GetEmployeeOngoingTask());
+        }
+
+        [HttpGet("GetCompletedEmployeeTasks")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetCompletedEmployeeTasks()
+        {
+            return Ok(await _employeeTaskService.GetEmployeeCompletedTask());
+        }
+
+        [HttpGet("GetPendingEmployeeTasks")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetPendingEmployeeTasks()
+        {
+            return Ok(await _employeeTaskService.GetEmployeePendingTask());
+        }
+
         [HttpPost("CreateEmployeeTasks")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
@@ -40,7 +64,7 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> DeleteEmployeeTask(int id){
             return Ok(await _employeeTaskService.DeleteEmployeeTask(id));
         }
-
+        
         [HttpGet("GetEmployeeTaskById")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTask(int id)
