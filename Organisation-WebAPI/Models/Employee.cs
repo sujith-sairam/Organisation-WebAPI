@@ -20,6 +20,10 @@ namespace Organisation_WebAPI.Models
 
         [ForeignKey("Product")]
         public int ProductID {get; set;}
+
+        [ForeignKey("Manager")]
+        public int? ManagerID { get; set; }
+        public Manager? Manager { get; set; }
         public User? User { get; set; }
         public Department? Department { get; set; }
         public Product? Product {get; set;}

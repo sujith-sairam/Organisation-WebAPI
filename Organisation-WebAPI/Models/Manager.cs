@@ -8,6 +8,10 @@ namespace Organisation_WebAPI.Models
 {
     public class Manager
     {
+        public Manager()
+        {
+            Employees = new List<Employee>();
+        }
         [Key]
         public int ManagerId {get;set;}
         public string? ManagerName {get;set; }
@@ -17,8 +21,11 @@ namespace Organisation_WebAPI.Models
         public int ManagerAge { get; set; }
         [ForeignKey("Product")]
         public int ProductID {get;set;}
+ 
         public Product? Product {get;set;}
         public User? User { get; set; }
+
+        public ICollection<Employee> Employees { get; set; }
 
 
     }

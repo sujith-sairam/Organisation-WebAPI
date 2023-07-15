@@ -129,6 +129,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
                 var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
 
+
                 if(manager == null)
                 {
                     response.Success = false;
@@ -136,10 +137,18 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     return response;
                 }
 
+
                 if (department == null)
                 {
                     response.Success = false;
                     response.Message = "Invalid department ID. Department Not Found";
+                    return response;
+                }
+
+                if (manager == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid manager ID. Manager Not Found";
                     return response;
                 }
 
@@ -151,6 +160,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     DepartmentID = model.DepartmentID,
                     ManagerID = model.DepartmentID,
                     ProductID = model.ProductID,
+                    ManagerID = model.ManagerID
                     User = user
                 };
 
