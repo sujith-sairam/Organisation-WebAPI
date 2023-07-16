@@ -20,35 +20,41 @@ namespace Organisation_WebAPI.Controllers
             _employeeTaskService = employeeTaskService;
         }
 
-        [HttpGet("GetAllEmployeeTasks")]
-        [Authorize(nameof(UserRole.Manager))]
+        [HttpGet("GetAllEmployeeTasksByManagerId")]
+        
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
             return Ok(await _employeeTaskService.GetAllEmployeeTasks());
         }
 
-        [HttpGet("GetNewEmployeeTasks")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetNewEmployeeTasks()
+        [HttpGet("GetAllEmployeeTasksByEmployeeId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasksByEmployeeId(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeNewTask());
+            return Ok(await _employeeTaskService.GetAllEmployeeTasksByEmployeeId(id));
         }
 
-        [HttpGet("GetOngoingEmployeeTasks")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetOngoingEmployeeTasks()
+        [HttpGet("GetNewEmployeeTasksByEmployeeId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetNewEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeOngoingTask());
+            return Ok(await _employeeTaskService.GetEmployeeNewTaskByEmployeeId(id));
         }
 
-        [HttpGet("GetCompletedEmployeeTasks")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetCompletedEmployeeTasks()
+        [HttpGet("GetOngoingEmployeeTasksByEmployeeId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetOngoingEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeCompletedTask());
+            return Ok(await _employeeTaskService.GetEmployeeOngoingTaskByEmployeeId(id));
         }
 
-        [HttpGet("GetPendingEmployeeTasks")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetPendingEmployeeTasks()
+        [HttpGet("GetCompletedEmployeeTasksByEmployeeId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetCompletedEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeePendingTask());
+            return Ok(await _employeeTaskService.GetEmployeeCompletedTaskByEmployeeId(id));
+        }
+
+        [HttpGet("GetPendingEmployeeTasksByManagerId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetPendingEmployeeTasksByEmployeeId(int id)
+        {
+            return Ok(await _employeeTaskService.GetEmployeePendingTaskByEmployeeId(id));
         }
 
         [HttpPost("CreateEmployeeTasks")]
@@ -81,7 +87,6 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPut("UpdateEmployeeTaskStatus")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployee(UpdateEmployeeTaskStatusDto updatedEmployeeTaskStatus,int id){
             return Ok(await _employeeTaskService.UpdateEmployeeTaskStatus(updatedEmployeeTaskStatus,id));
         }

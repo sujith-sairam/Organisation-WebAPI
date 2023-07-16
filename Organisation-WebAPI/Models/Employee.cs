@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,9 +8,14 @@ namespace Organisation_WebAPI.Models
 {
     public class Employee
     {
-         public Employee() { 
-           EmployeeTasks = new List<EmployeeTask>();
+        public Employee()
+        {
+            EmployeeTasks = new List<EmployeeTask>();
         }
+
+        
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)] 
         public int EmployeeID { get; set; }
         public string ?EmployeeName { get; set; }
         public int EmployeeSalary { get; set; }

@@ -114,7 +114,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
             };
 
             await _dbContext.Users.AddAsync(user);
-
+            await _dbContext.SaveChangesAsync();
+            
             var product = await _dbContext.Products.FindAsync(model.ProductID);
 
             if (product == null)
@@ -129,6 +130,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
                 var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
 
+
                 if(manager == null)
                 {
                     response.Success = false;
@@ -136,10 +138,18 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     return response;
                 }
 
+
                 if (department == null)
                 {
                     response.Success = false;
                     response.Message = "Invalid department ID. Department Not Found";
+                    return response;
+                }
+
+                if (manager == null)
+                {
+                    response.Success = false;
+                    response.Message = "Invalid manager ID. Manager Not Found";
                     return response;
                 }
 
@@ -149,11 +159,20 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     EmployeeSalary = model.EmployeeSalary,
                     EmployeeAge = model.EmployeeAge,
                     DepartmentID = model.DepartmentID,
-                    ManagerID = model.DepartmentID,
                     ProductID = model.ProductID,
+                    ManagerID = model.ManagerID,
                     User = user
                 };
-
+                if (user != null && user.UserID != 0)
+                {
+                    employee.EmployeeID = user.UserID;
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "User Object not created";
+                    return response;
+                }
                 await _dbContext.Employees.AddAsync(employee);
             }
             else if (user.Role == UserRole.Manager)

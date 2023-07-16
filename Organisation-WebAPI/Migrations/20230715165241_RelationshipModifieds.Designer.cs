@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230710161718_initialMigration")]
-    partial class initialMigration
+    [Migration("20230715165241_RelationshipModifieds")]
+    partial class RelationshipModifieds
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,10 +89,7 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
                 {
                     b.Property<int>("EmployeeID")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeID"));
 
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
@@ -104,6 +101,9 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeSalary")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ManagerID")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductID")
@@ -146,8 +146,8 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<string>("TaskName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaskStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TaskStatus")
+                        .HasColumnType("int");
 
                     b.HasKey("TaskID");
 
@@ -158,11 +158,11 @@ namespace Organisation_WebAPI.Migrations
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
                 {
-                    b.Property<int>("ManagerId")
+                    b.Property<int>("ManagerID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManagerId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManagerID"));
 
                     b.Property<int>("ManagerAge")
                         .HasColumnType("int");
@@ -179,7 +179,7 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
 
-                    b.HasKey("ManagerId");
+                    b.HasKey("ManagerID");
 
                     b.HasIndex("ProductID");
 
@@ -216,7 +216,6 @@ namespace Organisation_WebAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsVerified")
@@ -232,18 +231,15 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserID");
@@ -301,7 +297,7 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.EmployeeTask", b =>
                 {
                     b.HasOne("Organisation_WebAPI.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeTasks")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -329,6 +325,11 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Department", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
+                {
+                    b.Navigation("EmployeeTasks");
                 });
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Product", b =>
