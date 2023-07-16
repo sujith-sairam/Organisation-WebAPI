@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.EmployeeTaskDto;
@@ -20,14 +21,27 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             _mapper = mapper;
             _context = context;
         }
-        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto addEmployeeTask)
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask([FromBody] AddEmployeeTaskDto addEmployeeTask)
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
+            
+            var ExistingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == addEmployeeTask.EmployeeId);
+            if(ExistingEmployee is null){
+                throw new Exception($"Employee with id '{addEmployeeTask.EmployeeId}' not found");
+            }
             var employeeTask = _mapper.Map<EmployeeTask>(addEmployeeTask);
-
-             _context.EmployeeTasks.Add(employeeTask);
+            employeeTask.TaskCreatedDate = DateTime.Now;
+            _context.EmployeeTasks.Add(employeeTask);
             await _context.SaveChangesAsync();
             serviceResponse.Data = await _context.EmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;
         }
 
@@ -55,8 +69,26 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetAllEmployeeTasks()
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
             var dbEmployeeTasks = await _context.EmployeeTasks.ToListAsync();
+            var currentDate = DateTime.Today;
+            foreach (var employeeTask in dbEmployeeTasks)
+            {   
+                DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
+                DateTime dueDate = TaskDueDate.Date;
+                if (dueDate < currentDate)
+                {
+                    employeeTask.TaskStatus = Status.Pending;
+                }
+            }
             serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
             return serviceResponse;
         }
 
@@ -88,14 +120,16 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
             try {
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
-
-                if (employeeTask is null)
+                if(employeeTask is null)
                     throw new Exception($"EmployeeTask with id '{id}' not found");
+
+                var ExistingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == updateEmployeeTask.EmployeeId);
+                if(ExistingEmployee is null)
+                        throw new Exception($"Employee with id '{updateEmployeeTask.EmployeeId}' not found");
                 
                 employeeTask.TaskName = updateEmployeeTask.TaskName;
                 employeeTask.TaskDueDate = updateEmployeeTask.TaskDueDate;
                 employeeTask.TaskDescription = updateEmployeeTask.TaskDescription;
-                employeeTask.TaskStatus = updateEmployeeTask.TaskStatus;
                 employeeTask.EmployeeId = updateEmployeeTask.EmployeeId;
 
                 await _context.SaveChangesAsync();
@@ -118,7 +152,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
 
                 if (employeeTask is null)
-                    throw new Exception($"Employee with id '{id}' not found");
+                    throw new Exception($"EmployeeTask with id '{id}' not found");
                 
                 
                 employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
@@ -136,6 +170,70 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             }
             
             return serviceResponse;   
-        }     
+        }  
+
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTask() 
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
+            var dbEmployeeTasks = await _context.EmployeeTasks.Where(e =>  e.TaskStatus == Status.New).ToListAsync();
+            serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTask()
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
+            var dbEmployeeTasks = await _context.EmployeeTasks.Where(e =>  e.TaskStatus == Status.Ongoing).ToListAsync();
+            serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeCompletedTask()
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
+            var dbEmployeeTasks = await _context.EmployeeTasks.Where(e =>  e.TaskStatus == Status.Completed).ToListAsync();
+            serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeePendingTask()
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            try
+            {
+            var dbEmployeeTasks = await _context.EmployeeTasks.Where(e =>  e.TaskStatus == Status.Pending).ToListAsync();
+            serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+            }
+            catch(Exception ex) 
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
     }
 }

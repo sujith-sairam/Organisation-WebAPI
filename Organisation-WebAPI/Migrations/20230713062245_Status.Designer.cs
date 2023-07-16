@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Organisation_WebAPI.Data;
 
@@ -11,9 +12,11 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    partial class OrganizationContextModelSnapshot : ModelSnapshot
+    [Migration("20230713062245_Status")]
+    partial class Status
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,7 +89,10 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
                 {
                     b.Property<int>("EmployeeID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeID"));
 
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
@@ -100,9 +106,7 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("EmployeeSalary")
                         .HasColumnType("int");
 
-
-                    b.Property<int>("ManagerID");
-                    b.Property<int?>("ManagerID")
+                    b.Property<int>("ProductID")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserID")
@@ -112,7 +116,7 @@ namespace Organisation_WebAPI.Migrations
 
                     b.HasIndex("DepartmentID");
 
-                    b.HasIndex("ManagerID");
+                    b.HasIndex("ProductID");
 
                     b.HasIndex("UserID");
 
@@ -155,7 +159,10 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
                 {
                     b.Property<int>("ManagerId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManagerId"));
 
                     b.Property<int>("ManagerAge")
                         .HasColumnType("int");
@@ -166,14 +173,11 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("ManagerSalary")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductID")
+                    b.Property<int>("ProductID")
                         .HasColumnType("int");
 
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isAppointed")
-                        .HasColumnType("bit");
 
                     b.HasKey("ManagerId");
 
@@ -277,9 +281,11 @@ namespace Organisation_WebAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Organisation_WebAPI.Models.Manager", "Manager")
+                    b.HasOne("Organisation_WebAPI.Models.Product", "Product")
                         .WithMany("Employees")
-                        .HasForeignKey("ManagerID");
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Organisation_WebAPI.Models.User", "User")
                         .WithMany()
@@ -287,7 +293,7 @@ namespace Organisation_WebAPI.Migrations
 
                     b.Navigation("Department");
 
-                    b.Navigation("Manager");
+                    b.Navigation("Product");
 
                     b.Navigation("User");
                 });
@@ -307,7 +313,9 @@ namespace Organisation_WebAPI.Migrations
                 {
                     b.HasOne("Organisation_WebAPI.Models.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductID");
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Organisation_WebAPI.Models.User", "User")
                         .WithMany()
@@ -323,14 +331,11 @@ namespace Organisation_WebAPI.Migrations
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
-                {
-                    b.Navigation("Employees");
-                });
-
             modelBuilder.Entity("Organisation_WebAPI.Models.Product", b =>
                 {
                     b.Navigation("Customers");
+
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

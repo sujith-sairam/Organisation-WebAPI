@@ -18,8 +18,7 @@ namespace Organisation_WebAPI.Controllers
         private readonly IEmployeeService _employeeService;
         public EmployeeController(IEmployeeService employeeService)
         {
-            _employeeService = employeeService;
-            
+            _employeeService = employeeService;  
         }
 
         // Retrieves all employees from the database

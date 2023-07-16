@@ -23,12 +23,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8
-                .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+                .GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
 
             SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
@@ -50,7 +50,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Token").Value);
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("AppSettings:Token").Value!);
 
             try
             {
@@ -69,7 +69,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return userId;
 
             }
-            catch (Exception ex) {
+            catch (Exception ) {
 
                 return null;
             }

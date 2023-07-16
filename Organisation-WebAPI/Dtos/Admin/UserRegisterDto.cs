@@ -8,15 +8,14 @@
         public UserRole Role { get; set; } // Role field using the UserRole enum
 
         // Employee-specific fields
-        public string EmployeeName { get; set; }
+        public string? EmployeeName { get; set; }
         public int EmployeeSalary { get; set; }
         public int EmployeeAge { get; set; }
         public int DepartmentID { get; set; }
         public int ProductID { get; set; }
         public int ManagerID { get; set; }
 
-        // Manager-specific fields
-        public string ManagerName { get; set; }
+        public string? ManagerName { get; set; }
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
 

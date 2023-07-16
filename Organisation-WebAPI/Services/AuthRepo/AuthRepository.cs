@@ -32,7 +32,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly IMapper _mapper;
 
 
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration,IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
@@ -46,24 +46,24 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == username.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName!.ToLower() == username.ToLower());
             if (user == null)
             {
                 response.Success = false;
                 response.Message = "User Not Found";
             }
 
-            else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            else if (!VerifyPasswordHash(password, user.PasswordHash!, user.PasswordSalt!))
             {
                 response.Success = false;
                 response.Message = "Incorrect Password";
-                
+
             }
             else
             {
                 if (user.Role == UserRole.Manager) {
                     var manager = await _dbContext.Managers.FindAsync(user.UserID);
-                    if (manager.isAppointed == false) { 
+                    if (manager.isAppointed == false) {
                         response.Success = false;
                         response.Message = "User Not Found";
                         return response;
@@ -90,6 +90,14 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 response.Success = false;
                 response.Message = "User already exists";
+                return response;
+            }
+
+            var ExistingEmail = await _dbContext.Users.FirstOrDefaultAsync(e => model.Email == e.Email);
+            if (ExistingEmail != null)
+            {
+                response.Success = false;
+                response.Message = "Email already exists";
                 return response;
             }
 
@@ -141,7 +149,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
                         var employee = new Employee
                         {
-                            EmployeeID = user.UserID,
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
@@ -149,11 +156,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             ManagerID = model.ManagerID,
                             User = user
                         };
-                        // Send email to employee
-                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Employee Registration",
-                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in ORG 360." +
-                            $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
-                            $"information confidential.\n\nThank you and welcome to ORG 360!");
+                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Employee Registration", 
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in ORG 360.\n\nYour " +
+                            $"credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this information confidential" +
+                            $".\n\nThank you and welcome to ORG 360!");
 
                         _emailSender.SendEmail(employeeMessage);
 
@@ -200,9 +206,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     await _dbContext.SaveChangesAsync();
                     transaction.Commit();
 
-                    response.Data = "User Registrated successfully";
+                  
+                    response.Data = "User Registered Successfully";
                     return response;
                 }
+
+
                 catch (Exception ex)
                 {
                     // Handle exception if needed
@@ -211,8 +220,13 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     response.Message = "An error occurred during registration.";
                     return response;
                 }
+
+
+
             }
+        
         }
+
 
 
 
@@ -227,10 +241,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid email address.";
                 return response;
             }
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-
-          
-
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
             if (user != null)
             {
                 if (user.OtpResendCount >= 3)
@@ -239,7 +250,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     response.Message = "Maximum OTP resend limit reached.";
                     return response;
                 }
-                if (user.Otp == otp) {
+                if (user.Otp == otp)
+                {
 
                     if (user.OtpExpiration > DateTimeOffset.UtcNow)
                     {
@@ -250,10 +262,11 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         response.Message = "OTP verification successful.";
                         return response;
                     }
-                    else {
+                    else
+                    {
                         response.Success = false;
                         response.Message = "Your Otp has been expired , Please try again";
-                    }  
+                    }
                 }
                 else
                 {
@@ -263,7 +276,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 }
 
             }
-            else {
+            else
+            {
 
                 response.Success = false;
                 response.Message = "Invalid Email , Please try again";
@@ -273,12 +287,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return response;
         }
 
-      
+
 
 
         public async Task<bool> UserExists(string username)
         {
-            if (await _dbContext.Users.AnyAsync(u => u.UserName.ToLower() == username.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.UserName!.ToLower() == username.ToLower()))
             {
                 return true;
             }
@@ -287,7 +301,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> ForgotPassword(string email)
         {
             var response = new ServiceResponse<string>();
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
             if (!IsEmailValid(email))
             {
                 response.Success = false;
@@ -300,7 +314,11 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email does not exists";
                 return response;
             }
-            
+            if (user.IsVerified == false)
+            {
+                response.Success = false;
+                response.Message = "User Not Verified";
+            }
 
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
@@ -316,8 +334,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             user.IsVerified = false;
             await _dbContext.SaveChangesAsync();
 
-            var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP to reset your password : {otp}.\n\nIt will expire at {otpExpiration} IST.");
-            _emailSender.SendEmail(message);
+ 
             response.Data = "Please check your email for OTP.";
             return response;
         }
@@ -328,11 +345,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
         {
             ServiceResponse<ResetPasswordDto> response = new ServiceResponse<ResetPasswordDto>();
 
-            if (request.Email is not null) {
+            if (request.Email is not null)
+            {
 
-                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == request.Email.ToLower());
-                
-                if(user != null)
+                var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == request.Email.ToLower());
+
+                if (user != null)
                 {
                     if (user.IsVerified == false)
                     {
@@ -360,11 +378,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     }
 
                 }
-                else{
+                else
+                {
                     response.Success = false;
                     response.Message = "Invalid Email Address.";
                 }
-              
+
             }
             else
             {
@@ -424,7 +443,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
 
-     
+
             await _dbContext.SaveChangesAsync();
 
             response.Data = "User deleted successfully";
@@ -510,7 +529,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 return response;
             }
 
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
 
             if (user == null)
             {
@@ -554,7 +573,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
         public async Task<bool> EmailExists(string email)
         {
-            if (await _dbContext.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            if (await _dbContext.Users.AnyAsync(u => u.Email!.ToLower() == email.ToLower()))
             {
                 return true;
             }
