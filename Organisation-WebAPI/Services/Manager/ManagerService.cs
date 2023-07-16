@@ -38,6 +38,8 @@ namespace Organisation_WebAPI.Services.Managers
             }
             return serviceResponse;   
         }    
+
+
         public async Task<ServiceResponse<List<GetManagerDto>>> DeleteManager(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
@@ -87,6 +89,36 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<GetManagerDto>> GetManagerByProductId(int productId)
+        {
+            var serviceResponse = new ServiceResponse<GetManagerDto>();
+            try
+            {
+                var manager = await _context.Managers
+                    .Include(m => m.Product)
+                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+
+                if (manager == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Manager not found.";
+                    return serviceResponse;
+                }
+
+                var managerDto = _mapper.Map<GetManagerDto>(manager);
+                managerDto.ProductName = manager.Product?.ProductName;
+
+                serviceResponse.Data = managerDto;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+
         public async Task<ServiceResponse<GetManagerDto>> GetManagerById(int id)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
@@ -108,6 +140,7 @@ namespace Organisation_WebAPI.Services.Managers
         }
 
 
+
         public async Task<ServiceResponse<GetManagerDto>> UpdateManager(UpdateManagerDto updatedManager, int id)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
@@ -124,7 +157,7 @@ namespace Organisation_WebAPI.Services.Managers
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
-                manager.ProductID = updatedManager.ProductID;
+                //manager.ProductID = updatedManager.ProductID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetManagerDto>(manager);

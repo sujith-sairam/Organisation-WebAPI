@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using EmailService;
 using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.EmployeeDto;
+using Organisation_WebAPI.Dtos.ManagerDto;
 
 namespace Organisation_WebAPI.Services.Employees
 {
@@ -13,7 +15,7 @@ namespace Organisation_WebAPI.Services.Employees
     {
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
-        
+        private readonly IEmailSender _emailSender;
 
         public EmployeeService(IMapper mapper,OrganizationContext context)
         {
@@ -53,7 +55,7 @@ namespace Organisation_WebAPI.Services.Employees
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
-                return serviceResponse;
+             return serviceResponse;
         }
 
         // Retrieves all employees from the database
@@ -71,10 +73,7 @@ namespace Organisation_WebAPI.Services.Employees
             EmployeeAge = e.EmployeeAge,
             DepartmentID = e.DepartmentID,
             DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
-            ManagerID = e.ManagerID,
-            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.ManagerName,
-            ProductID = e.ProductID,
-            ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
+            ProductName = _context.Managers.Include(m => m.Product).FirstOrDefault(m => m.ManagerId == e.ManagerID)?.Product?.ProductName
         }).ToList();
 
         serviceResponse.Data = employeeDTOs;
@@ -86,7 +85,9 @@ namespace Organisation_WebAPI.Services.Employees
                 serviceResponse.Message = "Error occured while fetching Employee Details " + ex;
         }
         return serviceResponse;
-     }
+        }
+
+
 
 
 
@@ -112,6 +113,44 @@ namespace Organisation_WebAPI.Services.Employees
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByManagerId(int managerId)
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+            try
+            {
+                var manager = await _context.Managers
+                    .Include(m => m.Employees)
+                    .Include(m => m.Product)
+                    .FirstOrDefaultAsync(m => m.ManagerId == managerId);
+
+                if (manager == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Manager not found.";
+                    return serviceResponse;
+                }
+
+                var employees = manager.Employees.ToList();
+                var employeeDtos = employees.Select(e =>
+                {
+                    var employeeDto = _mapper.Map<GetEmployeeDto>(e);
+                    employeeDto.ProductName = manager.Product?.ProductName;
+                    employeeDto.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
+                    return employeeDto;
+                }).ToList();
+
+                serviceResponse.Data = employeeDtos;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+
+
         public async Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
         {
             var serviceResponse = new ServiceResponse<GetEmployeeDto>();
@@ -125,17 +164,11 @@ namespace Organisation_WebAPI.Services.Employees
                 if (!departmentExists)
                     throw new Exception($"Invalid DepartmentID '{updatedEmployee.DepartmentID}'");
 
-        
-                var productExists = await _context.Products.AnyAsync(p => p.ProductID == updatedEmployee.ProductID);
-                if (!productExists)
-                    throw new Exception($"Invalid ProductID '{updatedEmployee.ProductID}'");
 
                 employee.EmployeeName = updatedEmployee.EmployeeName;
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.DepartmentID = updatedEmployee.DepartmentID;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
-                employee.ManagerID = updatedEmployee.ManagerID;
-                employee.ProductID = updatedEmployee.ProductID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetEmployeeDto>(employee);
@@ -151,5 +184,47 @@ namespace Organisation_WebAPI.Services.Employees
             return serviceResponse;
         
         }
+
+
+        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByProduct(int productId)
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+            try
+            {
+                var manager = await _context.Managers
+                    .Include(m => m.Employees)
+                    .Include(m => m.Product)
+                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+
+                if (manager == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "No manager found for the product.";
+                    return serviceResponse;
+                }
+
+                var employees = manager.Employees.ToList();
+                var employeeDtos = employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+
+                // Add product name to each employee DTO
+                employeeDtos.ForEach(e =>
+                {
+                    e.ProductName = manager.Product.ProductName;
+                    e.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
+                });
+
+                serviceResponse.Data = employeeDtos;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+
+
+
     }
 }
