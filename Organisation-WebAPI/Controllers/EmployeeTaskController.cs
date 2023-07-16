@@ -21,14 +21,14 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
             return Ok(await _employeeTaskService.GetAllEmployeeTasks());
         }
 
         [HttpPost("CreateEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
             return Ok(await _employeeTaskService.AddEmployeeTask(newEmployeeTask));
@@ -42,7 +42,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetEmployeeTaskById")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTask(int id)
         {
             return Ok(await _employeeTaskService.GetEmployeeTaskById(id));

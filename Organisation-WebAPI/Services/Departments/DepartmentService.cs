@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.DepartmentDto;
+using Organisation_WebAPI.Dtos.EmployeeDto;
 
 namespace Organisation_WebAPI.Services.Departments
 {
@@ -79,6 +80,34 @@ namespace Organisation_WebAPI.Services.Departments
             }
             return serviceResponse;
         }
+
+        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetEmployeesByDepartmentId(int departmentId)
+        {
+            var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+            try
+            {
+                var department = await _context.Departments
+                    .Include(d => d.Employees)
+                    .FirstOrDefaultAsync(d => d.DepartmentID == departmentId);
+
+                if (department == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Department not found.";
+                    return serviceResponse;
+                }
+
+                var employees = department.Employees.ToList();
+                serviceResponse.Data = employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
 
         //Retrieves a department from the database with Id
         public async Task<ServiceResponse<GetDepartmentDto>> GetDepartmentById(int id)

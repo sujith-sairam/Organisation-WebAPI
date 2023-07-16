@@ -11,6 +11,7 @@ using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Dtos.CustomerDto;
 using Organisation_WebAPI.Dtos.DepartmentDto;
+using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -60,12 +61,19 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             else
             {
+                if (user.Role == UserRole.Manager) {
+                    var manager = await _dbContext.Managers.FindAsync(user.UserID);
+                    if (manager.isAppointed == false) { 
+                        response.Success = false;
+                        response.Message = "User Not Found";
+                        return response;
+                    }
+                }
                 response.Data = _jwtUtils.GenerateJwtToken(user);
+
             }
             return response;
         }
-
-
 
         public async Task<ServiceResponse<string>> Register(UserRegisterDto model)
         {
@@ -93,90 +101,120 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             CreatePasswordHash(model.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            var user = new User
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                UserName = model.UserName,
-                Email = model.Email,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-                Otp = otp,
-                IsVerified = true,
-                OtpExpiration = otpExpiration,
-                Role = model.Role
-            };
-
-            await _dbContext.Users.AddAsync(user);
-
-            var product = await _dbContext.Products.FindAsync(model.ProductID);
-
-            if (product == null)
-            {
-                response.Success = false;
-                response.Message = "Invalid product ID. Product Not Found";
-                return response;
-            }
-
-            if (user.Role == UserRole.Employee)
-            {
-                var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
-                var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
-
-
-                if (department == null)
+                try
                 {
-                    response.Success = false;
-                    response.Message = "Invalid department ID. Department Not Found";
+                    var user = new User
+                    {
+                        UserName = model.UserName,
+                        Email = model.Email,
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
+                        Role = model.Role,
+                        IsVerified = true
+                    };
+
+                    await _dbContext.Users.AddAsync(user);
+                    await _dbContext.SaveChangesAsync();
+
+                    if (model.Role == UserRole.Employee)
+                    {
+                        var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
+                        var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
+
+                        if (department == null)
+                        {
+                            response.Success = false;
+                            response.Message = "Invalid department ID. Department Not Found";
+                            transaction.Rollback();
+                            return response;
+                        }
+
+                        if (manager == null)
+                        {
+                            response.Success = false;
+                            response.Message = "Invalid manager ID. Manager Not Found";
+                            transaction.Rollback();
+                            return response;
+                        }
+
+                        var employee = new Employee
+                        {
+                            EmployeeID = user.UserID,
+                            EmployeeName = model.EmployeeName,
+                            EmployeeSalary = model.EmployeeSalary,
+                            EmployeeAge = model.EmployeeAge,
+                            DepartmentID = model.DepartmentID,
+                            ManagerID = model.ManagerID,
+                            User = user
+                        };
+                        // Send email to employee
+                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Employee Registration",
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in ORG 360." +
+                            $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
+                            $"information confidential.\n\nThank you and welcome to ORG 360!");
+
+                        _emailSender.SendEmail(employeeMessage);
+
+                        await _dbContext.Employees.AddAsync(employee);
+                    }
+                    else if (model.Role == UserRole.Manager)
+                    {
+                        var existingManager = await _dbContext.Managers.FirstOrDefaultAsync(m => m.ProductID == model.ProductID);
+                        if (existingManager != null)
+                        {
+                            response.Success = false;
+                            response.Message = "Product ID is already associated with a manager.";
+                            transaction.Rollback();
+                            return response;
+                        }
+
+                        var manager = new Manager
+                        {
+                            ManagerId = user.UserID,
+                            ManagerName = model.ManagerName,
+                            ManagerSalary = model.ManagerSalary,
+                            ManagerAge = model.ManagerAge,
+                            ProductID = model.ProductID,
+                            isAppointed = true,
+                            User = user
+                        };
+
+                        var managerMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Manager Registration",
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in ORG 360." +
+                            $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
+                            $"information confidential.\n\nThank you and welcome to ORG 360!");
+
+                        _emailSender.SendEmail(managerMessage);
+
+                        await _dbContext.Managers.AddAsync(manager);
+                    }
+                    else
+                    {
+                        response.Success = false;
+                        response.Message = "Invalid user role.";
+                        return response;
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+                    transaction.Commit();
+
+                    response.Data = "User Registrated successfully";
                     return response;
                 }
-
-                if (manager == null)
+                catch (Exception ex)
                 {
+                    // Handle exception if needed
+                    transaction.Rollback();
                     response.Success = false;
-                    response.Message = "Invalid manager ID. Manager Not Found";
+                    response.Message = "An error occurred during registration.";
                     return response;
                 }
-
-                var employee = new Employee
-                {
-                    EmployeeName = model.EmployeeName,
-                    EmployeeSalary = model.EmployeeSalary,
-                    EmployeeAge = model.EmployeeAge,
-                    DepartmentID = model.DepartmentID,
-                    ProductID = model.ProductID,
-                    ManagerID = model.ManagerID
-                    User = user
-                };
-
-                await _dbContext.Employees.AddAsync(employee);
             }
-            else if (user.Role == UserRole.Manager)
-            {
-                var manager = new Manager
-                {
-                    ManagerName = model.ManagerName,
-                    ManagerSalary = model.ManagerSalary,
-                    ManagerAge = model.ManagerAge,
-                    ProductID = model.ProductID,
-                    User = user
-                };
-
-                await _dbContext.Managers.AddAsync(manager);
-            }
-            else
-            {
-                response.Success = false;
-                response.Message = "Invalid user role.";
-                return response;
-            }
-
-            await _dbContext.SaveChangesAsync();
-
-            var message = new Message(new string[] { model.Email }, "HR GO - OTP", $"Your OTP for registering in HR GO Portal is: {otp}.\n\nIt will expire at {otpExpiration} IST.");
-            _emailSender.SendEmail(message);
-
-            response.Data = "Please check your email for OTP.";
-            return response;
         }
+
+
 
 
         public async Task<ServiceResponse<string>> Verify(string email, string otp)
@@ -205,8 +243,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
                     if (user.OtpExpiration > DateTimeOffset.UtcNow)
                     {
-                        user.IsVerified = true;
                         user.Otp = null;
+                        user.IsVerified = true;
                         await _dbContext.SaveChangesAsync();
                         response.Success = true;
                         response.Message = "OTP verification successful.";
@@ -262,11 +300,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email does not exists";
                 return response;
             }
-            if (user.IsVerified == false)
-            {
-                response.Success = false;
-                response.Message = "User Not Verified";
-            }
+            
 
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
@@ -279,7 +313,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             user.Otp = otp;
             user.OtpExpiration = otpExpiration;
-
+            user.IsVerified = false;
             await _dbContext.SaveChangesAsync();
 
             var message = new Message(new string[] { email }, $"Forgot Password OTP", $"This is your OTP to reset your password : {otp}.\n\nIt will expire at {otpExpiration} IST.");
@@ -360,6 +394,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public async Task<ServiceResponse<string>> DeleteUserById(int id)
         {
             var response = new ServiceResponse<string>();
+
             var user = await _dbContext.Users.FindAsync(id);
             if (user == null)
             {
@@ -367,11 +402,32 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "User not found";
                 return response;
             }
-            _dbContext.Users.Remove(user);
+
+            if (user.Role == UserRole.Employee)
+            {
+                _dbContext.Users.Remove(user);
+
+            }
+            else if (user.Role == UserRole.Manager)
+            {
+                // Update the manager's IsAppointed property to false
+                var manager = await _dbContext.Managers.FirstOrDefaultAsync(m => m.ManagerId == id);
+                if (manager != null)
+                {
+                    manager.isAppointed = false;
+                }
+            }
+            else
+            {
+                response.Success = false;
+                response.Message = "Invalid user role";
+                return response;
+            }
+
+     
             await _dbContext.SaveChangesAsync();
 
-            response.Success = true;
-            response.Message = "User deleted successfully";
+            response.Data = "User deleted successfully";
             return response;
 
         }
@@ -386,6 +442,61 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             return response;
 
+        }
+
+
+        public async Task<ServiceResponse<string>> AppointNewManager(int managerId, NewManagerDto model)
+        {
+            var response = new ServiceResponse<string>();
+
+            var manager = await _dbContext.Managers.Include(m => m.User)
+                                                  .FirstOrDefaultAsync(m => m.ManagerId == managerId);
+
+            if (manager == null)
+            {
+                response.Success = false;
+                response.Message = "Manager not found";
+                return response;
+            }
+
+            // Update the user associated with the manager
+            var user = await _dbContext.Users.FindAsync(managerId);
+
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            CreatePasswordHash(model.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+
+            // Update user properties
+            user.UserName = model.UserName;
+            user.Email = model.Email;
+            user.IsVerified = true;
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            // Update other user fields as needed
+
+            // Update manager properties
+
+            manager.ManagerName = model.ManagerName;
+            manager.ManagerSalary = model.ManagerSalary;
+            manager.ManagerAge = model.ManagerAge;
+            manager.isAppointed = true;
+            manager.User = user;
+
+            // Save changes to the database
+            await _dbContext.SaveChangesAsync();
+
+            // Send email with updated information
+            var message = new Message(new string[] { user.Email }, "Manager Information Updated", "Your manager information has been updated.");
+            _emailSender.SendEmail(message);
+
+            response.Data = "Manager updated successfully";
+            return response;
         }
 
         public async Task<ServiceResponse<string>> ResendOtp(string email)
@@ -426,6 +537,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             user.Otp = otp;
             user.OtpExpiration = otpExpiration;
+            user.IsVerified = false;
             user.OtpResendCount++;
 
             await _dbContext.SaveChangesAsync();
@@ -477,6 +589,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             return isValid;
         }
 
-      
+
+
     }
 }

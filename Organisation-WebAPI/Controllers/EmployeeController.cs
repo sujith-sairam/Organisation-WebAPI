@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.EmployeeDto;
+using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Services.Employees;
 
 namespace Organisation_WebAPI.Controllers
@@ -23,7 +24,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all employees from the database
         [HttpGet("GetAllEmployees")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployees()
         {
             return Ok(await _employeeService.GetAllEmployees());
@@ -38,6 +38,19 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeService.GetEmployeeById(id));
         }
 
+        // Retrieves a employee from the database based on the provided ID
+        [HttpGet("GetAllEmployeesByManagerId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByManagerId(int id)
+        {
+            return Ok(await _employeeService.GetAllEmployeesByManagerId(id));
+        }
+        
+
+        [HttpGet("GetAllEmployeesByProduct")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByProduct(int id)
+        {
+            return Ok(await _employeeService.GetAllEmployeesByProduct(id));
+        }
 
         // Updates a employee in the database based on the provided ID
         [HttpPut("UpdateEmployee")]
@@ -52,5 +65,8 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
             return Ok(await _employeeService.DeleteEmployee(id));
         }
+
+
+
     }
 }

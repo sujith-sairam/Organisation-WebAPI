@@ -58,7 +58,9 @@ namespace Organisation_WebAPI.Services.Products
         {
            
             var serviceResponse = new ServiceResponse<List<GetProductDto>>();
-            var dbProducts = await _context.Products.ToListAsync();
+            var dbProducts = await _context.Products
+                .Where(p => !_context.Managers.Any(m => m.ProductID == p.ProductID))
+                .ToListAsync();
             serviceResponse.Data = dbProducts.Select(c => _mapper.Map<GetProductDto>(c)).ToList();
             return serviceResponse;
         }

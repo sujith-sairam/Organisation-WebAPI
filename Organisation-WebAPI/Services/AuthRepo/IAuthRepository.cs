@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.Admin;
+using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Models;
 using System.Security.Claims;
 
@@ -17,6 +18,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
         Task<ServiceResponse<string>> DeleteUserById(int id);
         Task<ServiceResponse<List<GetUserDto>>> GetAllUsers();
         Task<bool> UserExists(string username);
+        Task<ServiceResponse<string>> AppointNewManager(int managerId, NewManagerDto model);
+
 
     }
 }
