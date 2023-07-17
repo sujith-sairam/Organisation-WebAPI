@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230716080434_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20230717044335_ManagersInProductRemoved1")]
+    partial class ManagersInProductRemoved1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -143,8 +143,8 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<string>("TaskName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaskStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TaskStatus")
+                        .HasColumnType("int");
 
                     b.HasKey("TaskID");
 
@@ -213,7 +213,6 @@ namespace Organisation_WebAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsVerified")
@@ -229,18 +228,15 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserID");

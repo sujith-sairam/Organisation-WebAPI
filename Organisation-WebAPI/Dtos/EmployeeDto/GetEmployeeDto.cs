@@ -1,3 +1,4 @@
+using Organisation_WebAPI.Dtos.DepartmentDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,7 @@ namespace Organisation_WebAPI.Dtos.EmployeeDto
         public string? DepartmentName {get;set;}
         public int ProductID {get; set;}
         public string? ProductName {get;set;}
+        public GetDepartmentDto Department { get; set; }
+
     }
 }

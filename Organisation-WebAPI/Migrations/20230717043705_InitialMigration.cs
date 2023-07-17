@@ -44,14 +44,14 @@ namespace Organisation_WebAPI.Migrations
                 {
                     UserID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsVerified = table.Column<bool>(type: "bit", nullable: false),
                     Otp = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OtpExpiration = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     OtpResendCount = table.Column<int>(type: "int", nullable: false),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -170,7 +170,7 @@ namespace Organisation_WebAPI.Migrations
                     TaskDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TaskCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TaskDueDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TaskStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskStatus = table.Column<int>(type: "int", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

@@ -136,7 +136,6 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllUsers")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
         {
             var response = await _authRepository.GetAllUsers();
