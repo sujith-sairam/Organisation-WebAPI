@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Organisation_WebAPI.Dtos.Admin;
-using Organisation_WebAPI.Dtos.ProductDto;
 using Organisation_WebAPI.Dtos.DepartmentDto;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.EmployeeTaskDto;
@@ -20,10 +19,6 @@ namespace Organisation_WebAPI
            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
-
-            CreateMap<Product, GetProductDto>();
-            CreateMap<AddProductDto,Product>();
-            CreateMap<UpdateProductDto,Product>();
 
             CreateMap<Department, GetDepartmentDto>();
             CreateMap<AddDepartmentDto,Department>();

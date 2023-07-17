@@ -10,7 +10,6 @@ using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Services.AuthRepo;
 using Organisation_WebAPI.Services.Departments;
 using Organisation_WebAPI.Services.Employees;
-using Organisation_WebAPI.Services.Products;
 using Swashbuckle.AspNetCore.Filters;
 using Serilog;
 using Organisation_WebAPI.Services.EmployeeTasks;
@@ -45,7 +44,6 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 
 builder.Services.AddScoped<IAuthRepository,AuthRepository>();
-builder.Services.AddScoped<IProductService,ProductService>();
 builder.Services.AddScoped<IDepartmentService,DepartmentService>(); 
 builder.Services.AddScoped<IEmployeeService,EmployeeService>();
 builder.Services.AddScoped<IManagerService,ManagerService>();

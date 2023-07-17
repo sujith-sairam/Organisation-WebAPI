@@ -140,6 +140,12 @@ namespace Organisation_WebAPI.Services.Managers
 
                 var managerDto = _mapper.Map<GetEmployeesAndManagerDto>(manager);
 
+                // Retrieve the department name using the department ID
+                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == departmentId);
+                if (department != null)
+                {
+                    managerDto.DepartmentName = department.DepartmentName;
+                }
 
                 serviceResponse.Data = managerDto;
             }
@@ -150,6 +156,7 @@ namespace Organisation_WebAPI.Services.Managers
             }
             return serviceResponse;
         }
+
 
         public async Task<ServiceResponse<GetManagerDto>> GetManagerById(int id)
         {

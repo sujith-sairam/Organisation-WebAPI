@@ -9,6 +9,5 @@ namespace Organisation_WebAPI.Services.Dashboard
     public interface IDashboardService
     {
         Task<ServiceResponse<Dictionary<string,int>>> GetTotalCount();
-        Task<ServiceResponse<List<OverViewChartDto>>> GetChartDetails();
     }
 }

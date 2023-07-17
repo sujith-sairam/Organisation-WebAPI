@@ -18,44 +18,19 @@ namespace Organisation_WebAPI.Services.Dashboard
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<List<OverViewChartDto>>> GetChartDetails()
-        {
-            var serviceResponse = new ServiceResponse<List<OverViewChartDto>>();
-            try
-            {
-            var products = await _context.Products
-            .Select(p => new OverViewChartDto
-            {
-                ProductName = p.ProductName,
-                EmployeeCount = _context.Employees.Count(e => e.ManagerID == p.ProductID),
-                ProductRevenue = p.ProductRevenue
-            })
-            .ToListAsync();
-
-            serviceResponse.Data = products;
-            }
-            catch(Exception ex)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = ex.Message;
-            } 
-            return serviceResponse;
-        }
-
+   
         public async Task<ServiceResponse<Dictionary<string, int>>> GetTotalCount()
         {
            var serviceResponse = new ServiceResponse<Dictionary<string, int>>();
 
             try
             {
-                var productsList = await _context.Products.ToListAsync();
                 var employeesList = await _context.Employees.ToListAsync();
                 var managersList = await _context.Managers.ToListAsync();
                 var departmentsList = await _context.Departments.ToListAsync();
 
                 var tableCounts = new Dictionary<string, int>
                 {
-                    { "Products", productsList.Count },
                     { "Employees", employeesList.Count },
                     { "Managers", managersList.Count },
                     { "Departments", departmentsList.Count }
