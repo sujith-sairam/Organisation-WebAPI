@@ -11,7 +11,7 @@ namespace Organisation_WebAPI.DataSeed
                 serviceProvider.GetRequiredService<DbContextOptions<OrganizationContext>>()))
             {
                 // Check if admin user already exists
-                if (context.Users.Any(u => u.UserName == "admin"))
+                if (context.Users.Any(u => u.UserName == "adminuser"))
                 {
                     return; // Admin user already seeded, no need to proceed
                 }

@@ -9,7 +9,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
         public string GenerateOtp()
         {
             using (var rng = new RNGCryptoServiceProvider())
-            {
+            {   
                 var buffer = new byte[OtpLength];
                 rng.GetBytes(buffer);
 
