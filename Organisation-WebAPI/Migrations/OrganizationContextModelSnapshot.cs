@@ -22,24 +22,6 @@ namespace Organisation_WebAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Organisation_WebAPI.Models.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Admins");
-                });
-
             modelBuilder.Entity("Organisation_WebAPI.Models.Customer", b =>
                 {
                     b.Property<int>("CustomerID")
@@ -248,17 +230,6 @@ namespace Organisation_WebAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Organisation_WebAPI.Models.Admin", b =>
-                {
-                    b.HasOne("Organisation_WebAPI.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Organisation_WebAPI.Models.Customer", b =>
                 {
                     b.HasOne("Organisation_WebAPI.Models.Product", "Product")
@@ -281,7 +252,7 @@ namespace Organisation_WebAPI.Migrations
                     b.HasOne("Organisation_WebAPI.Models.Product", "Product")
                         .WithMany("Employees")
                         .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Organisation_WebAPI.Models.User", "User")

@@ -5,7 +5,7 @@
 namespace Organisation_WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class inverseproperty : Migration
+    public partial class User : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
