@@ -12,7 +12,6 @@ namespace Organisation_WebAPI.Dtos.EmployeeDto
         public int EmployeeAge { get; set; }
         public int ManagerID {get;set;}
         public int DepartmentID { get; set; }
-        public int ProductID {get; set;}
       
     }
 }

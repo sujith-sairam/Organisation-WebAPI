@@ -10,10 +10,11 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
     {
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetAllEmployeeTasks();
         Task<ServiceResponse<GetEmployeeTaskDto>> GetEmployeeTaskById(int id);
-        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTask();
-        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTask();
-        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeCompletedTask();
-        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeePendingTask();
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetAllEmployeeTasksByEmployeeId(int id);
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTaskByEmployeeId(int id);
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id);
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeCompletedTaskByEmployeeId(int id);
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeePendingTaskByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto addEmployeeTask);
         Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTask(UpdateEmployeeTaskDto updateEmployeeTask,int id);
         Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updateEmployeeTaskStatus,int id);

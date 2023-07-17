@@ -169,7 +169,7 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.DepartmentID = updatedEmployee.DepartmentID;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
-
+                employee.ManagerID = updatedEmployee.ManagerID;
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetEmployeeDto>(employee);
 

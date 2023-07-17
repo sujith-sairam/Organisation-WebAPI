@@ -112,6 +112,7 @@ static void SeedData(IServiceProvider services)
     var serviceProvider = scope.ServiceProvider;
     var context = serviceProvider.GetRequiredService<OrganizationContext>();
 
+
     // Seed the admin user
     AdminUserSeed.SeedAdminUser(serviceProvider);
 

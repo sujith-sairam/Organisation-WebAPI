@@ -9,6 +9,7 @@ namespace Organisation_WebAPI.Services.Products
     public interface IProductService
     {
         Task<ServiceResponse<List<GetProductDto>>> GetAllProducts();
+        Task<ServiceResponse<List<GetProductDto>>> GetAvailableProducts();
         Task<ServiceResponse<GetProductDto>> GetProductById(int id);
         Task<ServiceResponse<Dictionary<string,int>>> GetRevenue();
         Task<ServiceResponse<List<GetProductDto>>> AddProduct(AddProductDto newProduct);
