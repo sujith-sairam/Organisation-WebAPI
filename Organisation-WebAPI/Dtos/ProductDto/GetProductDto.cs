@@ -10,7 +10,6 @@ namespace Organisation_WebAPI.Dtos.ProductDto
         
         public int ProductID { get; set; }
         public string? ProductName { get; set; }
-        
         public int ProductRevenue {get;set;}
     }
 }

@@ -14,6 +14,5 @@ namespace Organisation_WebAPI.Models
         [ForeignKey("EmployeeID")]
         public int EmployeeId { get; set; }
         public Employee? Employee { get; set; }
-
     }
 }

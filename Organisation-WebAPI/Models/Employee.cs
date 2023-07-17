@@ -8,6 +8,12 @@ namespace Organisation_WebAPI.Models
 {
     public class Employee
     {
+       
+        public Employee()
+        {
+            EmployeeTasks = new List<EmployeeTask>();
+        }
+        
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)] 
         public int EmployeeID { get; set; }
@@ -25,5 +31,8 @@ namespace Organisation_WebAPI.Models
         public Manager? Manager { get; set; }
         public User? User { get; set; }
         public Department? Department { get; set; }
+        public ICollection<EmployeeTask> EmployeeTasks { get; set; }
+
+
     }
 }

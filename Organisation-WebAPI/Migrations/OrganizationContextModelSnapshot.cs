@@ -100,8 +100,6 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("EmployeeSalary")
                         .HasColumnType("int");
 
-
-                    b.Property<int>("ManagerID");
                     b.Property<int?>("ManagerID")
                         .HasColumnType("int");
 
@@ -212,7 +210,6 @@ namespace Organisation_WebAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsVerified")
@@ -228,18 +225,15 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserID");
@@ -295,7 +289,7 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.EmployeeTask", b =>
                 {
                     b.HasOne("Organisation_WebAPI.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeTasks")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -321,6 +315,11 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Department", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
+                {
+                    b.Navigation("EmployeeTasks");
                 });
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>
