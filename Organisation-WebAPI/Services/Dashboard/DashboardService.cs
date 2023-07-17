@@ -28,7 +28,6 @@ namespace Organisation_WebAPI.Services.Dashboard
             {
                 ProductName = p.ProductName,
                 EmployeeCount = _context.Employees.Count(e => e.ManagerID == p.ProductID),
-                CustomerCount = p.Customers.Count(),
                 ProductRevenue = p.ProductRevenue
             })
             .ToListAsync();
@@ -51,7 +50,6 @@ namespace Organisation_WebAPI.Services.Dashboard
             {
                 var productsList = await _context.Products.ToListAsync();
                 var employeesList = await _context.Employees.ToListAsync();
-                var customersList = await _context.Customers.ToListAsync();
                 var managersList = await _context.Managers.ToListAsync();
                 var departmentsList = await _context.Departments.ToListAsync();
 
@@ -59,7 +57,6 @@ namespace Organisation_WebAPI.Services.Dashboard
                 {
                     { "Products", productsList.Count },
                     { "Employees", employeesList.Count },
-                    { "Customers", customersList.Count },
                     { "Managers", managersList.Count },
                     { "Departments", departmentsList.Count }
                 };

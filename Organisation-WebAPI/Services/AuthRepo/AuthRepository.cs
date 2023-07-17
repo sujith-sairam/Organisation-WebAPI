@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.Admin;
-using Organisation_WebAPI.Dtos.CustomerDto;
 using Organisation_WebAPI.Dtos.DepartmentDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Models;
