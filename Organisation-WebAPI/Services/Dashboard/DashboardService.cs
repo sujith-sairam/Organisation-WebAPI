@@ -27,7 +27,6 @@ namespace Organisation_WebAPI.Services.Dashboard
             .Select(p => new OverViewChartDto
             {
                 ProductName = p.ProductName,
-                EmployeeCount = p.Employees.Count(),
                 CustomerCount = p.Customers.Count(),
                 ProductRevenue = p.ProductRevenue
             })

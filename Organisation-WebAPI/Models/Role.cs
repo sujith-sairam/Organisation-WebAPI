@@ -6,4 +6,5 @@
         Manager = 1,
         Employee = 2
     }
+
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Organisation_WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class RelationshipModifieds : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -101,6 +101,33 @@ namespace Organisation_WebAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Managers",
+                columns: table => new
+                {
+                    ManagerId = table.Column<int>(type: "int", nullable: false),
+                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ManagerSalary = table.Column<int>(type: "int", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: true),
+                    ManagerAge = table.Column<int>(type: "int", nullable: false),
+                    isAppointed = table.Column<bool>(type: "bit", nullable: false),
+                    ProductID = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Managers", x => x.ManagerId);
+                    table.ForeignKey(
+                        name: "FK_Managers_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ProductID");
+                    table.ForeignKey(
+                        name: "FK_Managers_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "UserID");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -109,9 +136,8 @@ namespace Organisation_WebAPI.Migrations
                     EmployeeSalary = table.Column<int>(type: "int", nullable: false),
                     EmployeeAge = table.Column<int>(type: "int", nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: true),
-                    ManagerID = table.Column<int>(type: "int", nullable: false),
                     DepartmentID = table.Column<int>(type: "int", nullable: false),
-                    ProductID = table.Column<int>(type: "int", nullable: false)
+                    ManagerID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -123,41 +149,12 @@ namespace Organisation_WebAPI.Migrations
                         principalColumn: "DepartmentID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Employees_Products_ProductID",
-                        column: x => x.ProductID,
-                        principalTable: "Products",
-                        principalColumn: "ProductID",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_Employees_Managers_ManagerID",
+                        column: x => x.ManagerID,
+                        principalTable: "Managers",
+                        principalColumn: "ManagerId");
                     table.ForeignKey(
                         name: "FK_Employees_Users_UserID",
-                        column: x => x.UserID,
-                        principalTable: "Users",
-                        principalColumn: "UserID");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Managers",
-                columns: table => new
-                {
-                    ManagerID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ManagerSalary = table.Column<int>(type: "int", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: true),
-                    ManagerAge = table.Column<int>(type: "int", nullable: false),
-                    ProductID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Managers", x => x.ManagerID);
-                    table.ForeignKey(
-                        name: "FK_Managers_Products_ProductID",
-                        column: x => x.ProductID,
-                        principalTable: "Products",
-                        principalColumn: "ProductID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Managers_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
                         principalColumn: "UserID");
@@ -203,9 +200,9 @@ namespace Organisation_WebAPI.Migrations
                 column: "DepartmentID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_ProductID",
+                name: "IX_Employees_ManagerID",
                 table: "Employees",
-                column: "ProductID");
+                column: "ManagerID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_UserID",
@@ -241,13 +238,13 @@ namespace Organisation_WebAPI.Migrations
                 name: "EmployeeTasks");
 
             migrationBuilder.DropTable(
-                name: "Managers");
-
-            migrationBuilder.DropTable(
                 name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Departments");
+
+            migrationBuilder.DropTable(
+                name: "Managers");
 
             migrationBuilder.DropTable(
                 name: "Products");

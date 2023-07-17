@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using organisation_webapi.dtos.admin;
 using Organisation_WebAPI.Attributes;
 using Organisation_WebAPI.Dtos.Admin;
+using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Models;
 using Organisation_WebAPI.Services.AuthRepo;
 using System.Data;
@@ -122,9 +123,9 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("DeleteUserById")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
 
+
+        [HttpDelete("DeleteUserById")]
         public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
         {
             var response = await _authRepository.DeleteUserById(id);
@@ -147,5 +148,18 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+        [HttpPost("AppointNewManager")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ServiceResponse<string>>> AppointNewManager(NewManagerDto newManager, int id)
+        {
+            var response = await _authRepository.AppointNewManager(id, newManager);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
     }
 }
+    

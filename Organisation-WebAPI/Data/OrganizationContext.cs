@@ -30,5 +30,6 @@ namespace Organisation_WebAPI.Data
         
         public DbSet<User> Users => Set<User>();
 
+
     }
 }

@@ -38,12 +38,14 @@ namespace Organisation_WebAPI.Services.Managers
             }
             return serviceResponse;   
         }    
+
+
         public async Task<ServiceResponse<List<GetManagerDto>>> DeleteManager(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
             try {
 
-            var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
+            var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
             if (manager is null)
                 throw new Exception($"Manager with id '{id}' not found");
             
@@ -67,7 +69,7 @@ namespace Organisation_WebAPI.Services.Managers
             var dbManagers = await _context.Managers.ToListAsync();
             var managerDTOs = dbManagers.Select(e => new GetManagerDto
             {
-                ManagerId = e.ManagerID,
+                ManagerId = e.ManagerId,
                 ManagerName = e.ManagerName,
                 ManagerSalary = e.ManagerSalary,
                 ManagerAge = e.ManagerAge,
@@ -87,12 +89,42 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<GetManagerDto>> GetManagerByProductId(int productId)
+        {
+            var serviceResponse = new ServiceResponse<GetManagerDto>();
+            try
+            {
+                var manager = await _context.Managers
+                    .Include(m => m.Product)
+                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+
+                if (manager == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Manager not found.";
+                    return serviceResponse;
+                }
+
+                var managerDto = _mapper.Map<GetManagerDto>(manager);
+                managerDto.ProductName = manager.Product?.ProductName;
+
+                serviceResponse.Data = managerDto;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+
+
         public async Task<ServiceResponse<GetManagerDto>> GetManagerById(int id)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try
             {
-            var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
+            var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
             if (dbManager is null)
                     throw new Exception($"Manager with id '{id}' not found");
 
@@ -108,11 +140,12 @@ namespace Organisation_WebAPI.Services.Managers
         }
 
 
+
         public async Task<ServiceResponse<GetManagerDto>> UpdateManager(UpdateManagerDto updatedManager, int id)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try {
-                var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerID == id);
+                var manager = await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
 
                 if (manager is null)
                     throw new Exception($"Manager with id '{id}' not found");
@@ -124,7 +157,7 @@ namespace Organisation_WebAPI.Services.Managers
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
-                manager.ProductID = updatedManager.ProductID;
+                //manager.ProductID = updatedManager.ProductID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetManagerDto>(manager);

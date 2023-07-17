@@ -18,7 +18,7 @@ namespace Organisation_WebAPI.Controllers
         public DepartmentController(IDepartmentService departmentService)
         {
             _departmentService = departmentService;
-            
+
         }
 
         // Retrieves all departments from the database
@@ -28,6 +28,14 @@ namespace Organisation_WebAPI.Controllers
         {
             return Ok(await _departmentService.GetAllDepartments());
         }
+
+
+        [HttpGet("GetAllEmployeesByDepartmentId")]
+        public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetAllEmployeesByDepartmentId(int id)
+        {
+            return Ok(await _departmentService.GetEmployeesByDepartmentId(id));
+        }
+
 
         // Retrieves a department from the database based on the provided ID
         [HttpGet("GetDepartmentById")]

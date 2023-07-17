@@ -20,10 +20,17 @@ namespace Organisation_WebAPI.Controllers
         }
         // Retrieves all products from the database
         [HttpGet("GetAllProducts")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetProducts()
         {
             return Ok(await _productService.GetAllProducts());
+        }
+
+         [HttpGet("GetAvailableProducts")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<ActionResult<ServiceResponse<GetProductDto>>> GetAvailableProducts()
+        {
+            return Ok(await _productService.GetAvailableProducts());
         }
 
         // Retrieves a product from the database based on the provided ID

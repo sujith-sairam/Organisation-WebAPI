@@ -53,12 +53,23 @@ namespace Organisation_WebAPI.Services.Products
                 return serviceResponse;
         }
 
-        // Retrieves all product from the database
-        public async Task<ServiceResponse<List<GetProductDto>>> GetAllProducts()
+         public async Task<ServiceResponse<List<GetProductDto>>> GetAllProducts()
         {
            
             var serviceResponse = new ServiceResponse<List<GetProductDto>>();
             var dbProducts = await _context.Products.ToListAsync();
+            serviceResponse.Data = dbProducts.Select(c => _mapper.Map<GetProductDto>(c)).ToList();
+            return serviceResponse;
+        }
+
+        // Retrieves all product from the database
+        public async Task<ServiceResponse<List<GetProductDto>>> GetAvailableProducts()
+        {
+           
+            var serviceResponse = new ServiceResponse<List<GetProductDto>>();
+            var dbProducts = await _context.Products
+                .Where(p => !_context.Managers.Any(m => m.ProductID == p.ProductID))
+                .ToListAsync();
             serviceResponse.Data = dbProducts.Select(c => _mapper.Map<GetProductDto>(c)).ToList();
             return serviceResponse;
         }

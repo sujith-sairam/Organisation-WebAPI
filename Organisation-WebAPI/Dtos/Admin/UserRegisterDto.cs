@@ -15,7 +15,6 @@
         public int ProductID { get; set; }
         public int ManagerID { get; set; }
 
-        // Manager-specific fields
         public string? ManagerName { get; set; }
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }

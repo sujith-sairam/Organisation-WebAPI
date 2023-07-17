@@ -36,7 +36,15 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetManagerById(id));
         }
 
-       
+        [HttpGet("GetManagerByProductId")]
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagerByProductId(int id)
+        {
+            return Ok(await _managerService.GetManagerByProductId(id));
+        }
+
+
+
+
         [HttpPut("UpdateManager")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> UpdateEmployee(UpdateManagerDto updatedManager,int id){
