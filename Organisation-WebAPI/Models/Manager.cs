@@ -28,7 +28,12 @@ namespace Organisation_WebAPI.Models
         public User? User { get; set; }
         public bool isAppointed { get; set; }
         public ICollection<Employee> Employees { get; set; }
-        public int? ProductID { get; set; }
-        public Product Product { get; set; } = null!;
+        //public int? ProductID { get; set; }
+        //public Product Product { get; set; } = null!;
+
+        [ForeignKey("Department")]
+        public int DepartmentID { get; set; }
+        public Department Department { get; set; } = null!;
+
     }
 }

@@ -129,16 +129,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
                     if (model.Role == UserRole.Employee)
                     {
-                        var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
                         var manager = await _dbContext.Managers.FindAsync(model.ManagerID);
-
-                        if (department == null)
-                        {
-                            response.Success = false;
-                            response.Message = "Invalid department ID. Department Not Found";
-                            transaction.Rollback();
-                            return response;
-                        }
 
                         if (manager == null)
                         {
@@ -154,7 +145,6 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
-                            DepartmentID = model.DepartmentID,
                             ManagerID = model.ManagerID,
                             User = user
                         };
@@ -169,11 +159,21 @@ namespace Organisation_WebAPI.Services.AuthRepo
                     }
                     else if (model.Role == UserRole.Manager)
                     {
-                        var existingManager = await _dbContext.Managers.FirstOrDefaultAsync(m => m.ProductID == model.ProductID);
-                        if (existingManager != null)
+                        var department = await _dbContext.Departments.FindAsync(model.DepartmentID);
+
+                        if (department == null)
                         {
                             response.Success = false;
-                            response.Message = "Product ID is already associated with a manager.";
+                            response.Message = "Invalid department ID. Department Not Found";
+                            transaction.Rollback();
+                            return response;
+                        }
+                        var existingManagers = await _dbContext.Managers.FirstOrDefaultAsync(m => m.DepartmentID == model.DepartmentID);
+
+                        if (existingManagers != null)
+                        {
+                            response.Success = false;
+                            response.Message = "Department ID is already associated with a manager.";
                             transaction.Rollback();
                             return response;
                         }
@@ -184,7 +184,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             ManagerName = model.ManagerName,
                             ManagerSalary = model.ManagerSalary,
                             ManagerAge = model.ManagerAge,
-                            ProductID = model.ProductID,
+                            DepartmentID = model.DepartmentID,
                             isAppointed = true,
                             User = user
                         };

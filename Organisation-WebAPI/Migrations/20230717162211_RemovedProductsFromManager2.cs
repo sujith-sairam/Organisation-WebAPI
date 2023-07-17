@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Organisation_WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialMigration : Migration
+    public partial class RemovedProductsFromManager2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -110,16 +110,17 @@ namespace Organisation_WebAPI.Migrations
                     UserID = table.Column<int>(type: "int", nullable: true),
                     ManagerAge = table.Column<int>(type: "int", nullable: false),
                     isAppointed = table.Column<bool>(type: "bit", nullable: false),
-                    ProductID = table.Column<int>(type: "int", nullable: true)
+                    DepartmentID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Managers", x => x.ManagerId);
                     table.ForeignKey(
-                        name: "FK_Managers_Products_ProductID",
-                        column: x => x.ProductID,
-                        principalTable: "Products",
-                        principalColumn: "ProductID");
+                        name: "FK_Managers_Departments_DepartmentID",
+                        column: x => x.DepartmentID,
+                        principalTable: "Departments",
+                        principalColumn: "DepartmentID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Managers_Users_UserID",
                         column: x => x.UserID,
@@ -136,8 +137,8 @@ namespace Organisation_WebAPI.Migrations
                     EmployeeSalary = table.Column<int>(type: "int", nullable: false),
                     EmployeeAge = table.Column<int>(type: "int", nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: true),
-                    DepartmentID = table.Column<int>(type: "int", nullable: false),
-                    ManagerID = table.Column<int>(type: "int", nullable: true)
+                    ManagerID = table.Column<int>(type: "int", nullable: true),
+                    DepartmentID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -146,8 +147,7 @@ namespace Organisation_WebAPI.Migrations
                         name: "FK_Employees_Departments_DepartmentID",
                         column: x => x.DepartmentID,
                         principalTable: "Departments",
-                        principalColumn: "DepartmentID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DepartmentID");
                     table.ForeignKey(
                         name: "FK_Employees_Managers_ManagerID",
                         column: x => x.ManagerID,
@@ -215,9 +215,9 @@ namespace Organisation_WebAPI.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Managers_ProductID",
+                name: "IX_Managers_DepartmentID",
                 table: "Managers",
-                column: "ProductID");
+                column: "DepartmentID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Managers_UserID",
@@ -238,16 +238,16 @@ namespace Organisation_WebAPI.Migrations
                 name: "EmployeeTasks");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Departments");
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Managers");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Users");

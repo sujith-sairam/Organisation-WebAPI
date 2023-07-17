@@ -23,7 +23,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all customers from the database
         [HttpGet("GetAllCustomer")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetCustomerDto>>> GetCustomers()
         {
             return Ok(await _customerService.GetAllCustomers());

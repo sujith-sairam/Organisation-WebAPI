@@ -11,8 +11,8 @@ namespace Organisation_WebAPI.Dtos.ManagerDto
         public string? ManagerName {get;set;}
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
-        public int? ProductID {get;set;}
+        public int DepartmentID { get; set; }
         public bool isAppointed { get; set; }
-        public string? ProductName {get;set;}
+        public string? DepartmentName {get;set;}
     }
 }

@@ -35,8 +35,7 @@ namespace Organisation_WebAPI
             CreateMap<UpdateDepartmentDto,Department>();
 
             CreateMap<Employee, GetEmployeeDto>()
-            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.ManagerName : null))
-            .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null));
+            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.ManagerName : null));
 
             CreateMap<Employee, GetEmployeeDto>();
             CreateMap<AddEmployeeDto,Employee>();
@@ -49,8 +48,7 @@ namespace Organisation_WebAPI
             .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.ManagerId))
             .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.ManagerName))
             .ForMember(dest => dest.ManagerSalary, opt => opt.MapFrom(src => src.ManagerSalary))
-            .ForMember(dest => dest.ManagerAge, opt => opt.MapFrom(src => src.ManagerAge))
-            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.ProductName : null));
+            .ForMember(dest => dest.ManagerAge, opt => opt.MapFrom(src => src.ManagerAge));
 
             CreateMap<EmployeeTask, GetEmployeeTaskDto>();
             CreateMap<AddEmployeeTaskDto,EmployeeTask>();

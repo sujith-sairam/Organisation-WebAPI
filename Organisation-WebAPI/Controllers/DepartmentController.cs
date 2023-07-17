@@ -29,17 +29,8 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _departmentService.GetAllDepartments());
         }
 
-
-        [HttpGet("GetAllEmployeesByDepartmentId")]
-        public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetAllEmployeesByDepartmentId(int id)
-        {
-            return Ok(await _departmentService.GetEmployeesByDepartmentId(id));
-        }
-
-
         // Retrieves a department from the database based on the provided ID
         [HttpGet("GetDepartmentById")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartment(int id)
         {
             return Ok(await _departmentService.GetDepartmentById(id));
@@ -49,7 +40,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Adds a new Department to the database
         [HttpPost("CreateDepartment")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> AddProduct(AddDepartmentDto newDepartment)
         {
             return Ok(await _departmentService.AddDepartment(newDepartment));
@@ -57,14 +47,12 @@ namespace Organisation_WebAPI.Controllers
 
         // Updates a department in the database based on the provided ID
         [HttpPut("UpdateDepartment")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> UpdateProduct(UpdateDepartmentDto updatedDepartment,int id){
             return Ok(await _departmentService.UpdateDepartment(updatedDepartment,id));
         }
         
         // Deletes a department from the database based on the provided ID
         [HttpDelete("DeleteDepartment")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> DeleteProduct(int id){
             return Ok(await _departmentService.DeleteDepartment(id));
         }
