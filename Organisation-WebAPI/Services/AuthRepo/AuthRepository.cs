@@ -447,10 +447,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid user role";
                 return response;
             }
-
-
             await _dbContext.SaveChangesAsync();
-
             response.Data = "User deleted successfully";
             return response;
 

@@ -289,7 +289,7 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.EmployeeTask", b =>
                 {
                     b.HasOne("Organisation_WebAPI.Models.Employee", "Employee")
-                        .WithMany()
+                        .WithMany("EmployeeTasks")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -315,6 +315,11 @@ namespace Organisation_WebAPI.Migrations
             modelBuilder.Entity("Organisation_WebAPI.Models.Department", b =>
                 {
                     b.Navigation("Employees");
+                });
+
+            modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
+                {
+                    b.Navigation("EmployeeTasks");
                 });
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Manager", b =>

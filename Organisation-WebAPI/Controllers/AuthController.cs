@@ -84,6 +84,7 @@ namespace Organisation_WebAPI.Controllers
         [HttpPost("ForgotPassword")]
         [AllowAnonymous]
 
+        
         public async Task<ActionResult<ServiceResponse<string>>> ForgotPassword(string email)
         {
             var response = await _authRepository.ForgotPassword(email);

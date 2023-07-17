@@ -72,6 +72,7 @@ namespace Organisation_WebAPI.Services.Employees
             EmployeeSalary = e.EmployeeSalary,
             EmployeeAge = e.EmployeeAge,
             DepartmentID = e.DepartmentID,
+            ManagerName = _context.Managers.FirstOrDefault(d => d.ManagerId == e.ManagerID)?.ManagerName,
             DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
             ProductName = _context.Managers.Include(m => m.Product).FirstOrDefault(m => m.ManagerId == e.ManagerID)?.Product?.ProductName
         }).ToList();
@@ -169,7 +170,7 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.DepartmentID = updatedEmployee.DepartmentID;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
-
+                employee.ManagerID = updatedEmployee.ManagerID;
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetEmployeeDto>(employee);
 
@@ -210,6 +211,7 @@ namespace Organisation_WebAPI.Services.Employees
                 employeeDtos.ForEach(e =>
                 {
                     e.ProductName = manager.Product.ProductName;
+                    e.DepartmentID = e.DepartmentID;
                     e.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
                 });
 

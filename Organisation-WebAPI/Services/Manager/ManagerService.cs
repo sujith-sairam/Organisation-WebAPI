@@ -75,6 +75,7 @@ namespace Organisation_WebAPI.Services.Managers
                 ManagerSalary = e.ManagerSalary,
                 ManagerAge = e.ManagerAge,
                 ProductID = e.ProductID,
+                isAppointed = e.isAppointed,
                 ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
             }).ToList();
 
@@ -143,7 +144,6 @@ namespace Organisation_WebAPI.Services.Managers
 
                 foreach (var employeeDto in managerDto.Employees)
                 {
-                    employeeDto.DepartmentName = employeeDto.Department?.DepartmentName;
                     employeeDto.ManagerName = manager.ManagerName;
                 }
 
