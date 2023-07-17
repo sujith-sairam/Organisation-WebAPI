@@ -8,7 +8,7 @@ namespace Organisation_WebAPI.Models
 {
     public class Product
     {
-         public Product() { 
+        public Product() { 
             Customers = new List<Customer>();
             
         }
@@ -16,5 +16,6 @@ namespace Organisation_WebAPI.Models
         public string? ProductName { get; set; }
         public int ProductRevenue {get;set;}
         public ICollection<Customer> Customers { get; set; }
-    }       
-}
+  
+    }
+}       

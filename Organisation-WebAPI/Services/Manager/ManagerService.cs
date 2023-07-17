@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
+using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
 
 
@@ -74,6 +75,7 @@ namespace Organisation_WebAPI.Services.Managers
                 ManagerSalary = e.ManagerSalary,
                 ManagerAge = e.ManagerAge,
                 ProductID = e.ProductID,
+                isAppointed = e.isAppointed,
                 ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
             }).ToList();
 
@@ -118,6 +120,45 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<GetEmployeesAndManagerDto>> GetEmployeesAndManagerByProductId(int productId)
+        {
+            var serviceResponse = new ServiceResponse<GetEmployeesAndManagerDto>();
+            try
+            {
+                var manager = await _context.Managers
+                    .Include(m => m.Product)
+                    .Include(m => m.Employees) // Include the related employees
+                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+
+
+
+                if (manager == null)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Manager not found.";
+                    return serviceResponse;
+                }
+
+                var managerDto = _mapper.Map<GetEmployeesAndManagerDto>(manager);
+                managerDto.ProductName = manager.Product?.ProductName;
+
+                foreach (var employeeDto in managerDto.Employees)
+                {
+                    employeeDto.ManagerName = manager.ManagerName;
+                }
+
+                // Optionally, you can map the employees as well
+
+
+                serviceResponse.Data = managerDto;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
 
         public async Task<ServiceResponse<GetManagerDto>> GetManagerById(int id)
         {

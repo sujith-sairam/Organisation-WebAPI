@@ -32,7 +32,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
         private readonly IMapper _mapper;
 
 
-        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IJwtUtils jwtUtils, IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
+        public AuthRepository(OrganizationContext dbContext, IConfiguration configuration, IJwtUtils jwtUtils,
+            IEmailSender emailSender, IMemoryCache memoryCache, IMapper mapper)
         {
             _dbContext = dbContext;
             _emailSender = emailSender;
@@ -149,6 +150,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
                         var employee = new Employee
                         {
+                            EmployeeID = user.UserID,
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
@@ -424,6 +426,9 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
             if (user.Role == UserRole.Employee)
             {
+
+                var associatedEmployees = await _dbContext.Employees.Where(e => e.UserID == id).ToListAsync();
+                _dbContext.Employees.RemoveRange(associatedEmployees);
                 _dbContext.Users.Remove(user);
 
             }
@@ -442,10 +447,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Invalid user role";
                 return response;
             }
-
-
             await _dbContext.SaveChangesAsync();
-
             response.Data = "User deleted successfully";
             return response;
 
