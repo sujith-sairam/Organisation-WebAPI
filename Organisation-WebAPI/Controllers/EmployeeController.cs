@@ -45,11 +45,11 @@ namespace Organisation_WebAPI.Controllers
         }
         
 
-        [HttpGet("GetAllEmployeesByProduct")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByProduct(int id)
-        {
-            return Ok(await _employeeService.GetAllEmployeesByProduct(id));
-        }
+        //[HttpGet("GetAllEmployeesByProduct")]
+        //public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByProduct(int id)
+        //{
+        //    return Ok(await _employeeService.GetAllEmployeesByProduct(id));
+        //}
 
         // Updates a employee in the database based on the provided ID
         [HttpPut("UpdateEmployee")]
@@ -60,7 +60,6 @@ namespace Organisation_WebAPI.Controllers
         
         // Deletes a employee from the database based on the provided ID
         [HttpDelete("DeleteEmployee")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
             return Ok(await _employeeService.DeleteEmployee(id));
         }

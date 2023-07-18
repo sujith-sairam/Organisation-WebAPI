@@ -71,9 +71,7 @@ namespace Organisation_WebAPI.Services.Employees
             EmployeeName = e.EmployeeName,
             EmployeeSalary = e.EmployeeSalary,
             EmployeeAge = e.EmployeeAge,
-            DepartmentID = e.DepartmentID,
-            DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName,
-            ProductName = _context.Managers.Include(m => m.Product).FirstOrDefault(m => m.ManagerId == e.ManagerID)?.Product?.ProductName
+            ManagerName = _context.Managers.FirstOrDefault(d => d.ManagerId == e.ManagerID)?.ManagerName,
         }).ToList();
 
         serviceResponse.Data = employeeDTOs;
@@ -120,7 +118,6 @@ namespace Organisation_WebAPI.Services.Employees
             {
                 var manager = await _context.Managers
                     .Include(m => m.Employees)
-                    .Include(m => m.Product)
                     .FirstOrDefaultAsync(m => m.ManagerId == managerId);
 
                 if (manager == null)
@@ -134,8 +131,6 @@ namespace Organisation_WebAPI.Services.Employees
                 var employeeDtos = employees.Select(e =>
                 {
                     var employeeDto = _mapper.Map<GetEmployeeDto>(e);
-                    employeeDto.ProductName = manager.Product?.ProductName;
-                    employeeDto.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
                     return employeeDto;
                 }).ToList();
 
@@ -160,14 +155,8 @@ namespace Organisation_WebAPI.Services.Employees
                 if (employee is null)
                     throw new Exception($"Employee with id '{id}' not found");
 
-                var departmentExists = await _context.Departments.AnyAsync(d => d.DepartmentID == updatedEmployee.DepartmentID);
-                if (!departmentExists)
-                    throw new Exception($"Invalid DepartmentID '{updatedEmployee.DepartmentID}'");
-
-
                 employee.EmployeeName = updatedEmployee.EmployeeName;
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
-                employee.DepartmentID = updatedEmployee.DepartmentID;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
                 employee.ManagerID = updatedEmployee.ManagerID;
                 await _context.SaveChangesAsync();
@@ -186,42 +175,41 @@ namespace Organisation_WebAPI.Services.Employees
         }
 
 
-        public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByProduct(int productId)
-        {
-            var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
-            try
-            {
-                var manager = await _context.Managers
-                    .Include(m => m.Employees)
-                    .Include(m => m.Product)
-                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+        //public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByProduct(int productId)
+        //{
+        //    var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+        //    try
+        //    {
+        //        var manager = await _context.Managers
+        //            .Include(m => m.Employees)
+        //            .Include(m => m.Product)
+        //            .FirstOrDefaultAsync(m => m.ProductID == productId);
 
-                if (manager == null)
-                {
-                    serviceResponse.Success = false;
-                    serviceResponse.Message = "No manager found for the product.";
-                    return serviceResponse;
-                }
+        //        if (manager == null)
+        //        {
+        //            serviceResponse.Success = false;
+        //            serviceResponse.Message = "No manager found for the product.";
+        //            return serviceResponse;
+        //        }
 
-                var employees = manager.Employees.ToList();
-                var employeeDtos = employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
+        //        var employees = manager.Employees.ToList();
+        //        var employeeDtos = employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
 
-                // Add product name to each employee DTO
-                employeeDtos.ForEach(e =>
-                {
-                    e.ProductName = manager.Product.ProductName;
-                    e.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
-                });
+        //        // Add product name to each employee DTO
+        //        employeeDtos.ForEach(e =>
+        //        {
+        //            e.ProductName = manager.Product.ProductName;
+        //        });
 
-                serviceResponse.Data = employeeDtos;
-            }
-            catch (Exception ex)
-            {
-                serviceResponse.Success = false;
-                serviceResponse.Message = ex.Message;
-            }
-            return serviceResponse;
-        }
+        //        serviceResponse.Data = employeeDtos;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        serviceResponse.Success = false;
+        //        serviceResponse.Message = ex.Message;
+        //    }
+        //    return serviceResponse;
+        //}
 
 
 

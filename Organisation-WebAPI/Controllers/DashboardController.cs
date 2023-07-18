@@ -27,14 +27,6 @@ namespace Organisation_WebAPI.Controllers
             var serviceResponse = await _dashboardService.GetTotalCount();
             return Ok(serviceResponse);
         }
-
-        [HttpGet("GetChartDetails")]
-        //[Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<int>>> GetChartDetails()
-        {
-            var serviceResponse = await _dashboardService.GetChartDetails();
-            return Ok(serviceResponse);
-        }
       
     }
 }
