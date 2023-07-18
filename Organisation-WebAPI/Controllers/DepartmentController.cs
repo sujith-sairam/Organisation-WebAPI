@@ -56,5 +56,12 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> DeleteProduct(int id){
             return Ok(await _departmentService.DeleteDepartment(id));
         }
+
+
+        [HttpGet("GetAvailableDepartments")]
+        public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetAvailableDepartments()
+        {
+            return Ok(await _departmentService.GetAvailableDepartments());
+        }
     }
 }

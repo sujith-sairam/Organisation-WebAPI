@@ -15,5 +15,6 @@ namespace Organisation_WebAPI.Dtos.EmployeeDto
         public int ManagerID {get;set;}
         public string? ManagerName {get;set;}
 
+
     }
 }

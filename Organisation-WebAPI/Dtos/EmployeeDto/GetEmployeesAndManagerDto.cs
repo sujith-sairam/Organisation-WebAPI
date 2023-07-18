@@ -6,6 +6,7 @@
         public string ManagerName { get; set; }
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
+        public string DepartmentName { get; set; } // Department name
         public List<GetEmployeeDto> Employees { get; set; }
     }
 }
