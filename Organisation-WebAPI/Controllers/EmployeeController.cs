@@ -60,7 +60,6 @@ namespace Organisation_WebAPI.Controllers
         
         // Deletes a employee from the database based on the provided ID
         [HttpDelete("DeleteEmployee")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
             return Ok(await _employeeService.DeleteEmployee(id));
         }
