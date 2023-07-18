@@ -74,9 +74,9 @@ namespace Organisation_WebAPI.Services.Managers
                 ManagerName = e.ManagerName,
                 ManagerSalary = e.ManagerSalary,
                 ManagerAge = e.ManagerAge,
-                ProductID = e.ProductID,
+                DepartmentID = e.DepartmentID,
                 isAppointed = e.isAppointed,
-                ProductName = _context.Products.FirstOrDefault(p => p.ProductID == e.ProductID)?.ProductName
+                DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName
             }).ToList();
 
             serviceResponse.Data = managerDTOs;
@@ -91,14 +91,14 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<GetManagerDto>> GetManagerByProductId(int productId)
+        public async Task<ServiceResponse<GetManagerDto>> GetManagerByDepartmentId(int departmentId)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try
             {
                 var manager = await _context.Managers
-                    .Include(m => m.Product)
-                    .FirstOrDefaultAsync(m => m.ProductID == productId);
+                    .Include(m => m.Department)
+                    .FirstOrDefaultAsync(m => m.DepartmentID == departmentId);
 
                 if (manager == null)
                 {
@@ -108,7 +108,7 @@ namespace Organisation_WebAPI.Services.Managers
                 }
 
                 var managerDto = _mapper.Map<GetManagerDto>(manager);
-                managerDto.ProductName = manager.Product?.ProductName;
+                managerDto.DepartmentName = manager.Department?.DepartmentName;
 
                 serviceResponse.Data = managerDto;
             }
@@ -120,17 +120,16 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<GetEmployeesAndManagerDto>> GetEmployeesAndManagerByProductId(int productId)
+        public async Task<ServiceResponse<GetEmployeesAndManagerDto>> GetEmployeesAndManagerByDepartmentId(int departmentId)
         {
             var serviceResponse = new ServiceResponse<GetEmployeesAndManagerDto>();
             try
             {
                 var manager = await _context.Managers
-                    .Include(m => m.Product)
-                    .Include(m => m.Employees) // Include the related employees
-                    .FirstOrDefaultAsync(m => m.ProductID == productId);
-
-
+                    .Include(m => m.Department)
+                    .Include(m => m.Employees)
+                        .ThenInclude(e => e.Department)
+                    .FirstOrDefaultAsync(m => m.DepartmentID == departmentId);
 
                 if (manager == null)
                 {
@@ -140,15 +139,13 @@ namespace Organisation_WebAPI.Services.Managers
                 }
 
                 var managerDto = _mapper.Map<GetEmployeesAndManagerDto>(manager);
-                managerDto.ProductName = manager.Product?.ProductName;
 
-                foreach (var employeeDto in managerDto.Employees)
+                // Retrieve the department name using the department ID
+                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == departmentId);
+                if (department != null)
                 {
-                    employeeDto.ManagerName = manager.ManagerName;
+                    managerDto.DepartmentName = department.DepartmentName;
                 }
-
-                // Optionally, you can map the employees as well
-
 
                 serviceResponse.Data = managerDto;
             }
@@ -159,6 +156,7 @@ namespace Organisation_WebAPI.Services.Managers
             }
             return serviceResponse;
         }
+
 
         public async Task<ServiceResponse<GetManagerDto>> GetManagerById(int id)
         {
@@ -191,14 +189,15 @@ namespace Organisation_WebAPI.Services.Managers
                 if (manager is null)
                     throw new Exception($"Manager with id '{id}' not found");
                 
-                var productExists = await _context.Products.AnyAsync(p => p.ProductID == updatedManager.ProductID);
-                if (!productExists)
-                    throw new Exception($"Invalid ProductID '{updatedManager.ProductID}'");
+                var departmentExists = await _context.Departments.AnyAsync(d => d.DepartmentID == updatedManager.DepartmentID);
+
+                if (!departmentExists)
+                    throw new Exception($"Invalid DepartmentID '{updatedManager.DepartmentID}'");
 
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
-                //manager.ProductID = updatedManager.ProductID;
+                manager.DepartmentID = updatedManager.DepartmentID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetManagerDto>(manager);
