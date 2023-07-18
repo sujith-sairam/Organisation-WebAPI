@@ -58,7 +58,6 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("CreateEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
             return Ok(await _employeeTaskService.AddEmployeeTask(newEmployeeTask));

@@ -149,6 +149,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
 
                         var employee = new Employee
                         {
+                            EmployeeID = user.UserID,
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
