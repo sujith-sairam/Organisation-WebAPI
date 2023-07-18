@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Organisation_WebAPI.Dtos.Admin;
-using Organisation_WebAPI.Dtos.ProductDto;
-using Organisation_WebAPI.Dtos.CustomerDto;
 using Organisation_WebAPI.Dtos.DepartmentDto;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.EmployeeTaskDto;
@@ -22,21 +20,12 @@ namespace Organisation_WebAPI
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
 
-            CreateMap<Product, GetProductDto>();
-            CreateMap<AddProductDto,Product>();
-            CreateMap<UpdateProductDto,Product>();
-
-            CreateMap<Customer, GetCustomerDto>();
-            CreateMap<AddCustomerDto,Customer>();
-            CreateMap<UpdateCustomerDto,Customer>();
-
             CreateMap<Department, GetDepartmentDto>();
             CreateMap<AddDepartmentDto,Department>();
             CreateMap<UpdateDepartmentDto,Department>();
 
             CreateMap<Employee, GetEmployeeDto>()
-            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.ManagerName : null))
-            .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department != null ? src.Department.DepartmentName : null));
+            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.ManagerName : null));
 
             CreateMap<Employee, GetEmployeeDto>();
             CreateMap<AddEmployeeDto,Employee>();
@@ -49,8 +38,7 @@ namespace Organisation_WebAPI
             .ForMember(dest => dest.ManagerId, opt => opt.MapFrom(src => src.ManagerId))
             .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.ManagerName))
             .ForMember(dest => dest.ManagerSalary, opt => opt.MapFrom(src => src.ManagerSalary))
-            .ForMember(dest => dest.ManagerAge, opt => opt.MapFrom(src => src.ManagerAge))
-            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.ProductName : null));
+            .ForMember(dest => dest.ManagerAge, opt => opt.MapFrom(src => src.ManagerAge));
 
             CreateMap<EmployeeTask, GetEmployeeTaskDto>();
             CreateMap<AddEmployeeTaskDto,EmployeeTask>();

@@ -27,10 +27,10 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetAllManagers());
         }
 
-        [HttpGet("GetEmployeesAndManagerByProductId")]
-        public async Task<ActionResult<ServiceResponse<GetEmployeesAndManagerDto>>> GetEmployeesAndManagerByProductId(int id)
+        [HttpGet("GetEmployeesAndManagerByDepartmentId")]
+        public async Task<ActionResult<ServiceResponse<GetEmployeesAndManagerDto>>> GetEmployeesAndManagerByDepartmentId(int id)
         {
-            return Ok(await _managerService.GetEmployeesAndManagerByProductId(id));
+            return Ok(await _managerService.GetEmployeesAndManagerByDepartmentId(id));
         }
 
 
@@ -42,17 +42,16 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _managerService.GetManagerById(id));
         }
 
-        [HttpGet("GetManagerByProductId")]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagerByProductId(int id)
+        [HttpGet("GetManagerByDepartmentId")]
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagerByDepartmentId(int id)
         {
-            return Ok(await _managerService.GetManagerByProductId(id));
+            return Ok(await _managerService.GetManagerByDepartmentId(id)); 
         }
 
 
 
 
         [HttpPut("UpdateManager")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> UpdateEmployee(UpdateManagerDto updatedManager,int id){
             return Ok(await _managerService.UpdateManager(updatedManager,id));
         }

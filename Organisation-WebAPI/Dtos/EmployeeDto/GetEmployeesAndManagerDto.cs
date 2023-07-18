@@ -6,7 +6,6 @@
         public string ManagerName { get; set; }
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
-        public string ProductName { get; set; }
         public List<GetEmployeeDto> Employees { get; set; }
     }
 }
