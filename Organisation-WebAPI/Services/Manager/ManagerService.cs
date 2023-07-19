@@ -165,7 +165,6 @@ namespace Organisation_WebAPI.Services.Managers
                     if (department != null)
                     {
                         managerDto.DepartmentName = department.DepartmentName;
-                        serviceResponse.Data = department.DepartmentName;
 
                     }
                     serviceResponse.Message = "Manager not found.";

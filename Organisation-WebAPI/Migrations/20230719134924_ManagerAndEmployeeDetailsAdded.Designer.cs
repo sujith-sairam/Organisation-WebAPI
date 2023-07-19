@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230718034907_Init")]
-    partial class Init
+    [Migration("20230719134924_ManagerAndEmployeeDetailsAdded")]
+    partial class ManagerAndEmployeeDetailsAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,8 +46,14 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("EmployeeID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DepartmentID")
-                        .HasColumnType("int");
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Designation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeAge")
                         .HasColumnType("int");
@@ -61,12 +67,13 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int?>("ManagerID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("EmployeeID");
-
-                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("ManagerID");
 
@@ -113,8 +120,14 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ManagerAge")
                         .HasColumnType("int");
@@ -124,6 +137,9 @@ namespace Organisation_WebAPI.Migrations
 
                     b.Property<int>("ManagerSalary")
                         .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
@@ -182,10 +198,6 @@ namespace Organisation_WebAPI.Migrations
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
                 {
-                    b.HasOne("Organisation_WebAPI.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID");
-
                     b.HasOne("Organisation_WebAPI.Models.Manager", "Manager")
                         .WithMany("Employees")
                         .HasForeignKey("ManagerID");
@@ -193,8 +205,6 @@ namespace Organisation_WebAPI.Migrations
                     b.HasOne("Organisation_WebAPI.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID");
-
-                    b.Navigation("Department");
 
                     b.Navigation("Manager");
 

@@ -17,6 +17,10 @@ namespace Organisation_WebAPI.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)] 
         public int EmployeeID { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Designation { get; set; }
+        public string? Address { get; set; }
         public string ?EmployeeName { get; set; }
         public int EmployeeSalary { get; set; }
         public int EmployeeAge { get; set; }
