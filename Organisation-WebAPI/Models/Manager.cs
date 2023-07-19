@@ -16,20 +16,17 @@ namespace Organisation_WebAPI.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ManagerId { get; set; }
-
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
         public string? ManagerName { get; set; }
+        public string? Address { get; set; }
         public int ManagerSalary { get; set; }
-
         [ForeignKey("User")]
         public int? UserID { get; set; }
-
         public int ManagerAge { get; set; }
-
         public User? User { get; set; }
         public bool isAppointed { get; set; }
         public ICollection<Employee> Employees { get; set; }
-        //public int? ProductID { get; set; }
-        //public Product Product { get; set; } = null!;
 
         [ForeignKey("Department")]
         public int DepartmentID { get; set; }
