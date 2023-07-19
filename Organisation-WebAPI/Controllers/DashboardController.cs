@@ -27,6 +27,14 @@ namespace Organisation_WebAPI.Controllers
             var serviceResponse = await _dashboardService.GetTotalCount();
             return Ok(serviceResponse);
         }
+
+         [HttpGet("GetEmployeeTasksCount")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<ActionResult<ServiceResponse<int>>> GetTaskCounts(int id)
+        {
+            var serviceResponse = await _dashboardService.GetEmployeeTaskCount(id);
+            return Ok(serviceResponse);
+        }
       
     }
 }

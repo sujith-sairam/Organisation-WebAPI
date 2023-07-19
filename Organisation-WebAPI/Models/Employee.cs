@@ -26,8 +26,8 @@ namespace Organisation_WebAPI.Models
         [ForeignKey("Manager")]
         public int? ManagerID { get; set; }
         public Manager? Manager { get; set; }
+        public Department? Department {get;set;}
         public User? User { get; set; }
-        public Department? Department { get; set; }
         public ICollection<EmployeeTask> EmployeeTasks { get; set; }
 
 

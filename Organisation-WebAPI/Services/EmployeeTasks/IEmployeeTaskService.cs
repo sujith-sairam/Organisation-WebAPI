@@ -15,9 +15,11 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeCompletedTaskByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeePendingTaskByEmployeeId(int id);
+        Task<ServiceResponse<int>>  CalculateNewEmployeeTasksByEmployeeId(int employeeId);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto addEmployeeTask);
         Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTask(UpdateEmployeeTaskDto updateEmployeeTask,int id);
         Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updateEmployeeTaskStatus,int id);
+
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> DeleteEmployeeTask(int id);
 
     }

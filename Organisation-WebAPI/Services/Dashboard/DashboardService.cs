@@ -11,14 +11,42 @@ namespace Organisation_WebAPI.Services.Dashboard
     public class DashboardService : IDashboardService
     {   
         private readonly OrganizationContext _context;
-        private readonly ILogger<DashboardService> _logger;
-        public DashboardService(OrganizationContext context , ILogger<DashboardService> logger)
+
+        public DashboardService(OrganizationContext context )
         {
             _context = context;
-            _logger = logger;
+        
         }
 
-   
+     public async Task<ServiceResponse<Dictionary<Status, int>>> GetEmployeeTaskCount(int id)
+     {
+        var serviceResponse = new ServiceResponse<Dictionary<Status, int>>();
+
+        try
+        {
+            var allStatuses = Enum.GetValues(typeof(Status)).Cast<Status>();
+            var taskStatusCounts = await _context.EmployeeTasks
+            .Where(employee => employee.EmployeeId == id)
+            .GroupBy(employee => employee.TaskStatus)
+            .ToDictionaryAsync(group => group.Key, group => group.Count());
+
+            var finalStatusCounts = allStatuses.ToDictionary(status => status, status => taskStatusCounts.GetValueOrDefault(status, 0));
+
+            serviceResponse.Data = finalStatusCounts;
+            serviceResponse.Message = "Task status counts retrieved successfully.";
+        }
+        catch (Exception ex)
+        {
+            serviceResponse.Success = false;
+            serviceResponse.Message = "Failed to retrieve task status counts: " + ex.Message;
+        }
+
+            return serviceResponse;
+        }
+
+
+
+
         public async Task<ServiceResponse<Dictionary<string, int>>> GetTotalCount()
         {
            var serviceResponse = new ServiceResponse<Dictionary<string, int>>();

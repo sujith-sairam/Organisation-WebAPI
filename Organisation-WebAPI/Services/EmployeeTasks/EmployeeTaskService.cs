@@ -81,8 +81,10 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                 if (dueDate < currentDate)
                 {
                     employeeTask.TaskStatus = Status.Pending;
+                    _context.EmployeeTasks.Update(employeeTask);
                 }
             }
+            await _context.SaveChangesAsync();
             serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
             }
             catch(Exception ex) 
@@ -181,8 +183,21 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             try
             {
                 var dbEmployeeTasks = await _context.EmployeeTasks
-                    .Where(e => e.EmployeeId == id && e.TaskStatus == Status.Ongoing)
+                    .Where(e => e.EmployeeId == id && e.TaskStatus == Status.InProgress)
                     .ToListAsync();
+                 var currentDate = DateTime.Today;
+                foreach (var employeeTask in dbEmployeeTasks)
+                {   
+                    DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
+                    DateTime dueDate = TaskDueDate.Date;
+                    if (dueDate <= currentDate)
+                    {
+                        employeeTask.TaskStatus = Status.Pending;
+                        _context.EmployeeTasks.Update(employeeTask);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
 
                 serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
             }
@@ -257,16 +272,54 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             return serviceResponse;
         }
 
-       public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTaskByEmployeeId(int id)
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTaskByEmployeeId(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
             try
             {
-                var dbEmployeeTasks = await _context.EmployeeTasks
-                    .Where(e => e.EmployeeId == id && e.TaskStatus == Status.New)
-                    .ToListAsync();
+                var currentDate = DateTime.Now;
+                Console.WriteLine(currentDate);
+                var dbEmployeeTasks = await _context.EmployeeTasks.Where(t => t.TaskStatus == Status.New).ToListAsync();
 
-                serviceResponse.Data = dbEmployeeTasks.Select(c => _mapper.Map<GetEmployeeTaskDto>(c)).ToList();
+                foreach (var employeeTask in dbEmployeeTasks)
+                {   
+                    DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
+                    DateTime dueDate = TaskDueDate.Date;
+
+                    if (dueDate <= currentDate)
+                    {
+                        employeeTask.TaskStatus = Status.Pending;
+                        _context.EmployeeTasks.Update(employeeTask);
+                    }
+                }
+                
+                await _context.SaveChangesAsync();
+
+                serviceResponse.Data = dbEmployeeTasks
+                    .Where(t => t.TaskStatus == Status.New)
+                    .Select(c => _mapper.Map<GetEmployeeTaskDto>(c))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+
+            return serviceResponse;
+        }
+
+
+        public async Task<ServiceResponse<int>> CalculateNewEmployeeTasksByEmployeeId(int employeeId)
+        {
+            var serviceResponse = new ServiceResponse<int>();
+            try
+            {
+                var newTasksCount = await _context.EmployeeTasks
+                    .CountAsync(e => e.EmployeeId == employeeId && e.TaskStatus == Status.New);
+                    
+                serviceResponse.Data = newTasksCount;
+                serviceResponse.Message = $"New EmployeeTasks count calculated successfully for Employee ID: {employeeId}.";
             }
             catch (Exception ex)
             {
