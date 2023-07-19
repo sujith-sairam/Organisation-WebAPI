@@ -12,7 +12,6 @@
         public int EmployeeSalary { get; set; }
         public int EmployeeAge { get; set; }
         public int DepartmentID { get; set; }
-        public int ProductID { get; set; }
         public int ManagerID { get; set; }
 
         public string? ManagerName { get; set; }

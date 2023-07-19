@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230719134924_ManagerAndEmployeeDetailsAdded")]
-    partial class ManagerAndEmployeeDetailsAdded
+    [Migration("20230719135806_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,9 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("DepartmentID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Designation")
                         .HasColumnType("nvarchar(max)");
 
@@ -74,6 +77,8 @@ namespace Organisation_WebAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EmployeeID");
+
+                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("ManagerID");
 
@@ -198,6 +203,10 @@ namespace Organisation_WebAPI.Migrations
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
                 {
+                    b.HasOne("Organisation_WebAPI.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID");
+
                     b.HasOne("Organisation_WebAPI.Models.Manager", "Manager")
                         .WithMany("Employees")
                         .HasForeignKey("ManagerID");
@@ -205,6 +214,8 @@ namespace Organisation_WebAPI.Migrations
                     b.HasOne("Organisation_WebAPI.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID");
+
+                    b.Navigation("Department");
 
                     b.Navigation("Manager");
 
