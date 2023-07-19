@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230717170751_RemovedCustomerTable")]
-    partial class RemovedCustomerTable
+    [Migration("20230718034907_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,24 +24,6 @@ namespace Organisation_WebAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Organisation_WebAPI.Models.Admin", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Admins");
-                });
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Department", b =>
                 {
@@ -158,25 +140,6 @@ namespace Organisation_WebAPI.Migrations
                     b.ToTable("Managers");
                 });
 
-            modelBuilder.Entity("Organisation_WebAPI.Models.Product", b =>
-                {
-                    b.Property<int>("ProductID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductID"));
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductRevenue")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductID");
-
-                    b.ToTable("Products");
-                });
-
             modelBuilder.Entity("Organisation_WebAPI.Models.User", b =>
                 {
                     b.Property<int>("UserID")
@@ -215,17 +178,6 @@ namespace Organisation_WebAPI.Migrations
                     b.HasKey("UserID");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Organisation_WebAPI.Models.Admin", b =>
-                {
-                    b.HasOne("Organisation_WebAPI.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Organisation_WebAPI.Models.Employee", b =>
