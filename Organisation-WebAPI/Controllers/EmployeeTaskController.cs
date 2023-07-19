@@ -57,8 +57,12 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeTaskService.GetEmployeePendingTaskByEmployeeId(id));
         }
 
+        [HttpGet("GetNewTaskCount")]
+        public async Task<ActionResult<ServiceResponse<int>>> GetNewEmployeeTaskCount(int id){
+            return Ok(await _employeeTaskService.CalculateNewEmployeeTasksByEmployeeId(id) );
+        }
+
         [HttpPost("CreateEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
             return Ok(await _employeeTaskService.AddEmployeeTask(newEmployeeTask));

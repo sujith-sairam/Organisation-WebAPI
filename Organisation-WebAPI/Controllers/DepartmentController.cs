@@ -24,7 +24,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves all departments from the database
         [HttpGet("GetAllDepartment")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartments()
         {
 
