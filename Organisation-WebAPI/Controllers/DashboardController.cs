@@ -24,8 +24,12 @@ namespace Organisation_WebAPI.Controllers
         //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
         {
-            var serviceResponse = await _dashboardService.GetTotalCount();
-            return Ok(serviceResponse);
+            var response = await _dashboardService.GetTotalCount();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
       
     }
