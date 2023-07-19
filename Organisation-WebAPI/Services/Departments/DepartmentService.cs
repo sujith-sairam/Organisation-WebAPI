@@ -83,6 +83,19 @@ namespace Organisation_WebAPI.Services.Departments
 
 
 
+        public async Task<ServiceResponse<List<GetDepartmentDto>>> GetAvailableDepartments()
+        {
+
+            var serviceResponse = new ServiceResponse<List<GetDepartmentDto>>();
+            var dbProducts = await _context.Departments
+                .Where(d => !_context.Managers.Any(m => m.DepartmentID == d.DepartmentID))
+                .ToListAsync();
+            serviceResponse.Data = dbProducts.Select(c => _mapper.Map<GetDepartmentDto>(c)).ToList();
+            return serviceResponse;
+        }
+
+
+
         //Retrieves a department from the database with Id
         public async Task<ServiceResponse<GetDepartmentDto>> GetDepartmentById(int id)
         {
