@@ -71,9 +71,13 @@ namespace Organisation_WebAPI.Services.Employees
             EmployeeName = e.EmployeeName,
             EmployeeSalary = e.EmployeeSalary,
             EmployeeAge = e.EmployeeAge,
-            ManagerName = _context.Managers.FirstOrDefault(d => d.ManagerId == e.ManagerID)?.ManagerName,
-            
-        }).ToList();
+            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.ManagerName,
+            ManagerIsAppointed = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.isAppointed,
+            DepartmentName = _context.Managers
+                .Include(m => m.Department)
+                .FirstOrDefault(m => m.ManagerId == e.ManagerID)
+                ?.Department?.DepartmentName
+            }).ToList();
 
         serviceResponse.Data = employeeDTOs;
         } 

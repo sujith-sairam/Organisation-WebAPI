@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.EmployeeDto;
@@ -24,13 +25,23 @@ namespace Organisation_WebAPI.Controllers
         [HttpGet("GetAllManagers")]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagers()
         {
-            return Ok(await _managerService.GetAllManagers());
+            var response = await _managerService.GetAllManagers();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetEmployeesAndManagerByDepartmentId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeesAndManagerDto>>> GetEmployeesAndManagerByDepartmentId(int id)
         {
-            return Ok(await _managerService.GetEmployeesAndManagerByDepartmentId(id));
+            var response = await _managerService.GetEmployeesAndManagerByDepartmentId(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
 
@@ -39,13 +50,23 @@ namespace Organisation_WebAPI.Controllers
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetEmployee(int id)
         {
-            return Ok(await _managerService.GetManagerById(id));
+            var response = await _managerService.GetManagerById(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetManagerByDepartmentId")]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagerByDepartmentId(int id)
         {
-            return Ok(await _managerService.GetManagerByDepartmentId(id)); 
+            var response = await _managerService.GetManagerByDepartmentId(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
 
@@ -53,14 +74,36 @@ namespace Organisation_WebAPI.Controllers
 
         [HttpPut("UpdateManager")]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> UpdateEmployee(UpdateManagerDto updatedManager,int id){
-            return Ok(await _managerService.UpdateManager(updatedManager,id));
+            var response = await _managerService.UpdateManager(updatedManager,id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
+
         
         
         [HttpDelete("DeleteManager")]
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> DeleteEmployee(int id){
-            return Ok(await _managerService.DeleteManager(id));
+            var response = await _managerService.DeleteManager(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet("GetAllDepartmentsAssociatedWithManager")]
+        public async Task<ActionResult<ServiceResponse<string>>> GetAllDepartmentsAssociatedWithManager()
+        {
+            var response = await _managerService.GetAllDepartmentsAssociatedWithManager();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
     }
 }

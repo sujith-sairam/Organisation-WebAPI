@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.DepartmentDto;
@@ -26,14 +27,25 @@ namespace Organisation_WebAPI.Controllers
         //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartments()
         {
-            return Ok(await _departmentService.GetAllDepartments());
+
+            var response = await _departmentService.GetAllDepartments();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         // Retrieves a department from the database based on the provided ID
         [HttpGet("GetDepartmentById")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartment(int id)
         {
-            return Ok(await _departmentService.GetDepartmentById(id));
+            var response = await _departmentService.GetDepartmentById(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
        
@@ -42,19 +54,50 @@ namespace Organisation_WebAPI.Controllers
         [HttpPost("CreateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> AddProduct(AddDepartmentDto newDepartment)
         {
-            return Ok(await _departmentService.AddDepartment(newDepartment));
+
+            var response = await _departmentService.AddDepartment(newDepartment);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         // Updates a department in the database based on the provided ID
         [HttpPut("UpdateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> UpdateProduct(UpdateDepartmentDto updatedDepartment,int id){
-            return Ok(await _departmentService.UpdateDepartment(updatedDepartment,id));
+
+            var response = await _departmentService.UpdateDepartment(updatedDepartment,id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
+
         
         // Deletes a department from the database based on the provided ID
         [HttpDelete("DeleteDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> DeleteProduct(int id){
-            return Ok(await _departmentService.DeleteDepartment(id));
+
+            var response = await _departmentService.DeleteDepartment(id);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+
+        [HttpGet("GetAvailableDepartments")]
+        public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetAvailableDepartments()
+        {
+            var response = await _departmentService.GetAvailableDepartments();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
     }
 }

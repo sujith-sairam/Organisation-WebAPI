@@ -20,12 +20,16 @@ namespace Organisation_WebAPI.Controllers
             _dashboardService = dashboardService;
         }
         
-        [HttpGet("GetTotalCount")]
+        [HttpGet("GetTotalEmployeeCount")]
         //[Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<int>>> GetProductRevenue()
+        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
         {
-            var serviceResponse = await _dashboardService.GetTotalCount();
-            return Ok(serviceResponse);
+            var response = await _dashboardService.GetTotalEmployeeCount();
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
          [HttpGet("GetEmployeeTasksCount")]

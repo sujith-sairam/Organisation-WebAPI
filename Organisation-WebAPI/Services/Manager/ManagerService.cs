@@ -91,6 +91,32 @@ namespace Organisation_WebAPI.Services.Managers
             return serviceResponse;
         }
 
+
+        public async Task<ServiceResponse<List<ManagerDepartmentDto>>> GetAllDepartmentsAssociatedWithManager()
+        {
+            var serviceResponse = new ServiceResponse<List<ManagerDepartmentDto>>();
+            try
+            {
+                var dbManagers = await _context.Managers.ToListAsync();
+                var managerDepartmentList = dbManagers.Select(m => new ManagerDepartmentDto
+                {
+                    ManagerId = m.ManagerId,
+                    DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == m.DepartmentID)?.DepartmentName
+                }).ToList();
+
+                serviceResponse.Data = managerDepartmentList;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+
+            return serviceResponse;
+        }
+
+
+
         public async Task<ServiceResponse<GetManagerDto>> GetManagerByDepartmentId(int departmentId)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
@@ -128,20 +154,25 @@ namespace Organisation_WebAPI.Services.Managers
                 var manager = await _context.Managers
                     .Include(m => m.Department)
                     .Include(m => m.Employees)
-                        .ThenInclude(e => e.Department)
                     .FirstOrDefaultAsync(m => m.DepartmentID == departmentId);
+                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == departmentId);
+
+                var managerDto = _mapper.Map<GetEmployeesAndManagerDto>(manager);
 
                 if (manager == null)
                 {
                     serviceResponse.Success = false;
+                    if (department != null)
+                    {
+                        managerDto.DepartmentName = department.DepartmentName;
+
+                    }
+                    serviceResponse.Data = managerDto;
                     serviceResponse.Message = "Manager not found.";
                     return serviceResponse;
                 }
 
-                var managerDto = _mapper.Map<GetEmployeesAndManagerDto>(manager);
-
                 // Retrieve the department name using the department ID
-                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == departmentId);
                 if (department != null)
                 {
                     managerDto.DepartmentName = department.DepartmentName;
@@ -188,16 +219,10 @@ namespace Organisation_WebAPI.Services.Managers
 
                 if (manager is null)
                     throw new Exception($"Manager with id '{id}' not found");
-                
-                var departmentExists = await _context.Departments.AnyAsync(d => d.DepartmentID == updatedManager.DepartmentID);
-
-                if (!departmentExists)
-                    throw new Exception($"Invalid DepartmentID '{updatedManager.DepartmentID}'");
 
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
-                manager.DepartmentID = updatedManager.DepartmentID;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetManagerDto>(manager);
