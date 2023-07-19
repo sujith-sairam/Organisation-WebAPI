@@ -62,5 +62,11 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> DeleteEmployee(int id){
             return Ok(await _managerService.DeleteManager(id));
         }
+
+        [HttpGet("GetAllDepartmentsAssociatedWithManager")]
+        public async Task<ActionResult<ServiceResponse<string>>> GetAllDepartmentsAssociatedWithManager()
+        {
+            return Ok(await _managerService.GetAllDepartmentsAssociatedWithManager());
+        }
     }
 }

@@ -17,5 +17,6 @@ namespace Organisation_WebAPI.Services.Managers
         Task<ServiceResponse<List<GetManagerDto>>> DeleteManager(int id);
         Task<ServiceResponse<GetManagerDto>> GetManagerByDepartmentId(int departmentId); 
         Task<ServiceResponse<GetEmployeesAndManagerDto>> GetEmployeesAndManagerByDepartmentId(int departmentId);
+        Task<ServiceResponse<List<ManagerDepartmentDto>>> GetAllDepartmentsAssociatedWithManager();
     }
 }
