@@ -18,7 +18,7 @@ namespace Organisation_WebAPI.Controllers
    
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = nameof(UserRole.Admin))]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
@@ -60,7 +60,6 @@ namespace Organisation_WebAPI.Controllers
         // Retrieves a employee from the database based on the provided ID
         [HttpGet("GetEmployeeById")]
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
-        //[Authorize(Roles = nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
         {
             var response = await _employeeService.GetEmployeeById(id);
