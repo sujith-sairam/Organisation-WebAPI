@@ -37,7 +37,7 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a employee from the database based on the provided ID
         [HttpGet("GetEmployeeById")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
         {
             var response = await _employeeService.GetEmployeeById(id);
@@ -62,8 +62,7 @@ namespace Organisation_WebAPI.Controllers
         
 
         [HttpPut("UpdateEmployee")]
-       // [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
+        public async Task<ActionResult<ServiceResponse<UpdateEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
             var response = await _employeeService.UpdateEmployee(updatedEmployee,id);
             if (response.Success)
             {

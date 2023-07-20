@@ -24,76 +24,138 @@ namespace Organisation_WebAPI.Controllers
         //[Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
-            return Ok(await _employeeTaskService.GetAllEmployeeTasks());
+            var response = await _employeeTaskService.GetAllEmployeeTasks(); 
+
+            if(!response.Success){
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetAllEmployeeTasksByEmployeeId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasksByEmployeeId(int id)
         {
-            return Ok(await _employeeTaskService.GetAllEmployeeTasksByEmployeeId(id));
+            var response =  await _employeeTaskService.GetAllEmployeeTasksByEmployeeId(id);
+
+            if(!response.Success){
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetNewEmployeeTasksByEmployeeId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetNewEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeNewTaskByEmployeeId(id));
+            var response = await _employeeTaskService.GetEmployeeNewTaskByEmployeeId(id);
+            if(!response.Success){
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetOngoingEmployeeTasksByEmployeeId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetOngoingEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeOngoingTaskByEmployeeId(id));
+            var response =  await _employeeTaskService.GetEmployeeOngoingTaskByEmployeeId(id);
+
+            if(!response.Success){
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetCompletedEmployeeTasksByEmployeeId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetCompletedEmployeeTasks(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeCompletedTaskByEmployeeId(id));
+            var response = await _employeeTaskService.GetEmployeeCompletedTaskByEmployeeId(id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetPendingEmployeeTasksByManagerId")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetPendingEmployeeTasksByEmployeeId(int id)
-        {
-            return Ok(await _employeeTaskService.GetEmployeePendingTaskByEmployeeId(id));
+        {   
+            var response = await _employeeTaskService.GetEmployeePendingTaskByEmployeeId(id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpGet("GetNewTaskCount")]
         public async Task<ActionResult<ServiceResponse<int>>> GetNewEmployeeTaskCount(int id){
-            return Ok(await _employeeTaskService.CalculateNewEmployeeTasksByEmployeeId(id) );
+
+            var response =  await _employeeTaskService.CalculateNewEmployeeTasksByEmployeeId(id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         [HttpPost("CreateEmployeeTasks")]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
-            return Ok(await _employeeTaskService.AddEmployeeTask(newEmployeeTask));
+            var response = await _employeeTaskService.AddEmployeeTask(newEmployeeTask);
+
+            if(!response.Success) { 
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         
         [HttpDelete("DeleteEmployeeTask")]
        // [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> DeleteEmployeeTask(int id){
-            return Ok(await _employeeTaskService.DeleteEmployeeTask(id));
+            var response = await _employeeTaskService.DeleteEmployeeTask(id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
         
         [HttpGet("GetEmployeeTaskById")]
        // [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTask(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeTaskById(id));
+            var response = await _employeeTaskService.GetEmployeeTaskById(id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
 
         [HttpPut("UpdateEmployeeTask")]
        // [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployeeTask(UpdateEmployeeTaskDto updatedEmployeeTask,int id){
-            return Ok(await _employeeTaskService.UpdateEmployeeTask(updatedEmployeeTask,id));
+
+            var response = await _employeeTaskService.UpdateEmployeeTask(updatedEmployeeTask,id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
 
         [HttpPut("UpdateEmployeeTaskStatus")]
         [AllowAnonymous]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployee(UpdateEmployeeTaskStatusDto updatedEmployeeTaskStatus,int id){
-            return Ok(await _employeeTaskService.UpdateEmployeeTaskStatus(updatedEmployeeTaskStatus,id));
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updatedEmployeeTaskStatus,int id){
+            var response = await _employeeTaskService.UpdateEmployeeTaskStatus(updatedEmployeeTaskStatus,id);
+
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
+            
         }
     }
 }

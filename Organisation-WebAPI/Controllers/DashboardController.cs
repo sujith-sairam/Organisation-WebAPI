@@ -37,16 +37,26 @@ namespace Organisation_WebAPI.Controllers
         //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetTaskCounts(int id)
         {
-            var serviceResponse = await _dashboardService.GetEmployeeTaskCount(id);
-            return Ok(serviceResponse);
+            var response= await _dashboardService.GetEmployeeTaskCount(id);
+
+            if(!response.Success){
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
 
         [HttpGet("GetEmployeeTasksByManager")]
         //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeTasks(int id)
         {
-            var serviceResponse = await _dashboardService.GetEmployeeTasksByManager(id);
-            return Ok(serviceResponse);
+            var response = await _dashboardService.GetEmployeeTasksByManager(id);
+            
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
       
     }

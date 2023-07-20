@@ -65,7 +65,10 @@ namespace Organisation_WebAPI.Services.Dashboard
                 // Count the tasks for each status
                 foreach (var task in tasks)
                 {
-                    taskCounts[task.TaskStatus]++;
+                    if (taskCounts.ContainsKey(task.TaskStatus))
+                    {
+                        taskCounts[task.TaskStatus]++;
+                    }
                 }
 
                 serviceResponse.Data = taskCounts;

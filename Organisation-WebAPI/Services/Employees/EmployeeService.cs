@@ -65,21 +65,20 @@ namespace Organisation_WebAPI.Services.Employees
 
         try {
         var dbEmployees = await _context.Employees.ToListAsync();
-        var employeeDTOs = dbEmployees.Select(e => new GetEmployeeDto
+        var employeeDTOs = dbEmployees.Select(e =>
         {
-            EmployeeID = e.EmployeeID,
-            EmployeeName = e.EmployeeName,
-            EmployeeSalary = e.EmployeeSalary,
-            EmployeeAge = e.EmployeeAge,
-            ManagerName = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.ManagerName,
-            ManagerIsAppointed = _context.Managers.FirstOrDefault(m => m.ManagerId == e.ManagerID)?.isAppointed,
-            DepartmentName = _context.Managers
+            var employeeDto = _mapper.Map<GetEmployeeDto>(e);
+            var manager = _context.Managers
                 .Include(m => m.Department)
-                .FirstOrDefault(m => m.ManagerId == e.ManagerID)
-                ?.Department?.DepartmentName
-            }).ToList();
+                .FirstOrDefault(m => m.ManagerId == e.ManagerID);
+            employeeDto.DepartmentName = manager?.Department?.DepartmentName;
+            employeeDto.ManagerName = manager?.ManagerName;
+            employeeDto.ManagerIsAppointed = manager?.IsAppointed;
+            return employeeDto;
+        }).ToList();
 
-        serviceResponse.Data = employeeDTOs;
+
+                serviceResponse.Data = employeeDTOs;
         } 
 
         catch(Exception ex)
@@ -101,15 +100,26 @@ namespace Organisation_WebAPI.Services.Employees
             var serviceResponse = new ServiceResponse<GetEmployeeDto>();
             try
             {
-            var dbEmployee =  await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == id);
-            if (dbEmployee is null)
+                var dbEmployee = await _context.Employees
+                   .Include(e => e.Manager)
+                   .FirstOrDefaultAsync(c => c.EmployeeID == id);
+
+                if (dbEmployee is null)
                     throw new Exception($"Employee with id '{id}' not found");
 
-            serviceResponse.Data = _mapper.Map<GetEmployeeDto>(dbEmployee);
-            return serviceResponse;
+                var manager = dbEmployee.Manager;
+                if (manager is null)
+                    throw new Exception($"Manager not found for Employee with id '{id}'");
+
+                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == manager.DepartmentID);
+
+                var getEmployeeDto = _mapper.Map<GetEmployeeDto>(dbEmployee);
+                getEmployeeDto.DepartmentName = department?.DepartmentName;
+
+                serviceResponse.Data = getEmployeeDto;
             }
             catch(Exception ex)
-            {
+            {   
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
@@ -151,9 +161,9 @@ namespace Organisation_WebAPI.Services.Employees
 
 
 
-        public async Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
+        public async Task<ServiceResponse<UpdateEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
         {
-            var serviceResponse = new ServiceResponse<GetEmployeeDto>();
+            var serviceResponse = new ServiceResponse<UpdateEmployeeDto>();
             try {
                 var employee = await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == id);
 
@@ -164,8 +174,10 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
                 employee.ManagerID = updatedEmployee.ManagerID;
+                employee.Phone = updatedEmployee.Phone;
+                employee.Address = updatedEmployee.Address;
                 await _context.SaveChangesAsync();
-                serviceResponse.Data = _mapper.Map<GetEmployeeDto>(employee);
+                serviceResponse.Data = _mapper.Map<UpdateEmployeeDto>(employee);
 
                 return serviceResponse;
             }

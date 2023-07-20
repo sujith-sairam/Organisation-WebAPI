@@ -68,18 +68,15 @@ namespace Organisation_WebAPI.Services.Managers
             try
             {
             var dbManagers = await _context.Managers.ToListAsync();
-            var managerDTOs = dbManagers.Select(e => new GetManagerDto
-            {
-                ManagerId = e.ManagerId,
-                ManagerName = e.ManagerName,
-                ManagerSalary = e.ManagerSalary,
-                ManagerAge = e.ManagerAge,
-                DepartmentID = e.DepartmentID,
-                isAppointed = e.isAppointed,
-                DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName
+            var managerDTOs = dbManagers.Select(e => { 
+                
+                var managerDTO = _mapper.Map<GetManagerDto>(e);
+                managerDTO.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
+                return managerDTO;
+
             }).ToList();
 
-            serviceResponse.Data = managerDTOs;
+                serviceResponse.Data = managerDTOs;
             }
 
             catch(Exception ex)
@@ -101,7 +98,9 @@ namespace Organisation_WebAPI.Services.Managers
                 var managerDepartmentList = dbManagers.Select(m => new ManagerDepartmentDto
                 {
                     ManagerId = m.ManagerId,
-                    DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == m.DepartmentID)?.DepartmentName
+                    DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == m.DepartmentID)?.DepartmentName,
+                    IsAppointed = m.IsAppointed
+                    
                 }).ToList();
 
                 serviceResponse.Data = managerDepartmentList;
@@ -178,7 +177,6 @@ namespace Organisation_WebAPI.Services.Managers
                     managerDto.DepartmentName = department.DepartmentName;
 
                 }
-                managerDto.isAppointed = manager.isAppointed;
 
                 serviceResponse.Data = managerDto;
             }
@@ -225,6 +223,8 @@ namespace Organisation_WebAPI.Services.Managers
                 manager.ManagerName = updatedManager.ManagerName;
                 manager.ManagerSalary = updatedManager.ManagerSalary;
                 manager.ManagerAge = updatedManager.ManagerAge;
+                manager.Address = updatedManager.Address;
+                manager.Phone = updatedManager.Phone;
 
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<GetManagerDto>(manager);

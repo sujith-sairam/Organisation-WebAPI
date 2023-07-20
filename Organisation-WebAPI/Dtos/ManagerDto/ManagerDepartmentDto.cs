@@ -4,7 +4,7 @@
     {
         public int ManagerId { get; set; }
         public string DepartmentName { get; set;}
-        public bool isAppointed { get; set; }
+        public bool IsAppointed { get; set; }
 
     }
 }

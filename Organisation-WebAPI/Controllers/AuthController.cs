@@ -11,7 +11,8 @@ using System.Security.Claims;
 using static System.Net.WebRequestMethods;
 
 namespace Organisation_WebAPI.Controllers
-{
+{   
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -137,6 +138,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllUsers")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
         {
             var response = await _authRepository.GetAllUsers();
