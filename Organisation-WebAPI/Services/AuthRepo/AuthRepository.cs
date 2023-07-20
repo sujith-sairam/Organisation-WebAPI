@@ -510,6 +510,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             user.IsVerified = true;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+           
             // Update other user fields as needed
 
             // Update manager properties
@@ -519,13 +520,21 @@ namespace Organisation_WebAPI.Services.AuthRepo
             manager.ManagerAge = model.ManagerAge;
             manager.IsAppointed = true;
             manager.User = user;
+            manager.Phone = model.Phone;
+            manager.Address = model.Address;
 
             // Save changes to the database
             await _dbContext.SaveChangesAsync();
 
             // Send email with updated information
-            var message = new Message(new string[] { user.Email }, "Manager Information Updated", "Your manager information has been updated.");
-            _emailSender.SendEmail(message);
+
+            var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Manager Registration",
+                $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint 360." +
+                $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
+                $"information confidential.\n\nThank you and welcome to Stint 360!");
+
+            _emailSender.SendEmail(managerMessage);
+
 
             response.Data = "Manager updated successfully";
             return response;

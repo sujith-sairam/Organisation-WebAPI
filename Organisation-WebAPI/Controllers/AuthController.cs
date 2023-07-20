@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using organisation_webapi.dtos.admin;
-using Organisation_WebAPI.Attributes;
+
 using Organisation_WebAPI.Dtos.Admin;
 using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.Models;
@@ -10,9 +11,9 @@ using System.Data;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
 
+
 namespace Organisation_WebAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = nameof(UserRole.Admin))]
     public class AuthController : ControllerBase
@@ -38,6 +39,7 @@ namespace Organisation_WebAPI.Controllers
 
         [HttpPost("Login")]
         [AllowAnonymous]
+
         public async Task<ActionResult<ServiceResponse<int>>> Login(UserLoginDto request)
         {
             var response = await _authRepository.Login(request.UserName, request.Password);
@@ -51,7 +53,6 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("Verify")]
-        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> Verify(string email, string otp)
         {
             var response = await _authRepository.Verify(
@@ -119,8 +120,9 @@ namespace Organisation_WebAPI.Controllers
 
 
 
-        [HttpDelete("DeleteUserById")]
-        public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
+    [HttpDelete("DeleteUserById")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
+    public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
         {
             var response = await _authRepository.DeleteUserById(id);
             if (!response.Success)
@@ -131,6 +133,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllUsers")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
         {
             var response = await _authRepository.GetAllUsers();
