@@ -19,7 +19,6 @@ namespace Organisation_WebAPI.Dtos.EmployeeDto
         public string Address { get; set; }
         public string Phone { get; set; }
         public bool? ManagerIsAppointed { get; set;}
-
-
+        public int? ManagerID { get; set; }
     }
 }
