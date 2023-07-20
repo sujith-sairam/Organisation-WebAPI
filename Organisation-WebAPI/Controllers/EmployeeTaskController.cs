@@ -21,7 +21,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Employee))]
+        //  [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
             return Ok(await _employeeTaskService.GetAllEmployeeTasks());
@@ -58,15 +58,21 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("CreateEmployeeTasks")]
-        [Authorize(Roles = nameof(UserRole.Employee))]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
-            return Ok(await _employeeTaskService.AddEmployeeTask(newEmployeeTask));
+            var response = await _employeeTaskService.AddEmployeeTask(newEmployeeTask);
+            if (!response.Success) {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
 
         
         [HttpDelete("DeleteEmployeeTask")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> DeleteEmployeeTask(int id){
             return Ok(await _employeeTaskService.DeleteEmployeeTask(id));
         }
@@ -80,9 +86,12 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPut("UpdateEmployeeTask")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployeeTask(UpdateEmployeeTaskDto updatedEmployeeTask,int id){
-            return Ok(await _employeeTaskService.UpdateEmployeeTask(updatedEmployeeTask,id));
+            var response = await _employeeTaskService.UpdateEmployeeTask(updatedEmployeeTask, id);
+            if (!response.Success) { return BadRequest(response); }
+            return Ok(response);
         }
 
 
