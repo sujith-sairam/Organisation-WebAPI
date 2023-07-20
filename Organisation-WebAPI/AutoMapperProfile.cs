@@ -15,21 +15,23 @@ namespace Organisation_WebAPI
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, GetUserDto>()
-           .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-           .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role));
+            CreateMap<User, GetUserDto>();
+
 
             CreateMap<Department, GetDepartmentDto>();
             CreateMap<AddDepartmentDto,Department>();
             CreateMap<UpdateDepartmentDto,Department>();
 
             CreateMap<Employee, GetEmployeeDto>()
-            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager != null ? src.Manager.ManagerName : null));
+            .ForMember(dest => dest.ManagerName, opt => opt.MapFrom(src => src.Manager.ManagerName))
+            .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.DepartmentName));
+        
 
-            CreateMap<Employee, GetEmployeeDto>();
+
             CreateMap<AddEmployeeDto,Employee>();
             CreateMap<UpdateEmployeeDto,Employee>();
+            CreateMap<Employee, UpdateEmployeeDto > ();
+            CreateMap<GetEmployeeDto, Employee>();
 
             CreateMap<Manager, GetManagerDto>();
             CreateMap<AddManagerDto,Manager>();

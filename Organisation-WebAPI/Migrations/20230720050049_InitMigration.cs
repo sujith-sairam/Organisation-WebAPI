@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Organisation_WebAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -50,11 +50,14 @@ namespace Organisation_WebAPI.Migrations
                 columns: table => new
                 {
                     ManagerId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ManagerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ManagerSalary = table.Column<int>(type: "int", nullable: false),
                     UserID = table.Column<int>(type: "int", nullable: true),
                     ManagerAge = table.Column<int>(type: "int", nullable: false),
-                    isAppointed = table.Column<bool>(type: "bit", nullable: false),
+                    IsAppointed = table.Column<bool>(type: "bit", nullable: false),
                     DepartmentID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -78,6 +81,10 @@ namespace Organisation_WebAPI.Migrations
                 columns: table => new
                 {
                     EmployeeID = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Designation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmployeeSalary = table.Column<int>(type: "int", nullable: false),
                     EmployeeAge = table.Column<int>(type: "int", nullable: false),

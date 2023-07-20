@@ -63,7 +63,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 if (user.Role == UserRole.Manager) {
                     var manager = await _dbContext.Managers.FindAsync(user.UserID);
-                    if (manager.isAppointed == false) {
+                    if (manager.IsAppointed == false) {
                         response.Success = false;
                         response.Message = "User Not Found";
                         return response;
@@ -141,16 +141,20 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         var employee = new Employee
                         {
                             EmployeeID = user.UserID,
+                            Email = model.Email,
+                            Phone = model.Phone,
+                            Designation = model.Designation,
+                            Address = model.Address,
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
                             ManagerID = model.ManagerID,
                             User = user
                         };
-                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Employee Registration", 
-                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in ORG 360.\n\nYour " +
+                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Employee Registration", 
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in Stint 360.\n\nYour " +
                             $"credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this information confidential" +
-                            $".\n\nThank you and welcome to ORG 360!");
+                            $".\n\nThank you and welcome to Stint 360!");
 
                         _emailSender.SendEmail(employeeMessage);
 
@@ -180,18 +184,21 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         var manager = new Manager
                         {
                             ManagerId = user.UserID,
+                            Email = model.Email,
+                            Address = model.Address,
+                            Phone = model.Phone,
                             ManagerName = model.ManagerName,
                             ManagerSalary = model.ManagerSalary,
                             ManagerAge = model.ManagerAge,
                             DepartmentID = model.DepartmentID,
-                            isAppointed = true,
+                            IsAppointed = true,
                             User = user
                         };
 
-                        var managerMessage = new Message(new string[] { model.Email }, "Welcome to ORG 360 - Manager Registration",
-                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in ORG 360." +
+                        var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Manager Registration",
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint 360." +
                             $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
-                            $"information confidential.\n\nThank you and welcome to ORG 360!");
+                            $"information confidential.\n\nThank you and welcome to Stint 360!");
 
                         _emailSender.SendEmail(managerMessage);
 
@@ -335,7 +342,12 @@ namespace Organisation_WebAPI.Services.AuthRepo
             user.IsVerified = false;
             await _dbContext.SaveChangesAsync();
 
- 
+            var otpMessage = new Message(new string[] { email  }, "Stint 360 - Password Reset OTP",
+               $"Dear {email},\n\nYou have requested a password reset for your Stint 360 account.\n\nYour OTP (One-Time Password) is: {otp}" +
+               $"\n\nPlease use this OTP to reset your password within the specified time limit.\n\nIf you did not request this password reset, " +
+               $"please ignore this message.\n\nThank you!");
+
+            _emailSender.SendEmail(otpMessage);
             response.Data = "Please check your email for OTP.";
             return response;
         }
@@ -437,7 +449,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var manager = await _dbContext.Managers.FirstOrDefaultAsync(m => m.ManagerId == id);
                 if (manager != null)
                 {
-                    manager.isAppointed = false;
+                    manager.IsAppointed = false;
                 }
             }
             else
@@ -505,7 +517,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             manager.ManagerName = model.ManagerName;
             manager.ManagerSalary = model.ManagerSalary;
             manager.ManagerAge = model.ManagerAge;
-            manager.isAppointed = true;
+            manager.IsAppointed = true;
             manager.User = user;
 
             // Save changes to the database

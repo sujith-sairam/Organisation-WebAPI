@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
+using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.Models;
+using Organisation_WebAPI.Services.Pagination;
+using Organisation_WebAPI.ViewModels;
 
 namespace Organisation_WebAPI.Services.Employees
 {
@@ -16,11 +20,13 @@ namespace Organisation_WebAPI.Services.Employees
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
         private readonly IEmailSender _emailSender;
+        private readonly IPaginationServices<GetEmployeeDto, Employee> _paginationServices;
 
-        public EmployeeService(IMapper mapper,OrganizationContext context)
+        public EmployeeService(IMapper mapper,OrganizationContext context, IPaginationServices<GetEmployeeDto, Employee> paginationServices)
         {
             _context = context; // Injects the OrganizationContext instance
             _mapper = mapper; // Injects the IMapper instance
+            _paginationServices = paginationServices;
             
         }
 
@@ -59,22 +65,28 @@ namespace Organisation_WebAPI.Services.Employees
         }
 
         // Retrieves all employees from the database
-       public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees()
+       public async Task<ServiceResponse<PaginationResultVM<GetEmployeeDto>>> GetAllEmployees(PaginationInput paginationInput)
        {
-        var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+            var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeDto>>();
 
-        try {
+            try
+            {
         var dbEmployees = await _context.Employees.ToListAsync();
-        var employeeDTOs = dbEmployees.Select(e => new GetEmployeeDto
+        var employeeDTOs = dbEmployees.Select(e =>
         {
-            EmployeeID = e.EmployeeID,
-            EmployeeName = e.EmployeeName,
-            EmployeeSalary = e.EmployeeSalary,
-            EmployeeAge = e.EmployeeAge,
-            ManagerName = _context.Managers.FirstOrDefault(d => d.ManagerId == e.ManagerID)?.ManagerName,
+            var employeeDto = _mapper.Map<GetEmployeeDto>(e);
+            var manager = _context.Managers
+                .Include(m => m.Department)
+                .FirstOrDefault(m => m.ManagerId == e.ManagerID);
+            employeeDto.DepartmentName = manager?.Department?.DepartmentName;
+            employeeDto.ManagerName = manager?.ManagerName;
+            employeeDto.ManagerIsAppointed = manager?.IsAppointed;
+            return employeeDto;
         }).ToList();
+           var employees = _mapper.Map<List<Employee>>(employeeDTOs);
+           var result = _paginationServices.GetPagination(employees, paginationInput);
 
-        serviceResponse.Data = employeeDTOs;
+           serviceResponse.Data = result;
         } 
 
         catch(Exception ex)
@@ -96,15 +108,26 @@ namespace Organisation_WebAPI.Services.Employees
             var serviceResponse = new ServiceResponse<GetEmployeeDto>();
             try
             {
-            var dbEmployee =  await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == id);
-            if (dbEmployee is null)
+                var dbEmployee = await _context.Employees
+                   .Include(e => e.Manager)
+                   .FirstOrDefaultAsync(c => c.EmployeeID == id);
+
+                if (dbEmployee is null)
                     throw new Exception($"Employee with id '{id}' not found");
 
-            serviceResponse.Data = _mapper.Map<GetEmployeeDto>(dbEmployee);
-            return serviceResponse;
+                var manager = dbEmployee.Manager;
+                if (manager is null)
+                    throw new Exception($"Manager not found for Employee with id '{id}'");
+
+                var department = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentID == manager.DepartmentID);
+
+                var getEmployeeDto = _mapper.Map<GetEmployeeDto>(dbEmployee);
+                getEmployeeDto.DepartmentName = department?.DepartmentName;
+
+                serviceResponse.Data = getEmployeeDto;
             }
             catch(Exception ex)
-            {
+            {   
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
@@ -146,9 +169,9 @@ namespace Organisation_WebAPI.Services.Employees
 
 
 
-        public async Task<ServiceResponse<GetEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
+        public async Task<ServiceResponse<UpdateEmployeeDto>> UpdateEmployee(UpdateEmployeeDto updatedEmployee, int id)
         {
-            var serviceResponse = new ServiceResponse<GetEmployeeDto>();
+            var serviceResponse = new ServiceResponse<UpdateEmployeeDto>();
             try {
                 var employee = await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == id);
 
@@ -159,8 +182,10 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.EmployeeSalary = updatedEmployee.EmployeeSalary;
                 employee.EmployeeAge = updatedEmployee.EmployeeAge;
                 employee.ManagerID = updatedEmployee.ManagerID;
+                employee.Phone = updatedEmployee.Phone;
+                employee.Address = updatedEmployee.Address;
                 await _context.SaveChangesAsync();
-                serviceResponse.Data = _mapper.Map<GetEmployeeDto>(employee);
+                serviceResponse.Data = _mapper.Map<UpdateEmployeeDto>(employee);
 
                 return serviceResponse;
             }

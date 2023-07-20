@@ -43,8 +43,17 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("EmployeeID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("DepartmentID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Designation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EmployeeAge")
                         .HasColumnType("int");
@@ -57,6 +66,9 @@ namespace Organisation_WebAPI.Migrations
 
                     b.Property<int?>("ManagerID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
@@ -110,8 +122,17 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("ManagerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAppointed")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ManagerAge")
                         .HasColumnType("int");
@@ -122,11 +143,11 @@ namespace Organisation_WebAPI.Migrations
                     b.Property<int>("ManagerSalary")
                         .HasColumnType("int");
 
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("UserID")
                         .HasColumnType("int");
-
-                    b.Property<bool>("isAppointed")
-                        .HasColumnType("bit");
 
                     b.HasKey("ManagerId");
 
