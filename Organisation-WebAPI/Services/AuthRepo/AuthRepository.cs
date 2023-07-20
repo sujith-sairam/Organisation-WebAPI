@@ -141,6 +141,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         var employee = new Employee
                         {
                             EmployeeID = user.UserID,
+                            Email = model.Email,
+                            Phone = model.Phone,
+                            Designation = model.Designation,
+                            Address = model.Address,
                             EmployeeName = model.EmployeeName,
                             EmployeeSalary = model.EmployeeSalary,
                             EmployeeAge = model.EmployeeAge,
@@ -180,6 +184,9 @@ namespace Organisation_WebAPI.Services.AuthRepo
                         var manager = new Manager
                         {
                             ManagerId = user.UserID,
+                            Email = model.Email,
+                            Address = model.Address,
+                            Phone = model.Phone,
                             ManagerName = model.ManagerName,
                             ManagerSalary = model.ManagerSalary,
                             ManagerAge = model.ManagerAge,

@@ -14,5 +14,8 @@ namespace Organisation_WebAPI.Dtos.ManagerDto
         public int DepartmentID { get; set; }
         public bool isAppointed { get; set; }
         public string? DepartmentName {get;set;}
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? Address { get; set; }
     }
 }

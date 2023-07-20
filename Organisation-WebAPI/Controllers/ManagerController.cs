@@ -47,8 +47,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpGet("GetManagerById")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetEmployee(int id)
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagerById(int id)
         {
             var response = await _managerService.GetManagerById(id);
             if (!response.Success)
@@ -73,7 +72,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPut("UpdateManager")]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> UpdateEmployee(UpdateManagerDto updatedManager,int id){
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> UpdateManager(UpdateManagerDto updatedManager,int id){
             var response = await _managerService.UpdateManager(updatedManager,id);
             if (!response.Success)
             {
@@ -86,7 +85,7 @@ namespace Organisation_WebAPI.Controllers
         
         [HttpDelete("DeleteManager")]
         [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> DeleteEmployee(int id){
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> DeleteManager(int id){
             var response = await _managerService.DeleteManager(id);
             if (!response.Success)
             {

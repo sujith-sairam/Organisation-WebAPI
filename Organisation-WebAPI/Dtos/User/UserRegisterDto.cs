@@ -13,7 +13,9 @@
         public int EmployeeAge { get; set; }
         public int DepartmentID { get; set; }
         public int ManagerID { get; set; }
-
+        public string? Phone { get; set; }
+        public string? Designation { get; set; }
+        public string? Address { get; set; }
         public string? ManagerName { get; set; }
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
