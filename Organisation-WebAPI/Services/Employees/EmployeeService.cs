@@ -73,7 +73,7 @@ namespace Organisation_WebAPI.Services.Employees
                 .FirstOrDefault(m => m.ManagerId == e.ManagerID);
             employeeDto.DepartmentName = manager?.Department?.DepartmentName;
             employeeDto.ManagerName = manager?.ManagerName;
-            employeeDto.ManagerIsAppointed = manager?.isAppointed;
+            employeeDto.ManagerIsAppointed = manager?.IsAppointed;
             return employeeDto;
         }).ToList();
 

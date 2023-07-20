@@ -25,7 +25,7 @@ namespace Organisation_WebAPI.Models
         public int? UserID { get; set; }
         public int ManagerAge { get; set; }
         public User? User { get; set; }
-        public bool isAppointed { get; set; }
+        public bool IsAppointed { get; set; }
         public ICollection<Employee> Employees { get; set; }
 
         [ForeignKey("Department")]

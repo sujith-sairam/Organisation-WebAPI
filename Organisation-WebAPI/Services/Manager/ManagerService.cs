@@ -99,7 +99,7 @@ namespace Organisation_WebAPI.Services.Managers
                 {
                     ManagerId = m.ManagerId,
                     DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == m.DepartmentID)?.DepartmentName,
-                    isAppointed = m.isAppointed
+                    IsAppointed = m.IsAppointed
                     
                 }).ToList();
 

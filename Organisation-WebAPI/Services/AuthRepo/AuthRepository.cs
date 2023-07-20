@@ -63,7 +63,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             {
                 if (user.Role == UserRole.Manager) {
                     var manager = await _dbContext.Managers.FindAsync(user.UserID);
-                    if (manager.isAppointed == false) {
+                    if (manager.IsAppointed == false) {
                         response.Success = false;
                         response.Message = "User Not Found";
                         return response;
@@ -191,7 +191,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             ManagerSalary = model.ManagerSalary,
                             ManagerAge = model.ManagerAge,
                             DepartmentID = model.DepartmentID,
-                            isAppointed = true,
+                            IsAppointed = true,
                             User = user
                         };
 
@@ -449,7 +449,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 var manager = await _dbContext.Managers.FirstOrDefaultAsync(m => m.ManagerId == id);
                 if (manager != null)
                 {
-                    manager.isAppointed = false;
+                    manager.IsAppointed = false;
                 }
             }
             else
@@ -517,7 +517,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             manager.ManagerName = model.ManagerName;
             manager.ManagerSalary = model.ManagerSalary;
             manager.ManagerAge = model.ManagerAge;
-            manager.isAppointed = true;
+            manager.IsAppointed = true;
             manager.User = user;
 
             // Save changes to the database

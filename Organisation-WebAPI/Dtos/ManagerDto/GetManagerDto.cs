@@ -12,7 +12,7 @@ namespace Organisation_WebAPI.Dtos.ManagerDto
         public int ManagerSalary { get; set; }
         public int ManagerAge { get; set; }
         public int DepartmentID { get; set; }
-        public bool isAppointed { get; set; }
+        public bool IsAppointed { get; set; }
         public string? DepartmentName {get;set;}
         public string? Email { get; set; }
         public string? Phone { get; set; }
