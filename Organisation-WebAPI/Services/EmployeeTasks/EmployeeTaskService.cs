@@ -31,7 +31,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             try
             {
 
-            var employee = await _context.Users.FirstOrDefaultAsync(u => u.UserID == addEmployeeTask.EmployeeId);
+            var employee = await _context.Employees.FirstOrDefaultAsync(u => u.EmployeeID == addEmployeeTask.EmployeeId);
 
             if (employee is null)
             {
@@ -42,11 +42,13 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             
 
             _context.EmployeeTasks.Add(employeeTask);
+
             await _context.SaveChangesAsync();
-                var employeeMessage = new Message(new string[] { employee.Email }, "New Task Assignment", 
-                    $"Dear {employee.UserName},\n\nYou have been assigned a new task:\n\nTask Description:" +
-                    $" {addEmployeeTask.TaskDescription}\nStart Date: {addEmployeeTask.TaskCreatedDate}\nEnd Date: " +
-                    $"{addEmployeeTask.TaskDueDate}\n\nPlease take necessary actions accordingly.\n\nThank you!");
+
+            var employeeMessage = new Message(new string[] { employee.Email }, "New Task Assignment", 
+                $"Dear {employee.EmployeeName},\n\nYou have been assigned a new task:\n\nTask Description:" +
+                $" {addEmployeeTask.TaskDescription}\nStart Date: {addEmployeeTask.TaskCreatedDate}\nEnd Date: " +
+                $"{addEmployeeTask.TaskDueDate}\n\nPlease take necessary actions accordingly.\n\nThank you!");
 
             _emailSender.SendEmail(employeeMessage);
 
@@ -184,16 +186,16 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
                 await _context.SaveChangesAsync();
 
-                //if (updateEmployeeTaskStatus.TaskStatus == Status.Completed)
-                //{
-                //    var managerMessage = new Message(new string[] { manager.E }, "Task Completed",
-                //        $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
-                //        $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
-                //        $" any necessary actions.\n\nThank you!");
+                if (updateEmployeeTaskStatus.TaskStatus == Status.Completed)
+                {
+                    var managerMessage = new Message(new string[] { manager.Email }, "Task Completed",
+                        $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
+                        $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
+                        $" any necessary actions.\n\nThank you!");
 
-                //    _emailSender.SendEmail(managerMessage);
+                    _emailSender.SendEmail(managerMessage);
 
-                //}
+                }
 
 
                 return serviceResponse;

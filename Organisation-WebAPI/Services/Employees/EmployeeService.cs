@@ -74,6 +74,7 @@ namespace Organisation_WebAPI.Services.Employees
             employeeDto.DepartmentName = manager?.Department?.DepartmentName;
             employeeDto.ManagerName = manager?.ManagerName;
             employeeDto.ManagerIsAppointed = manager?.IsAppointed;
+            employeeDto.ManagerID = manager?.ManagerId; 
             return employeeDto;
         }).ToList();
 
@@ -176,6 +177,7 @@ namespace Organisation_WebAPI.Services.Employees
                 employee.ManagerID = updatedEmployee.ManagerID;
                 employee.Phone = updatedEmployee.Phone;
                 employee.Address = updatedEmployee.Address;
+                employee.Designation = updatedEmployee.Designation;
                 await _context.SaveChangesAsync();
                 serviceResponse.Data = _mapper.Map<UpdateEmployeeDto>(employee);
 
@@ -186,50 +188,9 @@ namespace Organisation_WebAPI.Services.Employees
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
-            
             return serviceResponse;
         
         }
-
-
-        //public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByProduct(int productId)
-        //{
-        //    var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
-        //    try
-        //    {
-        //        var manager = await _context.Managers
-        //            .Include(m => m.Employees)
-        //            .Include(m => m.Product)
-        //            .FirstOrDefaultAsync(m => m.ProductID == productId);
-
-        //        if (manager == null)
-        //        {
-        //            serviceResponse.Success = false;
-        //            serviceResponse.Message = "No manager found for the product.";
-        //            return serviceResponse;
-        //        }
-
-        //        var employees = manager.Employees.ToList();
-        //        var employeeDtos = employees.Select(e => _mapper.Map<GetEmployeeDto>(e)).ToList();
-
-        //        // Add product name to each employee DTO
-        //        employeeDtos.ForEach(e =>
-        //        {
-        //            e.ProductName = manager.Product.ProductName;
-        //        });
-
-        //        serviceResponse.Data = employeeDtos;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        serviceResponse.Success = false;
-        //        serviceResponse.Message = ex.Message;
-        //    }
-        //    return serviceResponse;
-        //}
-
-
-
 
     }
 }
