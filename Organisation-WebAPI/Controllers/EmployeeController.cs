@@ -62,7 +62,7 @@ namespace Organisation_WebAPI.Controllers
         
 
         [HttpPut("UpdateEmployee")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
+       // [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
             var response = await _employeeService.UpdateEmployee(updatedEmployee,id);
             if (response.Success)

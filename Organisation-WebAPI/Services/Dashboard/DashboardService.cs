@@ -44,10 +44,43 @@ namespace Organisation_WebAPI.Services.Dashboard
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<Dictionary<Status, int>>> GetEmployeeTasksByManager(int id)
+        {
+            var serviceResponse = new ServiceResponse<Dictionary<Status, int>>();
+            var taskCounts = new Dictionary<Status, int>();
+
+            try
+            {
+                var tasks = await _context.EmployeeTasks
+                    .Include(t => t.Employee)
+                    .Where(t => t.Employee!.ManagerID == id)
+                    .ToListAsync();
+
+                // Initialize the dictionary with all possible Status enum values
+                foreach (Status status in Enum.GetValues(typeof(Status)))
+                {
+                    taskCounts.Add(status, 0);
+                }
+
+                // Count the tasks for each status
+                foreach (var task in tasks)
+                {
+                    taskCounts[task.TaskStatus]++;
+                }
+
+                serviceResponse.Data = taskCounts;
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+
+            return serviceResponse;
+        }
 
 
-
-       public async Task<ServiceResponse<Dictionary<string, int>>> GetTotalEmployeeCount()
+        public async Task<ServiceResponse<Dictionary<string, int>>> GetTotalEmployeeCount()
        {
         var serviceResponse = new ServiceResponse<Dictionary<string, int>>();
 
