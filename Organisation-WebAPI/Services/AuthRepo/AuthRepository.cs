@@ -322,11 +322,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email does not exists";
                 return response;
             }
-            if (user.IsVerified == false)
-            {
-                response.Success = false;
-                response.Message = "User Not Verified";
-            }
+       
 
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
