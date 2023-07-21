@@ -80,7 +80,7 @@ namespace Organisation_WebAPI.Controllers
         [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<UpdateEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
             var response = await _employeeService.UpdateEmployee(updatedEmployee,id);
-            if (response.Success)
+            if (!response.Success)
             {
                 return BadRequest(response);
             }
