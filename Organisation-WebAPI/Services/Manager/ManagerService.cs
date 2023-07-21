@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -20,13 +21,17 @@ namespace Organisation_WebAPI.Services.Managers
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
         private readonly IPaginationServices<GetManagerDto, GetManagerDto> _paginationServices;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ManagerService(OrganizationContext context,IMapper mapper, IPaginationServices<GetManagerDto, GetManagerDto> paginationServices)
+        public ManagerService(OrganizationContext context,IMapper mapper, IPaginationServices<GetManagerDto, GetManagerDto> paginationServices,IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _context = context;
             _paginationServices = paginationServices;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        private int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
         public async Task<ServiceResponse<List<GetManagerDto>>> AddManager(AddManagerDto newManager)
         {

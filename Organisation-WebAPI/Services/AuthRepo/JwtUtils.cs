@@ -12,11 +12,16 @@ namespace Organisation_WebAPI.Services.AuthRepo
     {
         private readonly IConfiguration _configuration;
         private readonly IOptions<AppSettings> _appSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public JwtUtils(IConfiguration configuration, IOptions<AppSettings> appSettings) {
+        public JwtUtils(IConfiguration configuration, IOptions<AppSettings> appSettings,IHttpContextAccessor httpContextAccessor) {
             _configuration = configuration;
             _appSettings = appSettings;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
 
         public string GenerateJwtToken(User user)
         {

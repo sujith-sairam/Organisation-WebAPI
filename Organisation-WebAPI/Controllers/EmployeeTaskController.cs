@@ -82,11 +82,11 @@ namespace Organisation_WebAPI.Controllers
             return Ok(await _employeeTaskService.DeleteEmployeeTask(id));
         }
         
-        [HttpGet("GetEmployeeTaskById")]
+        [HttpGet("GetEmployeeTasksById")]
         [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTask(int id)
         {
-            return Ok(await _employeeTaskService.GetEmployeeTaskById(id));
+            return Ok(await _employeeTaskService.GetEmployeeTasksById(id));
         }
 
 

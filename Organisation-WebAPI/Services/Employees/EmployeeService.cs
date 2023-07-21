@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EmailService;
@@ -27,8 +28,8 @@ namespace Organisation_WebAPI.Services.Employees
             _context = context; // Injects the OrganizationContext instance
             _mapper = mapper; // Injects the IMapper instance
             _paginationServices = paginationServices;
-            
         }
+
 
         // Adds a new Employee to the database
         public async Task<ServiceResponse<List<GetEmployeeDto>>> AddEmployee(AddEmployeeDto newEmployee)
