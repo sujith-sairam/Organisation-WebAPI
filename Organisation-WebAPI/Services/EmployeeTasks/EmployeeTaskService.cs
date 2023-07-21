@@ -193,12 +193,12 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
                 await _context.SaveChangesAsync();
 
-                if (updateEmployeeTaskStatus.TaskStatus == Status.Completed)
-                {
-                    var managerMessage = new Message(new string[] { manager.Email }, "Task Completed",
-                        $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
-                        $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
-                        $" any necessary actions.\n\nThank you!");
+                    if (updateEmployeeTaskStatus.TaskStatus == Status.Completed && manager is not null)
+                    {
+                        var managerMessage = new Message(new string [] { manager.Email }, "Task Completed",
+                            $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
+                            $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
+                            $" any necessary actions.\n\nThank you!");
 
                     _emailSender.SendEmail(managerMessage);
                 }
@@ -222,7 +222,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                 var dbEmployeeTasks = await _context.EmployeeTasks
                     .Where(e => e.EmployeeId == id && e.TaskStatus == Status.InProgress)
                     .ToListAsync();
-                 var currentDate = DateTime.Today;
+                var currentDate = DateTime.Today;
                 foreach (var employeeTask in dbEmployeeTasks)
                 {   
                     DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
@@ -297,6 +297,20 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
                 if (dbEmployeeTasks.Count == 0)
                     throw new Exception($"Employee with id '{id}' has no tasks.");
+                    
+                var currentDate = DateTime.Today;
+                foreach (var employeeTask in dbEmployeeTasks)
+                {   
+                    DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
+                    DateTime dueDate = TaskDueDate.Date;
+                    if (dueDate <= currentDate)
+                    {
+                        employeeTask.TaskStatus = Status.Pending;
+                        _context.EmployeeTasks.Update(employeeTask);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
                 
                 serviceResponse.Data = _mapper.Map<List<GetEmployeeTaskDto>>(dbEmployeeTasks);
                 return serviceResponse;

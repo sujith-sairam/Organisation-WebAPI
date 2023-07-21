@@ -11,7 +11,7 @@ namespace Organisation_WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+   
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -32,11 +32,30 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+
          [HttpGet("GetEmployeeTasksCount")]
         public async Task<ActionResult<ServiceResponse<int>>> GetTaskCounts(int id)
         {
-            var serviceResponse = await _dashboardService.GetEmployeeTaskCount(id);
-            return Ok(serviceResponse);
+            var response= await _dashboardService.GetEmployeeTaskCount(id);
+
+            if(!response.Success){
+                return BadRequest(response);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("GetEmployeeTasksByManager")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeTasks(int id)
+        {
+            var response = await _dashboardService.GetEmployeeTasksByManager(id);
+            
+            if(!response.Success) {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
       
     }
