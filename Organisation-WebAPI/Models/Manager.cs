@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Organisation_WebAPI.Models
 {
@@ -26,6 +27,8 @@ namespace Organisation_WebAPI.Models
         public int ManagerAge { get; set; }
         public User? User { get; set; }
         public bool IsAppointed { get; set; }
+
+        [JsonIgnore]
         public ICollection<Employee> Employees { get; set; }
 
         [ForeignKey("Department")]

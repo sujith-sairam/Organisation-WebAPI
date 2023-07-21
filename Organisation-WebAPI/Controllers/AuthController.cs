@@ -55,6 +55,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("Verify")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> Verify(string email, string otp)
         {
             var response = await _authRepository.Verify(
@@ -123,7 +124,6 @@ namespace Organisation_WebAPI.Controllers
 
 
     [HttpDelete("DeleteUserById")]
-    [Authorize(Roles = nameof(UserRole.Admin))]
     public async Task<ActionResult<ServiceResponse<string>>> DeleteUserById(int id)
         {
             var response = await _authRepository.DeleteUserById(id);
@@ -135,8 +135,6 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllUsers")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<string>>> GetAllUsers()
         {
             var response = await _authRepository.GetAllUsers();

@@ -166,25 +166,32 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             }
             
             return serviceResponse;   
-        }    
+        }
         public async Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updateEmployeeTaskStatus, int id)
         {
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
             try
             {
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
+
+                if (employeeTask is null)
+                    throw new Exception($"Employee task with id '{id}' not found");
+
                 var existingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == updateEmployeeTaskStatus.EmployeeId);
 
                 if (existingEmployee is null)
                     throw new Exception($"Employee with id '{updateEmployeeTaskStatus.EmployeeId}' not found");
 
-                var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerAge == existingEmployee.ManagerID);
+                var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerId == existingEmployee.ManagerID);
 
-                if (employeeTask is not null)
-                {
-                    employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
-                    serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
-                    await _context.SaveChangesAsync();
+                if (manager is null)
+                    throw new Exception($"Manager not found for employee with id '{updateEmployeeTaskStatus.EmployeeId}'");
+
+                employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
+
+                serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
+
+                await _context.SaveChangesAsync();
 
                     if (updateEmployeeTaskStatus.TaskStatus == Status.Completed && manager is not null)
                     {
@@ -193,16 +200,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                             $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
                             $" any necessary actions.\n\nThank you!");
 
-                        _emailSender.SendEmail(managerMessage);
-                    }else{
-                        serviceResponse.Success = false;
-                        serviceResponse.Message = "Email not send";
-                        return serviceResponse;
-                    }
-                }
-                else
-                {
-                    throw new Exception($"Employee task with id '{id}' not found");
+                    _emailSender.SendEmail(managerMessage);
                 }
 
                 return serviceResponse;
@@ -215,9 +213,6 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
             return serviceResponse;
         }
- 
-
-
 
         public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id)
         {
