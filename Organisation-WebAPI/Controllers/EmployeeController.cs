@@ -59,7 +59,6 @@ namespace Organisation_WebAPI.Controllers
 
         // Retrieves a employee from the database based on the provided ID
         [HttpGet("GetEmployeeById")]
-        [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         //[Authorize(Roles = nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
         {

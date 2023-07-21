@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
+using Organisation_WebAPI.InputModels;
 using Organisation_WebAPI.Services.Managers;
 
 namespace Organisation_WebAPI.Controllers
@@ -22,11 +23,11 @@ namespace Organisation_WebAPI.Controllers
              _managerService = managerService;
         }
 
-        [HttpGet("GetAllManagers")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
-        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagers()
+        [HttpPost("GetAllManagers")]
+        //[Authorize(Roles = nameof(UserRole.Admin))]
+        public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagers(PaginationInput paginationInput)
         {
-            var response = await _managerService.GetAllManagers();
+            var response = await _managerService.GetAllManagers(paginationInput);
             if (!response.Success)
             {
                 return BadRequest(response);
