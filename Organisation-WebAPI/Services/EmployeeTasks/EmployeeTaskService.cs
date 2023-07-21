@@ -172,49 +172,65 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
             try
             {
-                var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
+                var employeeTask = await _context.EmployeeTasks
+                    .Include(c => c.Employee)
+                    .ThenInclude(e => e.Manager)
+                    .FirstOrDefaultAsync(c => c.TaskID == id);
 
                 if (employeeTask is null)
-                    throw new Exception($"Employee task with id '{id}' not found");
+                {
+                    throw new ArgumentException($"Employee task with id '{id}' not found");
+                }
 
-                var existingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == updateEmployeeTaskStatus.EmployeeId);
+                if (employeeTask.Employee is null)
+                {
+                    throw new ArgumentException($"Employee with id '{updateEmployeeTaskStatus.EmployeeId}' not found");
+                }
 
-                if (existingEmployee is null)
-                    throw new Exception($"Employee with id '{updateEmployeeTaskStatus.EmployeeId}' not found");
-
-                var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerId == existingEmployee.ManagerID);
-
-                if (manager is null)
-                    throw new Exception($"Manager not found for employee with id '{updateEmployeeTaskStatus.EmployeeId}'");
+                if (employeeTask.Employee.Manager is null)
+                {
+                    throw new ArgumentException($"Manager not found for employee with id '{updateEmployeeTaskStatus.EmployeeId}'");
+                }
 
                 employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
 
                 serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
 
+                // Save changes in a single database call
                 await _context.SaveChangesAsync();
 
-                    if (updateEmployeeTaskStatus.TaskStatus == Status.Completed && manager is not null)
-                    {
-                        var managerMessage = new Message(new string [] { manager.Email }, "Task Completed",
-                            $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
-                            $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
-                            $" any necessary actions.\n\nThank you!");
+                if (updateEmployeeTaskStatus.TaskStatus == Status.Completed)
+                {
+                    var manager = employeeTask.Employee.Manager;
+                    var managerMessage = new Message(new string[] { manager.Email }, "Task Completed",
+                        $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
+                        $" {employeeTask.Employee.EmployeeName} has been completed.\n\nPlease review and take" +
+                        $" any necessary actions.\n\nThank you!");
 
                     _emailSender.SendEmail(managerMessage);
                 }
 
                 return serviceResponse;
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
+                // Specific exception handling
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                // Generic exception handling
+                serviceResponse.Success = false;
+                serviceResponse.Message = "An error occurred while processing the request." + ex.Message;
+                // Log the exception for debugging and monitoring purposes
             }
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id)
+
+        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeInProgressTaskByEmployeeId(int id)
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
             try
@@ -303,7 +319,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                 {   
                     DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
                     DateTime dueDate = TaskDueDate.Date;
-                    if (dueDate <= currentDate)
+                    if (dueDate < currentDate)
                     {
                         employeeTask.TaskStatus = Status.Pending;
                         _context.EmployeeTasks.Update(employeeTask);
@@ -337,7 +353,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                     DateTime TaskDueDate = (DateTime)employeeTask.TaskDueDate!;
                     DateTime dueDate = TaskDueDate.Date;
 
-                    if (dueDate <= currentDate)
+                    if (dueDate < currentDate)
                     {
                         employeeTask.TaskStatus = Status.Pending;
                         _context.EmployeeTasks.Update(employeeTask);

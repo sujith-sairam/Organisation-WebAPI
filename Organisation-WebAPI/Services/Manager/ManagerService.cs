@@ -122,7 +122,6 @@ namespace Organisation_WebAPI.Services.Managers
         }
 
 
-
         public async Task<ServiceResponse<GetManagerDto>> GetManagerByDepartmentId(int departmentId)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();

@@ -12,7 +12,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         Task<ServiceResponse<GetEmployeeTaskDto>> GetEmployeeTaskById(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetAllEmployeeTasksByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeNewTaskByEmployeeId(int id);
-        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id);
+        Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeInProgressTaskByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeCompletedTaskByEmployeeId(int id);
         Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeePendingTaskByEmployeeId(int id);
         Task<ServiceResponse<int>>  CalculateNewEmployeeTasksByEmployeeId(int employeeId);

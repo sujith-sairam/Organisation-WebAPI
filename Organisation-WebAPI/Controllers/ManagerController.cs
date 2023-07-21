@@ -25,7 +25,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("GetAllManagers")]
-        //[Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagers(PaginationInput paginationInput)
         {
             var response = await _managerService.GetAllManagers(paginationInput);

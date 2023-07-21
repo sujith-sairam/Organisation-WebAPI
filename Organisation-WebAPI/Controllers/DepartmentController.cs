@@ -27,6 +27,7 @@ namespace Organisation_WebAPI.Controllers
         
 
         // Retrieves all departments from the database
+
         [HttpGet("GetAllDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartments()
         {
@@ -40,6 +41,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         // Retrieves a department from the database based on the provided ID
+
         [HttpGet("GetDepartmentById")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartment(int id)
         {
@@ -54,6 +56,7 @@ namespace Organisation_WebAPI.Controllers
        
 
         // Adds a new Department to the database
+
         [HttpPost("CreateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> AddProduct(AddDepartmentDto newDepartment)
         {
@@ -67,6 +70,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         // Updates a department in the database based on the provided ID
+
         [HttpPut("UpdateDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> UpdateProduct(UpdateDepartmentDto updatedDepartment,int id){
 
@@ -80,6 +84,7 @@ namespace Organisation_WebAPI.Controllers
 
         
         // Deletes a department from the database based on the provided ID
+
         [HttpDelete("DeleteDepartment")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> DeleteProduct(int id){
 
@@ -91,6 +96,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+        //Get Available Departments for Manager Appointment
 
         [HttpGet("GetAvailableDepartments")]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetAvailableDepartments()
