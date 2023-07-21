@@ -67,10 +67,11 @@ namespace Organisation_WebAPI.Services.Employees
         // Retrieves all employees from the database
        public async Task<ServiceResponse<PaginationResultVM<GetEmployeeDto>>> GetAllEmployees(PaginationInput paginationInput)
        {
-            var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeDto>>();
 
-            try
-            {   
+        var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeDto>>();
+
+        try
+        {   
         var dbEmployees = await _context.Employees.ToListAsync();
         var employeeDTOs = dbEmployees.Select(e =>
         {
@@ -135,6 +136,8 @@ namespace Organisation_WebAPI.Services.Employees
             }
             return serviceResponse;
         }
+
+        
 
         public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByManagerId(int managerId)
         {

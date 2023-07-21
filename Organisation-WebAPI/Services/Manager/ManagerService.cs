@@ -182,6 +182,7 @@ namespace Organisation_WebAPI.Services.Managers
                 if (department != null)
                 {
                     managerDto.DepartmentName = department.DepartmentName;
+
                 }
 
                 serviceResponse.Data = managerDto;
