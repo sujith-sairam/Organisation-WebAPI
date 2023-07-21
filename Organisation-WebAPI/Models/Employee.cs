@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Organisation_WebAPI.Models
@@ -30,8 +31,10 @@ namespace Organisation_WebAPI.Models
         [ForeignKey("Manager")]
         public int? ManagerID { get; set; }
         public Manager? Manager { get; set; }
-        public Department? Department {get;set;}
         public User? User { get; set; }
+        public Department? Department { get; set; }
+
+        [JsonIgnore]
         public ICollection<EmployeeTask> EmployeeTasks { get; set; }
 
 

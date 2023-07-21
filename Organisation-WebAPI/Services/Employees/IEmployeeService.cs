@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
+using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.ViewModels;
 
 namespace Organisation_WebAPI.Services.Employees
 {
     public interface IEmployeeService
     {
-        Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees();
+        Task<ServiceResponse<PaginationResultVM<GetEmployeeDto>>> GetAllEmployees(PaginationInput paginationInput);
         Task<ServiceResponse<GetEmployeeDto>> GetEmployeeById(int id);
         Task<ServiceResponse<List<GetEmployeeDto>>> AddEmployee(AddEmployeeDto newDepartment);
         Task<ServiceResponse<UpdateEmployeeDto>> UpdateEmployee(UpdateEmployeeDto department,int id);

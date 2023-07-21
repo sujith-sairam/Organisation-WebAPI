@@ -18,6 +18,8 @@ using Organisation_WebAPI.Services.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Organisation_WebAPI.DataSeed;
+using System.Text.Json.Serialization;
+using Organisation_WebAPI.Services.Pagination;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -117,6 +119,8 @@ static void SeedData(IServiceProvider services)
     // Save changes to the database
     context.SaveChanges();
 }
+
+builder.Services.AddTransient(typeof(IPaginationServices<,>), typeof(PaginationService<,>));
 
 #region Configure Serilog
 

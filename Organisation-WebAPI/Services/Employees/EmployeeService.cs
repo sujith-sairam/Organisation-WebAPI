@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
+using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.Models;
+using Organisation_WebAPI.Services.Pagination;
+using Organisation_WebAPI.ViewModels;
 
 namespace Organisation_WebAPI.Services.Employees
 {
@@ -16,11 +20,13 @@ namespace Organisation_WebAPI.Services.Employees
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
         private readonly IEmailSender _emailSender;
+        private readonly IPaginationServices<GetEmployeeDto, Employee> _paginationServices;
 
-        public EmployeeService(IMapper mapper,OrganizationContext context)
+        public EmployeeService(IMapper mapper,OrganizationContext context, IPaginationServices<GetEmployeeDto, Employee> paginationServices)
         {
             _context = context; // Injects the OrganizationContext instance
             _mapper = mapper; // Injects the IMapper instance
+            _paginationServices = paginationServices;
             
         }
 
@@ -59,11 +65,12 @@ namespace Organisation_WebAPI.Services.Employees
         }
 
         // Retrieves all employees from the database
-       public async Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployees()
+       public async Task<ServiceResponse<PaginationResultVM<GetEmployeeDto>>> GetAllEmployees(PaginationInput paginationInput)
        {
-        var serviceResponse = new ServiceResponse<List<GetEmployeeDto>>();
+            var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeDto>>();
 
-        try {
+            try
+            {
         var dbEmployees = await _context.Employees.ToListAsync();
         var employeeDTOs = dbEmployees.Select(e =>
         {
@@ -77,9 +84,10 @@ namespace Organisation_WebAPI.Services.Employees
             employeeDto.ManagerID = manager?.ManagerId; 
             return employeeDto;
         }).ToList();
+           var employees = _mapper.Map<List<Employee>>(employeeDTOs);
+           var result = _paginationServices.GetPagination(employees, paginationInput);
 
-
-                serviceResponse.Data = employeeDTOs;
+           serviceResponse.Data = result;
         } 
 
         catch(Exception ex)

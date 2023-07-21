@@ -23,6 +23,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllManagers")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetManagerDto>>> GetManagers()
         {
             var response = await _managerService.GetAllManagers();

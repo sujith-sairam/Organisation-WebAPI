@@ -6,25 +6,28 @@ using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.DepartmentDto;
+using Organisation_WebAPI.InputModels;
 using Organisation_WebAPI.Services.Departments;
+using Organisation_WebAPI.Services.Pagination;
 
 namespace Organisation_WebAPI.Controllers
 {
     
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;
         public DepartmentController(IDepartmentService departmentService)
         {
             _departmentService = departmentService;
-
         }
+
+        
 
         // Retrieves all departments from the database
         [HttpGet("GetAllDepartment")]
-        //[Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetDepartmentDto>>> GetDepartments()
         {
 

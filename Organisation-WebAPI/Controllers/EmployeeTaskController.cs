@@ -21,7 +21,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpGet("GetAllEmployeeTasks")]
-        //[Authorize(Roles = nameof(UserRole.Employee))]
+        //  [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasks()
         {
             var response = await _employeeTaskService.GetAllEmployeeTasks(); 
@@ -98,6 +98,8 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("CreateEmployeeTasks")]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> AddEmployeeTask(AddEmployeeTaskDto newEmployeeTask)
         {
             var response = await _employeeTaskService.AddEmployeeTask(newEmployeeTask);
@@ -110,7 +112,8 @@ namespace Organisation_WebAPI.Controllers
 
         
         [HttpDelete("DeleteEmployeeTask")]
-       // [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> DeleteEmployeeTask(int id){
             var response = await _employeeTaskService.DeleteEmployeeTask(id);
 
@@ -134,7 +137,8 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPut("UpdateEmployeeTask")]
-       // [Authorize(Roles = nameof(UserRole.Admin))]
+        //[Authorize(Roles = nameof(UserRole.Manager))]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> UpdateEmployeeTask(UpdateEmployeeTaskDto updatedEmployeeTask,int id){
 
             var response = await _employeeTaskService.UpdateEmployeeTask(updatedEmployeeTask,id);

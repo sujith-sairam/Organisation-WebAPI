@@ -28,6 +28,8 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask([FromBody] AddEmployeeTaskDto addEmployeeTask)
         {
             var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
+            var ExistingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == addEmployeeTask.EmployeeId);
+
             try
             {
 

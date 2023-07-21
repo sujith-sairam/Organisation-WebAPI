@@ -13,10 +13,9 @@ using static System.Net.WebRequestMethods;
 
 
 namespace Organisation_WebAPI.Controllers
-{   
-    
-    [Route("api/[controller]")]
+{
     [ApiController]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
@@ -37,7 +36,6 @@ namespace Organisation_WebAPI.Controllers
             }
             return Ok(response);
         }
-
 
         [HttpPost("Login")]
         [AllowAnonymous]
@@ -68,9 +66,9 @@ namespace Organisation_WebAPI.Controllers
 
         }
 
-
+        
         [HttpGet("GetUserById")]
-
+        
         public async Task<ActionResult<ServiceResponse<GetUserDto>>> GetUserById(int id)
         {
             var response = await _authRepository.GetUserById(id);
@@ -83,8 +81,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("ForgotPassword")]
-
-        
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> ForgotPassword(string email)
         {
             var response = await _authRepository.ForgotPassword(email);
@@ -97,7 +94,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("ResetPassword")]
-
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> ResetPassword(ResetPasswordDto request)
         {
             var response = await _authRepository.ResetPassword(request);
@@ -110,7 +107,7 @@ namespace Organisation_WebAPI.Controllers
 
 
         [HttpPost("ResendOtp")]
-
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResponse<string>>> ResendOtp(string email)
         {
             var response = await _authRepository.ResendOtp(email);
@@ -149,9 +146,7 @@ namespace Organisation_WebAPI.Controllers
         }
 
         [HttpPost("AppointNewManager")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
-
-    public async Task<ActionResult<ServiceResponse<string>>> AppointNewManager(NewManagerDto newManager, int id)
+        public async Task<ActionResult<ServiceResponse<string>>> AppointNewManager(NewManagerDto newManager, int id)
         {
             var response = await _authRepository.AppointNewManager(id, newManager);
             if (!response.Success)
