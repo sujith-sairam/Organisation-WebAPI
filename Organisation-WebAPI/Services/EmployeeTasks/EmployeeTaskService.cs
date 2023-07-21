@@ -170,9 +170,9 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         public async Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updateEmployeeTaskStatus, int id)
         {
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
-            try {
+            try
+            {
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
-
                 var existingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == updateEmployeeTaskStatus.EmployeeId);
 
                 if (existingEmployee is null)
@@ -180,36 +180,42 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
 
                 var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerAge == existingEmployee.ManagerID);
 
-
-                employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
-
-                serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
-
-
-                await _context.SaveChangesAsync();
-
-                if (updateEmployeeTaskStatus.TaskStatus == Status.Completed)
+                if (employeeTask is not null)
                 {
-                    var managerMessage = new Message(new string[] { manager.Email }, "Task Completed",
-                        $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
-                        $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
-                        $" any necessary actions.\n\nThank you!");
+                    employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
+                    serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
+                    await _context.SaveChangesAsync();
 
-                    _emailSender.SendEmail(managerMessage);
+                    if (updateEmployeeTaskStatus.TaskStatus == Status.Completed && manager is not null)
+                    {
+                        var managerMessage = new Message(new string [] { manager.Email }, "Task Completed",
+                            $"Dear {manager.ManagerName},\n\nThe task '{employeeTask.TaskName}' assigned to" +
+                            $" {existingEmployee.EmployeeName} has been completed.\n\nPlease review and take" +
+                            $" any necessary actions.\n\nThank you!");
 
+                        _emailSender.SendEmail(managerMessage);
+                    }else{
+                        serviceResponse.Success = false;
+                        serviceResponse.Message = "Email not send";
+                        return serviceResponse;
+                    }
                 }
-
+                else
+                {
+                    throw new Exception($"Employee task with id '{id}' not found");
+                }
 
                 return serviceResponse;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
-            
-            return serviceResponse;   
-        }  
+
+            return serviceResponse;
+        }
+ 
 
 
 
