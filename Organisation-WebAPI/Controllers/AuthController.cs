@@ -17,6 +17,7 @@ namespace Organisation_WebAPI.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = nameof(UserRole.Admin))]
+
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;

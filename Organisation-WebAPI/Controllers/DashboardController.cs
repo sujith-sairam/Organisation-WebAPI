@@ -22,7 +22,6 @@ namespace Organisation_WebAPI.Controllers
         }
         
         [HttpGet("GetTotalEmployeeCount")]
-        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
         {
             var response = await _dashboardService.GetTotalEmployeeCount();
@@ -34,7 +33,6 @@ namespace Organisation_WebAPI.Controllers
         }
 
          [HttpGet("GetEmployeeTasksCount")]
-        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<int>>> GetTaskCounts(int id)
         {
             var serviceResponse = await _dashboardService.GetEmployeeTaskCount(id);

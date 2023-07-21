@@ -7,7 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
-
+using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.Models;
+using Organisation_WebAPI.Services.Pagination;
+using Organisation_WebAPI.ViewModels;
 
 namespace Organisation_WebAPI.Services.Managers
 {
@@ -16,11 +19,13 @@ namespace Organisation_WebAPI.Services.Managers
 
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
+        private readonly IPaginationServices<GetManagerDto, GetManagerDto> _paginationServices;
 
-        public ManagerService(OrganizationContext context,IMapper mapper)
+        public ManagerService(OrganizationContext context,IMapper mapper, IPaginationServices<GetManagerDto, GetManagerDto> paginationServices)
         {
             _mapper = mapper;
             _context = context;
+            _paginationServices = paginationServices;
         }
 
         public async Task<ServiceResponse<List<GetManagerDto>>> AddManager(AddManagerDto newManager)
@@ -62,9 +67,9 @@ namespace Organisation_WebAPI.Services.Managers
                 return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<GetManagerDto>>> GetAllManagers()
+        public async Task<ServiceResponse<PaginationResultVM<GetManagerDto>>> GetAllManagers(PaginationInput paginationInput)
         {   
-            var serviceResponse = new ServiceResponse<List<GetManagerDto>>();
+            var serviceResponse = new ServiceResponse<PaginationResultVM<GetManagerDto>>();
             try
             {
             var dbManagers = await _context.Managers.ToListAsync();
@@ -73,10 +78,12 @@ namespace Organisation_WebAPI.Services.Managers
                 var managerDTO = _mapper.Map<GetManagerDto>(e);
                 managerDTO.DepartmentName = _context.Departments.FirstOrDefault(d => d.DepartmentID == e.DepartmentID)?.DepartmentName;
                 return managerDTO;
-
             }).ToList();
+                var managers = _mapper.Map<List<GetManagerDto>>(managerDTOs);
 
-                serviceResponse.Data = managerDTOs;
+                var result = _paginationServices.GetPagination(managers, paginationInput);
+
+                serviceResponse.Data = result;
             }
 
             catch(Exception ex)

@@ -51,7 +51,7 @@ namespace Organisation_WebAPI.Controllers
             var response = await _employeeService.GetAllEmployees(paginationInput);
             if(!response.Success)
             {
-                BadRequest(response);
+                return BadRequest(response);
             }
             return Ok(response);
         }
@@ -78,7 +78,7 @@ namespace Organisation_WebAPI.Controllers
             var response = await _employeeService.GetAllEmployeesByManagerId(id);
             if (!response.Success)
             {
-                BadRequest(response);
+                return BadRequest(response);
             }
             return Ok(response);
         }
@@ -89,7 +89,7 @@ namespace Organisation_WebAPI.Controllers
             var response = await _employeeService.UpdateEmployee(updatedEmployee,id);
             if (response.Success)
             {
-                BadRequest(response);
+                return BadRequest(response);
             }
             return Ok(response);
         }
@@ -101,7 +101,7 @@ namespace Organisation_WebAPI.Controllers
             var response = await _employeeService.DeleteEmployee(id);
             if (response.Success)
             {
-                BadRequest(response);
+                return BadRequest(response);
             }
             return Ok(response);
 

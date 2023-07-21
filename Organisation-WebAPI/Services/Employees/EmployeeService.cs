@@ -20,9 +20,9 @@ namespace Organisation_WebAPI.Services.Employees
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
         private readonly IEmailSender _emailSender;
-        private readonly IPaginationServices<GetEmployeeDto, Employee> _paginationServices;
+        private readonly IPaginationServices<GetEmployeeDto, GetEmployeeDto> _paginationServices;
 
-        public EmployeeService(IMapper mapper,OrganizationContext context, IPaginationServices<GetEmployeeDto, Employee> paginationServices)
+        public EmployeeService(IMapper mapper,OrganizationContext context, IPaginationServices<GetEmployeeDto, GetEmployeeDto> paginationServices)
         {
             _context = context; // Injects the OrganizationContext instance
             _mapper = mapper; // Injects the IMapper instance
@@ -70,7 +70,7 @@ namespace Organisation_WebAPI.Services.Employees
             var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeDto>>();
 
             try
-            {
+            {   
         var dbEmployees = await _context.Employees.ToListAsync();
         var employeeDTOs = dbEmployees.Select(e =>
         {
@@ -84,7 +84,8 @@ namespace Organisation_WebAPI.Services.Employees
             employeeDto.ManagerID = manager?.ManagerId; 
             return employeeDto;
         }).ToList();
-           var employees = _mapper.Map<List<Employee>>(employeeDTOs);
+           var employees = _mapper.Map<List<GetEmployeeDto>>(employeeDTOs);
+            Console.WriteLine(employees);
            var result = _paginationServices.GetPagination(employees, paginationInput);
 
            serviceResponse.Data = result;
