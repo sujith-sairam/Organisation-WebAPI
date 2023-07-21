@@ -86,7 +86,6 @@ namespace Organisation_WebAPI.Services.Employees
             return employeeDto;
         }).ToList();
            var employees = _mapper.Map<List<GetEmployeeDto>>(employeeDTOs);
-            Console.WriteLine(employees);
            var result = _paginationServices.GetPagination(employees, paginationInput);
 
            serviceResponse.Data = result;

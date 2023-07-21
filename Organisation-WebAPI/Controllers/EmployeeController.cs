@@ -18,7 +18,6 @@ namespace Organisation_WebAPI.Controllers
    
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = nameof(UserRole.Admin))]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
@@ -31,21 +30,10 @@ namespace Organisation_WebAPI.Controllers
             _mapper = mapper;
         }
 
-        //[HttpPost]
-        //[Route("GetPagination")]
-        //public async Task<ActionResult> GetPagination([FromBody] PaginationInput paginationInput)
-        //{
-        //    var serviceResponse = await _employeeService.GetAllEmployees();
-        //    var employeesDto = serviceResponse.Data;
+        //Retrieves all employees from the database
 
-        //    // Convert GetEmployeeDto to Employee using AutoMapper
-        //    var employees = _mapper.Map<List<Employee>>(employeesDto);
-        //    var result = _paginationServices.GetPagination(employees, paginationInput); 
-        //    return Ok(result);
-        //}
-
-        // Retrieves all employees from the database
         [HttpPost("GetAllEmployees")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployees(PaginationInput paginationInput)
         {
             var response = await _employeeService.GetAllEmployees(paginationInput);
@@ -57,7 +45,8 @@ namespace Organisation_WebAPI.Controllers
         }
 
 
-        // Retrieves a employee from the database based on the provided ID
+        // Retrieves a employee from the database based on the provided employeeID
+
         [HttpGet("GetEmployeeById")]
         [Authorize(Roles = nameof(UserRole.Employee) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetEmployee(int id)
@@ -70,7 +59,8 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-        // Retrieves a employee from the database based on the provided ID
+        // Retrieves all employees from the database based on the provided ManagerID
+
         [HttpGet("GetAllEmployeesByManagerId")]
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByManagerId(int id)
@@ -83,8 +73,11 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
         
+        
+        // Updates an employee from the database based on the provided employeeID
 
         [HttpPut("UpdateEmployee")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<UpdateEmployeeDto>>> UpdateEmployee(UpdateEmployeeDto updatedEmployee,int id){
             var response = await _employeeService.UpdateEmployee(updatedEmployee,id);
             if (response.Success)
@@ -94,8 +87,10 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
         
-        // Deletes a employee from the database based on the provided ID
+        // Deletes an employee from the database based on the provided employeeID
+
         [HttpDelete("DeleteEmployee")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
 
             var response = await _employeeService.DeleteEmployee(id);

@@ -21,7 +21,10 @@ namespace Organisation_WebAPI.Controllers
             _dashboardService = dashboardService;
         }
         
+        //Retrieves Total Number of Employees in each Department 
+
         [HttpGet("GetTotalEmployeeCount")]
+        [Authorize(Roles = nameof(UserRole.Admin))]
         public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeCount()
         {
             var response = await _dashboardService.GetTotalEmployeeCount();
@@ -32,8 +35,10 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+        //Retrives Total Task counts with provided employeeID
 
-         [HttpGet("GetEmployeeTasksCount")]
+        [HttpGet("GetEmployeeTasksCount")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<int>>> GetTaskCounts(int id)
         {
             var response= await _dashboardService.GetEmployeeTaskCount(id);
@@ -45,8 +50,10 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
+        //Retrieves Total Task counts with provided managerID
+
         [HttpGet("GetEmployeeTasksByManager")]
-        //[Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = nameof(UserRole.Manager))]
         public async Task<ActionResult<ServiceResponse<int>>> GetEmployeeTasks(int id)
         {
             var response = await _dashboardService.GetEmployeeTasksByManager(id);
