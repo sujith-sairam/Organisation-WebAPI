@@ -18,7 +18,7 @@ namespace Organisation_WebAPI.Controllers
    
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = nameof(UserRole.Admin))]
+    //[Authorize(Roles = nameof(UserRole.Admin))]
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
@@ -65,7 +65,7 @@ namespace Organisation_WebAPI.Controllers
             var response = await _employeeService.GetEmployeeById(id);
             if (!response.Success)
             {
-                BadRequest(response);
+                return BadRequest(response);
             }
             return Ok(response);
         }

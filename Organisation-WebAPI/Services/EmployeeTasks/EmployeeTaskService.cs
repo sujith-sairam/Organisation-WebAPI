@@ -166,25 +166,30 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             }
             
             return serviceResponse;   
-        }    
+        }
         public async Task<ServiceResponse<GetEmployeeTaskDto>> UpdateEmployeeTaskStatus(UpdateEmployeeTaskStatusDto updateEmployeeTaskStatus, int id)
         {
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
-            try {
+            try
+            {
                 var employeeTask = await _context.EmployeeTasks.FirstOrDefaultAsync(c => c.TaskID == id);
+
+                if (employeeTask is null)
+                    throw new Exception($"Employee task with id '{id}' not found");
 
                 var existingEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeID == updateEmployeeTaskStatus.EmployeeId);
 
                 if (existingEmployee is null)
                     throw new Exception($"Employee with id '{updateEmployeeTaskStatus.EmployeeId}' not found");
 
-                var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerAge == existingEmployee.ManagerID);
+                var manager = await _context.Managers.FirstOrDefaultAsync(m => m.ManagerId == existingEmployee.ManagerID);
 
+                if (manager is null)
+                    throw new Exception($"Manager not found for employee with id '{updateEmployeeTaskStatus.EmployeeId}'");
 
                 employeeTask.TaskStatus = updateEmployeeTaskStatus.TaskStatus;
 
                 serviceResponse.Data = _mapper.Map<GetEmployeeTaskDto>(employeeTask);
-
 
                 await _context.SaveChangesAsync();
 
@@ -196,22 +201,18 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
                         $" any necessary actions.\n\nThank you!");
 
                     _emailSender.SendEmail(managerMessage);
-
                 }
-
 
                 return serviceResponse;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 serviceResponse.Success = false;
                 serviceResponse.Message = ex.Message;
             }
-            
-            return serviceResponse;   
-        }  
 
-
+            return serviceResponse;
+        }
 
         public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetEmployeeOngoingTaskByEmployeeId(int id)
         {
