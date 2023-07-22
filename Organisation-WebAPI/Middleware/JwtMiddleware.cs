@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Organisation_WebAPI.Helpers;
 using Organisation_WebAPI.Services.AuthRepo;
 
 namespace Organisation_WebAPI.Middleware
@@ -8,13 +7,11 @@ namespace Organisation_WebAPI.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IAuthRepository _authRepository;
-        private readonly AppSettings _appSettings;
 
-        public JwtMiddleware(RequestDelegate next, IOptions<AppSettings> appSettings,IAuthRepository authRepository)
+        public JwtMiddleware(RequestDelegate next,IAuthRepository authRepository)
         {
             _next = next;
             _authRepository = authRepository;
-            _appSettings = appSettings.Value;
         }
 
         public async Task Invoke(HttpContext context,IAuthRepository authRepository,IJwtUtils jwtUtils ) {
