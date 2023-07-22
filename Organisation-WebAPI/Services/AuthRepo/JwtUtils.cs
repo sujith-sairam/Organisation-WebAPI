@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Organisation_WebAPI.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,12 +10,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
     public class JwtUtils : IJwtUtils
     {
         private readonly IConfiguration _configuration;
-        private readonly IOptions<AppSettings> _appSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public JwtUtils(IConfiguration configuration, IOptions<AppSettings> appSettings,IHttpContextAccessor httpContextAccessor) {
+        public JwtUtils(IConfiguration configuration,IHttpContextAccessor httpContextAccessor) {
             _configuration = configuration;
-            _appSettings = appSettings;
             _httpContextAccessor = httpContextAccessor;
         }
 

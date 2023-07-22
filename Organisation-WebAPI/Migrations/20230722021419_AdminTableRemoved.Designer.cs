@@ -12,8 +12,8 @@ using Organisation_WebAPI.Data;
 namespace Organisation_WebAPI.Migrations
 {
     [DbContext(typeof(OrganizationContext))]
-    [Migration("20230721101441_Init")]
-    partial class Init
+    [Migration("20230722021419_AdminTableRemoved")]
+    partial class AdminTableRemoved
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

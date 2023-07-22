@@ -597,7 +597,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
             return false;
         }
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())
             {
@@ -606,7 +606,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
             {
@@ -615,7 +615,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
             }
         }
 
-        private bool IsEmailValid(string email)
+        private static bool IsEmailValid(string email)
         {
             // Regular expression pattern for email validation
             string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
