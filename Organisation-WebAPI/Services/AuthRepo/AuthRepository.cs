@@ -151,10 +151,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             ManagerID = model.ManagerID,
                             User = user
                         };
-                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Employee Registration", 
-                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in Stint 360.\n\nYour " +
+                        var employeeMessage = new Message(new string[] { model.Email }, "Welcome to Stint360 - Employee Registration", 
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as an employee in Stint360.\n\nYour " +
                             $"credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this information confidential" +
-                            $".\n\nThank you and welcome to Stint 360!");
+                            $".\n\nThank you and welcome to Stint360!");
 
                         _emailSender.SendEmail(employeeMessage);
 
@@ -195,10 +195,10 @@ namespace Organisation_WebAPI.Services.AuthRepo
                             User = user
                         };
 
-                        var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Manager Registration",
-                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint 360." +
+                        var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint360 - Manager Registration",
+                            $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint360." +
                             $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
-                            $"information confidential.\n\nThank you and welcome to Stint 360!");
+                            $"information confidential.\n\nThank you and welcome to Stint360!");
 
                         _emailSender.SendEmail(managerMessage);
 
@@ -322,11 +322,7 @@ namespace Organisation_WebAPI.Services.AuthRepo
                 response.Message = "Email does not exists";
                 return response;
             }
-            if (user.IsVerified == false)
-            {
-                response.Success = false;
-                response.Message = "User Not Verified";
-            }
+       
 
             OtpGenerator otpGenerator = new OtpGenerator();
             string otp = otpGenerator.GenerateOtp();
@@ -342,8 +338,8 @@ namespace Organisation_WebAPI.Services.AuthRepo
             user.IsVerified = false;
             await _dbContext.SaveChangesAsync();
 
-            var otpMessage = new Message(new string[] { email  }, "Stint 360 - Password Reset OTP",
-               $"Dear {email},\n\nYou have requested a password reset for your Stint 360 account.\n\nYour OTP (One-Time Password) is: {otp}" +
+            var otpMessage = new Message(new string[] { email  }, "Stint360 - Password Reset OTP",
+               $"Dear {email},\n\nYou have requested a password reset for your Stint360 account.\n\nYour OTP (One-Time Password) is: {otp}" +
                $"\n\nPlease use this OTP to reset your password within the specified time limit.\n\nIf you did not request this password reset, " +
                $"please ignore this message.\n\nThank you!");
 
@@ -522,16 +518,16 @@ namespace Organisation_WebAPI.Services.AuthRepo
             manager.User = user;
             manager.Phone = model.Phone;
             manager.Address = model.Address;
-
+            manager.Email = model.Email;
             // Save changes to the database
             await _dbContext.SaveChangesAsync();
 
             // Send email with updated information
 
-            var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint 360 - Manager Registration",
-                $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint 360." +
+            var managerMessage = new Message(new string[] { model.Email }, "Welcome to Stint360 - Manager Registration",
+                $"Dear {model.UserName},\n\nCongratulations! You have been registered as a manager in Stint360." +
                 $"\n\nYour credentials:\nUsername: {model.UserName}\nPassword: {model.Password}\n\nPlease keep this " +
-                $"information confidential.\n\nThank you and welcome to Stint 360!");
+                $"information confidential.\n\nThank you and welcome to Stint360!");
 
             _emailSender.SendEmail(managerMessage);
 

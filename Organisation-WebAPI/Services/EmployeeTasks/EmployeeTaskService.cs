@@ -7,9 +7,12 @@ using EmailService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Organisation_WebAPI.Data;
+using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.EmployeeTaskDto;
+using Organisation_WebAPI.InputModels;
 using Organisation_WebAPI.Models;
-
+using Organisation_WebAPI.Services.Pagination;
+using Organisation_WebAPI.ViewModels;
 
 namespace Organisation_WebAPI.Services.EmployeeTasks
 {
@@ -18,12 +21,14 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         private readonly IMapper _mapper;  // Provides object-object mapping
         private readonly OrganizationContext _context ; // Represents the database context
         private readonly IEmailSender _emailSender;
+        private readonly IPaginationServices<GetEmployeeTaskDto, GetEmployeeTaskDto> _paginationServices;
 
-        public EmployeeTaskService(IMapper mapper,OrganizationContext context, IEmailSender emailSender)
+        public EmployeeTaskService(IMapper mapper,OrganizationContext context, IEmailSender emailSender, IPaginationServices<GetEmployeeTaskDto, GetEmployeeTaskDto> paginationServices)
         {
             _mapper = mapper;
             _context = context;
             _emailSender = emailSender;
+            _paginationServices = paginationServices;
         }
         public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> AddEmployeeTask([FromBody] AddEmployeeTaskDto addEmployeeTask)
         {
@@ -112,7 +117,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<GetEmployeeTaskDto>> GetEmployeeTaskById(int id)
+        public async Task<ServiceResponse<GetEmployeeTaskDto>> GetEmployeeTasksById(int id)
         {
              
             var serviceResponse = new ServiceResponse<GetEmployeeTaskDto>();
@@ -287,18 +292,42 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
         }
 
 
-        public async Task<ServiceResponse<List<GetEmployeeTaskDto>>> GetAllEmployeeTasksByEmployeeId(int id)
+        public async Task<ServiceResponse<PaginationResultVM<GetEmployeeTaskDto>>> GetAllEmployeeTasksByEmployeeId(int managerid, int employeeid, PaginationInput paginationInput)
         {
 
-            var serviceResponse = new ServiceResponse<List<GetEmployeeTaskDto>>();
-            try 
+            var serviceResponse = new ServiceResponse<PaginationResultVM<GetEmployeeTaskDto>>();
+            try
             {
-                var dbEmployeeTasks = await _context.EmployeeTasks.Where(c => c.EmployeeId == id).ToListAsync();
+                var employee = await _context.Employees.FirstOrDefaultAsync(c => c.EmployeeID == employeeid);
+
+                if (employee == null) {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Employee not found";
+                    return serviceResponse;
+                }
+
+                if (employee.ManagerID != managerid)
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "Unauthorized";
+                    return serviceResponse;
+                }
+
+
+                var dbEmployeeTasks = await _context.EmployeeTasks.Where(c => c.EmployeeId == employeeid).ToListAsync();
 
                 if (dbEmployeeTasks.Count == 0)
-                    throw new Exception($"Employee with id '{id}' has no tasks.");
-                
-                serviceResponse.Data = _mapper.Map<List<GetEmployeeTaskDto>>(dbEmployeeTasks);
+                    throw new Exception($"Employee has no tasks.");
+
+
+                var employeeTasks = _mapper.Map<List<GetEmployeeTaskDto>>(dbEmployeeTasks);
+
+                var result = _paginationServices.GetPagination(employeeTasks, paginationInput);
+
+
+                serviceResponse.Data = result;
+
+
                 return serviceResponse;
             }
             catch (Exception ex)
@@ -316,7 +345,7 @@ namespace Organisation_WebAPI.Services.EmployeeTasks
             {
                 var currentDate = DateTime.Now;
                 Console.WriteLine(currentDate);
-                var dbEmployeeTasks = await _context.EmployeeTasks.Where(t => t.TaskStatus == Status.New).ToListAsync();
+                var dbEmployeeTasks = await _context.EmployeeTasks.Where(t => t.EmployeeId == id && t.TaskStatus == Status.New).ToListAsync();
 
                 foreach (var employeeTask in dbEmployeeTasks)
                 {   

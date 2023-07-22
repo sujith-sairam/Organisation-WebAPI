@@ -127,7 +127,6 @@ namespace Organisation_WebAPI.Services.Managers
         }
 
 
-
         public async Task<ServiceResponse<GetManagerDto>> GetManagerByDepartmentId(int departmentId)
         {
             var serviceResponse = new ServiceResponse<GetManagerDto>();
@@ -173,12 +172,6 @@ namespace Organisation_WebAPI.Services.Managers
                 if (manager == null)
                 {
                     serviceResponse.Success = false;
-                    if (department != null)
-                    {
-                        managerDto.DepartmentName = department.DepartmentName;
-
-                    }
-                    serviceResponse.Data = managerDto;
                     serviceResponse.Message = "Manager not found.";
                     return serviceResponse;
                 }
@@ -187,6 +180,7 @@ namespace Organisation_WebAPI.Services.Managers
                 if (department != null)
                 {
                     managerDto.DepartmentName = department.DepartmentName;
+
                 }
 
                 serviceResponse.Data = managerDto;
@@ -205,9 +199,11 @@ namespace Organisation_WebAPI.Services.Managers
             var serviceResponse = new ServiceResponse<GetManagerDto>();
             try
             {
-            var dbManager =  await _context.Managers.FirstOrDefaultAsync(c => c.ManagerId == id);
+            var dbManager = await _context.Managers
+            .Include(m => m.Department) // Eagerly load the associated department
+            .FirstOrDefaultAsync(m => m.ManagerId == id);
             if (dbManager is null)
-                    throw new Exception($"Manager with id '{id}' not found");
+                throw new Exception($"Manager with id '{id}' not found");
 
             serviceResponse.Data = _mapper.Map<GetManagerDto>(dbManager);
             return serviceResponse;
