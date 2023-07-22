@@ -1,4 +1,4 @@
-# Organisation-WebAPI
+# Stint360-API
 
 Database Schema : https://drawsql.app/teams/mini-project-7/diagrams/organisation-webapi
 
