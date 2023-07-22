@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'Stint360'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1514ED7AF1BF43068F5513BB6226DECE }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_832998D22D5E45F5842CD77D554F115C }}
           package: .
