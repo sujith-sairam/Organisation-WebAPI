@@ -33,7 +33,9 @@ namespace Organisation_WebAPI
             CreateMap<Employee, UpdateEmployeeDto > ();
             //CreateMap<GetEmployeeDto, Employee>();
 
-            CreateMap<Manager, GetManagerDto>();
+            CreateMap<Manager, GetManagerDto>()
+                .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.DepartmentName));
+
             CreateMap<AddManagerDto,Manager>();
             CreateMap<UpdateManagerDto,Manager>();
             CreateMap<Manager, GetEmployeesAndManagerDto>()

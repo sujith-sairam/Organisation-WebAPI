@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Organisation_WebAPI.Dtos.EmployeeTaskDto;
+using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.Services.AuthRepo;
 using Organisation_WebAPI.Services.EmployeeTasks;
 
 namespace Organisation_WebAPI.Controllers
@@ -14,10 +16,12 @@ namespace Organisation_WebAPI.Controllers
     public class EmployeeTaskController : ControllerBase
     {
         private readonly IEmployeeTaskService _employeeTaskService;
+        private readonly IJwtUtils _jwtUtils;
 
-        public EmployeeTaskController(IEmployeeTaskService employeeTaskService)
+        public EmployeeTaskController(IEmployeeTaskService employeeTaskService, IJwtUtils jwtUtils)
         {
             _employeeTaskService = employeeTaskService;
+            _jwtUtils = jwtUtils;
         }
 
         [HttpGet("GetEmployeeTasks")]
@@ -31,16 +35,26 @@ namespace Organisation_WebAPI.Controllers
             }
             return Ok(response);
         }
-
-        [HttpGet("GetEmployeeTasksByEmployeeId")]
+        
+        [HttpPost("GetEmployeeTasksByEmployeeId")]  
         [Authorize(Roles = nameof(UserRole.Manager))]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasksByEmployeeId(int id)
+        public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTasksByEmployeeId(int employeeid, PaginationInput paginationInput)
         {
-            var response =  await _employeeTaskService.GetAllEmployeeTasksByEmployeeId(id);
+
+            int managerId = _jwtUtils.GetUserId();
+            Console.WriteLine(managerId);
+            var response =  await _employeeTaskService.GetAllEmployeeTasksByEmployeeId(managerId,employeeid, paginationInput);
+
+
+            if (response.Message == "Unauthorized")
+            {
+               return Unauthorized();
+            }
 
             if(!response.Success){
                 return BadRequest(response);
             }
+
             return Ok(response);
         }
 
@@ -59,7 +73,7 @@ namespace Organisation_WebAPI.Controllers
         [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetInProgressEmployeeTasks(int id)
         {
-            var response =  await _employeeTaskService.GetEmployeeInProgressTaskByEmployeeId(id);
+            var response =  await _employeeTaskService.GetEmployeeOngoingTaskByEmployeeId(id);
 
             if(!response.Success){
                 return BadRequest(response);
@@ -67,7 +81,7 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-        [HttpGet("GetCompletedEmployeeTasksByEmployeeId")]
+        [HttpGet("GetCompletedEmployeeTasksByEmployeeId")] 
         [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetCompletedEmployeeTasks(int id)
         {
@@ -127,11 +141,11 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
         
-        [HttpGet("GetEmployeeTaskById")]
-        [Authorize(Roles = nameof(UserRole.Manager))]
+        [HttpGet("GetEmployeeTasksById")]
+        [Authorize(Roles = nameof(UserRole.Employee))]
         public async Task<ActionResult<ServiceResponse<GetEmployeeTaskDto>>> GetEmployeeTask(int id)
         {
-            var response = await _employeeTaskService.GetEmployeeTaskById(id);
+            var response = await _employeeTaskService.GetEmployeeTasksById(id);
 
             if(!response.Success) {
                 return BadRequest(response);

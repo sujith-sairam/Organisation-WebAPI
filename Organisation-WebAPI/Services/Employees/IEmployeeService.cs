@@ -17,6 +17,5 @@ namespace Organisation_WebAPI.Services.Employees
         Task<ServiceResponse<UpdateEmployeeDto>> UpdateEmployee(UpdateEmployeeDto department,int id);
         Task<ServiceResponse<List<GetEmployeeDto>>> DeleteEmployee(int id);
         Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByManagerId(int managerId);
-        //Task<ServiceResponse<List<GetEmployeeDto>>> GetAllEmployeesByProduct(int productId);
     }
 }

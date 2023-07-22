@@ -59,6 +59,9 @@ var emailConfig = builder.Configuration
         .Get<EmailConfiguration>();
 builder.Services.AddSingleton(emailConfig);
 
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddControllers();
 
 
@@ -154,7 +157,7 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
-app.UseAuthentication();
+app.UseAuthentication();    
 
 app.UseAuthorization();
 

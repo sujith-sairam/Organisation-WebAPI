@@ -10,6 +10,7 @@ using Organisation_WebAPI.Dtos.DepartmentDto;
 using Organisation_WebAPI.Dtos.EmployeeDto;
 using Organisation_WebAPI.Dtos.ManagerDto;
 using Organisation_WebAPI.InputModels;
+using Organisation_WebAPI.Services.AuthRepo;
 using Organisation_WebAPI.Services.Employees;
 using Organisation_WebAPI.Services.Pagination;
 
@@ -21,12 +22,12 @@ namespace Organisation_WebAPI.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        private readonly IPaginationServices<GetEmployeeDto, Employee> _paginationServices;
+        private readonly IJwtUtils _jwtUtils;
         private readonly IMapper _mapper;
-        public EmployeeController(IEmployeeService employeeService, IPaginationServices<GetEmployeeDto, Employee> paginationServices, IMapper mapper)
+        public EmployeeController(IEmployeeService employeeService, IJwtUtils jwtUtils, IMapper mapper)
         {
-            _employeeService = employeeService;  
-            _paginationServices = paginationServices;
+            _employeeService = employeeService;
+            _jwtUtils = jwtUtils;
             _mapper = mapper;
         }
 
@@ -59,13 +60,15 @@ namespace Organisation_WebAPI.Controllers
             return Ok(response);
         }
 
-        // Retrieves all employees from the database based on the provided ManagerID
+        // Retrieves all employees from the database based on the provided ManagerID 
 
         [HttpGet("GetAllEmployeesByManagerId")]
         [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.Manager))]
-        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByManagerId(int id)
+        public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> GetAllEmployeesByManagerId()
         {
-            var response = await _employeeService.GetAllEmployeesByManagerId(id);
+            int managerId = _jwtUtils.GetUserId();
+
+            var response = await _employeeService.GetAllEmployeesByManagerId(managerId);
             if (!response.Success)
             {
                 return BadRequest(response);
@@ -94,7 +97,7 @@ namespace Organisation_WebAPI.Controllers
         public async Task<ActionResult<ServiceResponse<GetEmployeeDto>>> DeleteEmployee(int id){
 
             var response = await _employeeService.DeleteEmployee(id);
-            if (response.Success)
+            if (!response.Success)
             {
                 return BadRequest(response);
             }
